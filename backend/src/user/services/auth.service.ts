@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { SignUpDto } from '../types';
-
 import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
-import { User } from 'src/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+
+import { SignInDto, SignUpDto } from 'src/user/types';
+import { User } from 'src/entities/user.entity';
 import { RoleName } from 'src/entities/role-name.enum';
 import { UserRole } from 'src/entities/user-role.entity';
 import { Role } from 'src/entities/role.entity';
-import { QueryRunner } from 'typeorm';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -17,8 +17,7 @@ export class AuthService {
     private userRepository: Repository<User>,
     @InjectRepository(UserRole)
     private userRoleRepository: Repository<UserRole>,
-    @InjectRepository(Role)
-    private roleRepository: Repository<Role>,
+    private jwtService: JwtService,
   ) {}
 
   async signup(data: SignUpDto): Promise<void> {
@@ -48,27 +47,46 @@ export class AuthService {
         password: passwordHash,
       });
 
-      // Salva o novo usuário primeiro
       await queryRunner.manager.save(user);
-
-      // Cria a relação entre o usuário e o papel
       const userRole = this.userRoleRepository.create({
         role: role,
-        user: user, // Agora user.id está garantido
+        user: user,
       });
 
-      // Salva o papel do usuário
       await queryRunner.manager.save(userRole);
 
-      // Confirma a transação
       await queryRunner.commitTransaction();
     } catch (error) {
-      // Caso ocorra um erro, desfaz a transação
       await queryRunner.rollbackTransaction();
-      throw error; // Relança o erro para que ele seja tratado corretamente
+      throw error;
     } finally {
-      // Libera o queryRunner
       await queryRunner.release();
     }
+  }
+
+  async signin(data: SignInDto): Promise<{ accessToken: string }> {
+    const user = await this.userRepository.findOneBy({
+      email: data.email.trim(),
+    });
+    if (user === null) {
+      throw new Error(`e-mail or password invalid`);
+    }
+    const passwordEquals = bcrypt.compareSync(data.password, user.password);
+    if (!passwordEquals) {
+      throw new Error(`e-mail or password invalid`);
+    }
+
+    user.userRoles = await this.userRoleRepository.findBy({
+      user: user,
+    });
+
+    const payload = {
+      sub: user.id,
+      roles: user.userRoles.map((userRole) => userRole.role.name),
+    };
+    const token = await this.jwtService.signAsync(payload);
+    return {
+      accessToken: token,
+    };
   }
 }

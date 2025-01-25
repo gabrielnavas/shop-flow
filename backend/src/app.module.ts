@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { RolesInititalData } from './initial-data/roles.initital-data';
 import { Role } from './entities/role.entity';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -20,6 +21,11 @@ import { Role } from './entities/role.entity';
       synchronize: false,
     }),
     TypeOrmModule.forFeature([Role]),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '7d' },
+    }),
     UserModule,
   ],
   controllers: [],
