@@ -1,11 +1,12 @@
-import { SiBuymeacoffee } from "react-icons/si";
+import { FaShopify } from "react-icons/fa6";
+
 import styled from "styled-components";
 
 export const HeaderPage = () => {
   return (
     <Container>
       <IconContainer>
-        <SiBuymeacoffee />
+        <FaShopify />
       </IconContainer>
       <Title>Shop Flow</Title>
     </Container>
