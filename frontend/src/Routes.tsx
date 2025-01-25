@@ -2,7 +2,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router"
 import { SignupPage } from "./Signup/pages/Signup"
 
 export const routes = {
-  signup: '/sign-up'
+  signup: '/sign-up',
+  signin: '/sign-in'
 }
 
 export const MyRoutes = () => (

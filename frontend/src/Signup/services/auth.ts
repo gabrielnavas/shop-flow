@@ -8,9 +8,9 @@ type SignupParam = {
 export class AuthService {
   constructor(
     private urlEndpoint: string = import.meta.env.VITE_API_ENDPOINT
-  ) { 
+  ) {
     console.log(import.meta.env);
-    
+
   }
 
   async signup(data: SignupParam): Promise<void> {
@@ -27,7 +27,8 @@ export class AuthService {
       })
     })
     if (response.status >= 400) {
-      throw new Error('Ocorreu um problema. Tente novamente mais tarde')
+      const { message } = await response.json()
+      throw new Error(message)
     }
   }
 }

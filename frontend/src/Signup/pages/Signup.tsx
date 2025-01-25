@@ -1,10 +1,11 @@
 import React, { useState } from "react"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 import styled from "styled-components"
 import { HeaderPage } from "../../components/HeaderPage"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { validateEmail } from "../../validators/email"
 import { AuthService } from "../services/auth"
+import { routes } from "../../Routes"
 
 type Inputs = {
   fullname: string
@@ -15,7 +16,7 @@ type Inputs = {
 
 export const SignupPage = () => {
 
-  const [globalErrors, setGlobalErrors] = useState<string[]>([])
+  const [globalError, setGlobalError] = useState<string>('')
 
   const {
     register,
@@ -24,32 +25,43 @@ export const SignupPage = () => {
     formState: { errors },
   } = useForm<Inputs>()
 
+  const navigate = useNavigate()
+
   React.useEffect(() => {
     document.title = "Shop Flow | Criar conta!"
   }, [])
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const onSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
     try {
       const authService = new AuthService()
       await authService.signup(data)
+      navigate(routes.signin)
     } catch (err) {
       if (err instanceof Error) {
-        setGlobalErrors(prev => [...prev].concat(err.message))
+        setGlobalError(err.message)
       } else {
-        setGlobalErrors(prev =>
-          [...prev].concat('Ocorreu um problema.', 'Tente novamente mais tarde.')
-        )
+        setGlobalError('Ocorreu um problema.\nTente novamente mais tarde.')
       }
+
+      handleScrollToTop()
     }
-  }, [])
+  }, [navigate])
 
   return (
     <Page>
       <HeaderPage />
       <Lines>
-        <Line>
-          {globalErrors.map(err => <div>{err.toString()}</div>)}
-        </Line>
+        {!!globalError && (
+          <Line>
+            <GlobalErrors>
+              <FormError>{globalError}</FormError>
+            </GlobalErrors>
+          </Line>
+        )}
         <Line>
           <Card>
             <Header>
@@ -61,6 +73,7 @@ export const SignupPage = () => {
                 <Label>Nome completo</Label>
                 <Input
                   type="text"
+                  autoComplete="on"
                   {...register("fullname", {
                     required: {
                       message: 'Esse Campo é requerido.',
@@ -79,6 +92,7 @@ export const SignupPage = () => {
                 <Label>E-mail</Label>
                 <Input
                   type="email"
+                  autoComplete="on"
                   $error={!!errors.email}
                   {...register("email", {
                     required: {
@@ -181,6 +195,16 @@ const Line = styled.div`
   width: 400px;
 `
 
+const GlobalErrors = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: #FF828051;
+  border: 1px solid ${props => props.theme.colors.error};
+  border-radius: ${props => props.theme.borderRadius.default};
+  padding: ${props => props.theme.spacing.lg};
+`
+
 const Card = styled.div`
   width: 100%;
   display: flex;
@@ -200,7 +224,7 @@ const Header = styled.div`
 
 const HeaderTitle = styled.span`
   font-weight: 500;
-  font-size: calc(${props => props.theme.fontSizes.extraLarge} * 1.6);
+  font-size: calc(${props => props.theme.fontSizes.extraLarge} * 1.45);
 `
 
 const HeaderSubtitle = styled.span`
@@ -226,7 +250,7 @@ const FormGroup = styled.div`
 const FormError = styled.span`
   color: ${props => props.theme.colors.error};
   font-weight: 400;
-  font-size: ${props => props.theme.fontSizes.md};
+  font-size: ${props => props.theme.fontSizes.small};
 `
 
 const Label = styled.label`

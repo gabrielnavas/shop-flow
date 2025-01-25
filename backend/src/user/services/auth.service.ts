@@ -9,6 +9,7 @@ import { RoleName } from 'src/entities/role-name.enum';
 import { UserRole } from 'src/entities/user-role.entity';
 import { Role } from 'src/entities/role.entity';
 import { JwtService } from '@nestjs/jwt';
+import { UserAlreadyExistsEmail } from 'src/user/exceptions/user-already-exists-email';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,6 @@ export class AuthService {
     const queryRunner =
       this.userRepository.manager.connection.createQueryRunner();
 
-    // Inicia a transação
     await queryRunner.startTransaction();
 
     try {
@@ -32,7 +32,6 @@ export class AuthService {
       const saltOrRounds = 10;
       const passwordHash = await bcrypt.hash(data.password, saltOrRounds);
 
-      // Verifica se o papel (role) existe
       const role = await queryRunner.manager.findOne(Role, {
         where: { name: RoleName.CONSUMER },
       });
@@ -40,7 +39,13 @@ export class AuthService {
         throw new Error(`missing role ${RoleName.CONSUMER}`);
       }
 
-      // Cria o novo usuário
+      const emailAlreadyExists = await this.userRepository.findOneBy({
+        email: data.email.trim(),
+      });
+      if (emailAlreadyExists !== null) {
+        throw new UserAlreadyExistsEmail();
+      }
+
       const user = this.userRepository.create({
         email: data.email,
         name: data.fullname,
