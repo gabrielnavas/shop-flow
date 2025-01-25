@@ -1,8 +1,27 @@
-import React, { useState } from "react"
-import { Link, useNavigate } from "react-router"
-import styled from "styled-components"
-import { HeaderPage } from "../../components/HeaderPage"
+import React from "react"
+import { useNavigate } from "react-router"
 import { SubmitHandler, useForm } from "react-hook-form"
+
+import { HeaderPage } from "../../components/HeaderPage"
+import { Page } from "../components/Page"
+import { Rows } from "../components/Rows"
+import { Row } from "../components/Row"
+import { Card } from "../components/Card"
+import { CardHeader } from "../components/CardHeader"
+import { HeaderTitle } from "../components/HeaderTitle"
+import { HeaderSubtitle } from "../components/HeaderSubtitle"
+import { Form } from "../components/Form"
+import { FormGroup } from "../components/FormGroup"
+import { Label } from "../components/Label"
+import { Input } from "../components/Input"
+import { SubmitButton } from "../components/SubmitButton"
+import { FormError } from "../components/FormError"
+import { MoreLinks } from "../components/MoreLinks"
+import { LinkContainer } from "../components/LinkContainer"
+import { EnterLink } from "../components/EnterLink"
+import { LinkTitle } from "../components/LinkTitle"
+import { GlobalErrors } from "../components/GlobalErrors"
+
 import { validateEmail } from "../../validators/email"
 import { AuthService } from "../services/auth"
 import { routes } from "../../Routes"
@@ -16,7 +35,7 @@ type Inputs = {
 
 export const SignupPage = () => {
 
-  const [globalError, setGlobalError] = useState<string>('')
+  const [globalError, setGlobalError] = React.useState<string>('')
 
   const {
     register,
@@ -54,20 +73,20 @@ export const SignupPage = () => {
   return (
     <Page>
       <HeaderPage />
-      <Lines>
+      <Rows>
         {!!globalError && (
-          <Line>
+          <Row>
             <GlobalErrors>
               <FormError>{globalError}</FormError>
             </GlobalErrors>
-          </Line>
+          </Row>
         )}
-        <Line>
+        <Row>
           <Card>
-            <Header>
+            <CardHeader>
               <HeaderTitle>Criar conta</HeaderTitle>
               <HeaderSubtitle>Crie um conta para continuar</HeaderSubtitle>
-            </Header>
+            </CardHeader>
             <Form onSubmit={handleSubmit(onSubmit)}>
               <FormGroup>
                 <Label>Nome completo</Label>
@@ -162,151 +181,19 @@ export const SignupPage = () => {
                 />
                 {errors.passwordConfirmation && <FormError>{errors.passwordConfirmation.message}</FormError>}
               </FormGroup>
-              <SignUpButton type="submit">Criar conta!</SignUpButton>
+              <SubmitButton type="submit">Criar conta!</SubmitButton>
             </Form>
           </Card>
-        </Line>
-        <Line>
+        </Row>
+        <Row>
           <MoreLinks>
             <LinkContainer>
               <LinkTitle>Já tem uma conta?</LinkTitle>
-              <Enter to='/sign-in'>Entrar</Enter>
+              <EnterLink to='/sign-in'>Entrar</EnterLink>
             </LinkContainer>
           </MoreLinks>
-        </Line>
-      </Lines>
+        </Row>
+      </Rows>
     </Page>
   )
 }
-
-const Page = styled.div`
-  height: 100vh;
-`
-
-const Lines = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: ${props => props.theme.spacing.md};
-  padding: calc(${props => props.theme.spacing.lg} * 3);
-`
-
-const Line = styled.div`
-  width: 400px;
-`
-
-const GlobalErrors = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  background-color: #FF828051;
-  border: 1px solid ${props => props.theme.colors.error};
-  border-radius: ${props => props.theme.borderRadius.default};
-  padding: ${props => props.theme.spacing.lg};
-`
-
-const Card = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  background-color: ${props => props.theme.colors.cardBackground};
-  border-radius: ${props => props.theme.borderRadius.default};
-  padding: ${props => props.theme.spacing.lg};
-  border: 1px solid ${props => props.theme.colors.borderColor};
-`
-
-const Header = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: ${props => props.theme.spacing.md} 0;
-`
-
-const HeaderTitle = styled.span`
-  font-weight: 500;
-  font-size: calc(${props => props.theme.fontSizes.extraLarge} * 1.45);
-`
-
-const HeaderSubtitle = styled.span`
-  font-weight: 400;
-  color: ${props => props.theme.colors.textPrimary};
-  font-size: ${props => props.theme.fontSizes.small};
-`
-
-const Form = styled.form`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.sm};
-`
-
-const FormGroup = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: ${props => props.theme.spacing.xs};
-`
-
-const FormError = styled.span`
-  color: ${props => props.theme.colors.error};
-  font-weight: 400;
-  font-size: ${props => props.theme.fontSizes.small};
-`
-
-const Label = styled.label`
-  color: ${props => props.theme.colors.textPrimary};
-`
-
-const Input = styled.input<{ $error?: boolean }>`
-  width: 100%;
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm};
-  font-weight: 400;
-  font-size: ${props => props.theme.fontSizes.small};
-  color: ${props => props.theme.colors.textPrimary};
-  border-radius: ${props => props.theme.borderRadius.default};
-  outline: none;
-  border: 1px solid ${props => props.theme.colors.borderColor};
-
-  &:hover,&:focus {
-    border: 1px solid ${props => props.$error ? props.theme.colors.error : props.theme.colors.borderColorHoverActive};
-  }
-`
-
-const SignUpButton = styled.button`
-  width: 100%;
-  padding: ${props => props.theme.spacing.sm} ${props => props.theme.spacing.sm};
-  font-size: ${props => props.theme.fontSizes.small};
-  font-weight: 500;
-  outline: none;
-  border: none;
-  cursor: pointer;
-  color: ${props => props.theme.colors.buttonColorPrimary};
-  background-color: ${props => props.theme.colors.buttonBackgroundPrimary};
-  border-radius: ${props => props.theme.borderRadius.default};
-
-  &:hover {
-    background-color: ${props => props.theme.colors.buttonBackgroundHover};
-  }
-`
-
-const MoreLinks = styled.div`
-  display: flex;
-`
-
-const LinkContainer = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  gap: 10px;
-
-  color: ${props => props.theme.colors.textPrimary};
-  font-weight: 400;
-  font-size: ${props => props.theme.fontSizes.medium};
-`
-
-const LinkTitle = styled.span`
-`
-
-const Enter = styled(Link)`
-  color: ${props => props.theme.colors.link};
-`
