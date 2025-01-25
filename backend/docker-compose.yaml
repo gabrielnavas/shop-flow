@@ -1,0 +1,15 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0 
+    container_name: mysql_shopflow
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword 
+      MYSQL_DATABASE: shop-flow        
+      MYSQL_USER: dev               
+      MYSQL_PASSWORD: dev       
+    ports:
+      - "3306:3306" 
+  
