@@ -16,7 +16,7 @@ const Container = styled.div`
   height: 100vh;
   justify-content: center;
   align-items: center;
-  color: green;
+  color: ${props => props.theme.colors.text};
   font-weight: bold;
   font-size: 80px;
 `
