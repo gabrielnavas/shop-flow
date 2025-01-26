@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router"
 
@@ -26,6 +26,7 @@ import { AuthService } from "../services/auth"
 import { routes } from "../../Routes"
 
 import { validateEmail } from "../../validators/email"
+import { AuthContext, AuthContextType } from "../../contexts/auth"
 
 
 type Inputs = {
@@ -35,6 +36,8 @@ type Inputs = {
 
 export const SigninPage = () => {
   const [globalError, setGlobalError] = React.useState<string>('')
+
+  const { signin, isAuthencated } = useContext(AuthContext) as AuthContextType
 
   const {
     register,
@@ -58,7 +61,7 @@ export const SigninPage = () => {
     try {
       const authService = new AuthService()
       const { accessToken } = await authService.signin(data)
-      alert(accessToken)
+      signin(accessToken)
       navigate(routes.home)
     } catch (err) {
       if (err instanceof Error) {
@@ -69,7 +72,11 @@ export const SigninPage = () => {
 
       handleScrollToTop()
     }
-  }, [navigate])
+  }, [navigate, signin])
+
+  if (isAuthencated) {
+    navigate(routes.home)
+  }
 
   return (
     <Page>

@@ -1,5 +1,7 @@
-export const lightTheme = {
+export const theme = {
   colors: {
+    menuBackgroundColor: "#FFF",
+    menuBackgroundColorHover: "#D0D0D0AB",
     background: "#f5f5f5",
     textPrimary: "#212121",
     textPrimaryDark: "#FFFFFF",
@@ -12,6 +14,7 @@ export const lightTheme = {
     borderColor: "#D5D5D5",
     borderColorHoverActiveFocus: "#555555",
     icon: "#FFFFFF",
+    darkIcon: "#555",
     border: "#e0e0e0",
     link: "#007aff",
     error: "#e53935",

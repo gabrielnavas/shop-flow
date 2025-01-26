@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 import { useNavigate } from "react-router"
 import { SubmitHandler, useForm } from "react-hook-form"
 
@@ -25,6 +25,7 @@ import { GlobalErrors } from "../components/GlobalErrors"
 import { validateEmail } from "../../validators/email"
 import { AuthService } from "../services/auth"
 import { routes } from "../../Routes"
+import { AuthContext, AuthContextType } from "../../contexts/auth"
 
 type Inputs = {
   fullname: string
@@ -36,6 +37,8 @@ type Inputs = {
 export const SignupPage = () => {
 
   const [globalError, setGlobalError] = React.useState<string>('')
+
+  const { isAuthencated } = useContext(AuthContext) as AuthContextType
 
   const {
     register,
@@ -69,6 +72,12 @@ export const SignupPage = () => {
       handleScrollToTop()
     }
   }, [navigate])
+
+
+  if (isAuthencated) {
+    navigate(routes.home)
+  }
+
 
   return (
     <Page>

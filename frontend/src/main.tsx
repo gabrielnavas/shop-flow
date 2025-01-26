@@ -4,11 +4,11 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import { MyRoutes } from './Routes'
 import { ThemeProvider } from 'styled-components'
-import { lightTheme } from './theme'
+import { theme } from './theme'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider theme={lightTheme}>
+    <ThemeProvider theme={theme}>
       <MyRoutes />
     </ThemeProvider>
   </StrictMode>,
