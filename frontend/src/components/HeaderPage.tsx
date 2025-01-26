@@ -21,9 +21,9 @@ export const HeaderPage = () => {
         setOpenMenu(false);
       }
     };
-  
+
     document.addEventListener("mousedown", handleClickOutside);
-  
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -69,14 +69,26 @@ export const HeaderPage = () => {
 }
 
 const Container = styled.div`
+  position: sticky;
+  top: 0; /* Fixa no topo da página */
+  z-index: 100; /* Garante que fique acima de outros elementos */
+
   display: flex;
   justify-content: space-between;
   align-items: center;
   
   padding: ${props => props.theme.spacing.lg};
-  height: calc(${props => props.theme.spacing.lg} * 3.5);
+  height: calc(${props => props.theme.spacing.lg} * 2.5);
   background-color: #007aff;
-  position: relative;
+  
+  width: 100%;
+
+  box-shadow: ${props => props.theme.shadows.card} 0px 5px 15px;
+
+
+  @media (max-width: 768px) {
+    height: ${props => props.theme.spacing.sm};
+  }
 `
 
 const LeftSide = styled.div`
@@ -92,6 +104,7 @@ const MenuRightSide = styled.div`
 `
 
 const UserButtonContainer = styled.button`
+  box-shadow: ${props => props.theme.shadows.button};
   cursor: pointer;
   background-color: #0000;
   border: 1px solid ${props => props.theme.colors.borderColor};
@@ -115,9 +128,17 @@ const UserButtonContainer = styled.button`
 
     transform: scale(1.1);
   }
+
+
+  @media (max-width: 768px) {
+    svg {
+      font-size: calc(${props => props.theme.fontSizes.medium} * 1.5);
+    };
+  }
 `
 
 const Menu = styled.ul`
+  background-color: ${props => props.theme.colors.menuBackgroundColor};
   position: absolute;
   bottom: calc(
     calc(
@@ -133,6 +154,7 @@ const Menu = styled.ul`
 `
 
 const MenuItem = styled.li`
+  box-shadow: ${props => props.theme.shadows.button};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -162,9 +184,19 @@ const LogoIconContainer = styled.div`
     font-size: calc(${props => props.theme.fontSizes.extraLarge} * 2);
     color: ${props => props.theme.colors.icon}
   }
+
+  @media (max-width: 768px) {
+    svg {
+      font-size: calc(${props => props.theme.fontSizes.small} * 2);
+    }
+  }
 `
 const Title = styled.div`
   font-weight: bold;
   font-size: ${props => props.theme.fontSizes.extraLarge};
   color: ${props => props.theme.colors.textPrimaryDark};
+
+  @media (max-width: 768px) {
+    font-size: ${props => props.theme.fontSizes.small};
+  }
 `

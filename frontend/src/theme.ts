@@ -5,7 +5,7 @@ export const theme = {
     background: "#f5f5f5",
     textPrimary: "#212121",
     textPrimaryDark: "#FFFFFF",
-    textSecondary: "#757575",
+    textSecondary: "#9E9E9E",
     buttonColorPrimary: "#ffffff",
     buttonBackgroundPrimary: "#007aff",
     buttonBackgroundHover: "#0056b3",
@@ -37,7 +37,7 @@ export const theme = {
     round: "50%",
   },
   shadows: {
-    card: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    button: "0 2px 4px rgba(0, 0, 0, 0.1)",
+    card: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+    button: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
   },
 };
