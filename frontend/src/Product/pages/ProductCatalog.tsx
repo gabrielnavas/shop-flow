@@ -39,27 +39,27 @@ const Page = styled.div`
 
 const Products = styled.ul`
   display: grid;
-  grid-template-columns: repeat(6, 1fr); /* Cria 3 colunas com tamanhos iguais */
+  grid-template-columns: repeat(6, 1fr); 
   gap: calc(${props => props.theme.spacing.md} * 2);
   padding: calc(${props => props.theme.spacing.md} * 2) 0;
 
-  @media (max-width: 1700px) {
-    grid-template-columns: repeat(5, 1fr);  /* 3 colunas em telas médias */
+  @media (max-width: 575.98px) { 
+    grid-template-columns: repeat(1, 1fr);  
   }
 
-  @media (max-width: 1500px) {
-    grid-template-columns: repeat(4, 1fr);  /* 3 colunas em telas médias */
+  @media (min-width: 576px) and (max-width: 767px) {
+    grid-template-columns: repeat(2, 1fr); 
   }
 
-  @media (max-width: 1200px) {
-    grid-template-columns: repeat(3, 1fr);  /* 2 colunas em telas pequenas */
+  @media (min-width: 768px) and (max-width: 991px) {
+    grid-template-columns: repeat(3, 1fr); 
   }
 
-  @media (max-width: 900px) {
-    grid-template-columns: repeat(2, 1fr);  /* 2 colunas em telas pequenas */
+  @media (min-width: 992px) and (max-width: 1199px) {
+    grid-template-columns: repeat(4, 1fr);  
   }
-  
-  @media (max-width: 600px) {
-    grid-template-columns: repeat(1, 1fr);  /* 2 colunas em telas pequenas */
+
+  @media (min-width: 1200px) and (max-width: 1400px)  {
+    grid-template-columns: repeat(5, 1fr);  
   }
 `
