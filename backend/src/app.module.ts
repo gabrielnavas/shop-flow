@@ -5,6 +5,15 @@ import { UserModule } from './user/user.module';
 import { RolesInititalData } from './initial-data/roles.initital-data';
 import { Role } from './entities/role.entity';
 import { JwtModule } from '@nestjs/jwt';
+import { UsersInititalData } from './initial-data/users.initital-data';
+import { AuthService } from './user/services/auth.service';
+import { User } from './entities/user.entity';
+import { UserRole } from './entities/user-role.entity';
+import { CategoriesInititalData } from './initial-data/categories.initital-data';
+import { Category } from './entities/category.entity';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesJwt } from './guards/roles-jwt.guard';
+import { ProductModule } from './product/product.module';
 
 @Module({
   imports: [
@@ -20,15 +29,25 @@ import { JwtModule } from '@nestjs/jwt';
       migrations: [__dirname + '/migrations/*.{js,ts}'],
       synchronize: false,
     }),
-    TypeOrmModule.forFeature([Role]),
+    TypeOrmModule.forFeature([Role, User, UserRole, Category]),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '7d' },
     }),
     UserModule,
+    ProductModule,
   ],
   controllers: [],
-  providers: [RolesInititalData],
+  providers: [
+    AuthService,
+    RolesInititalData,
+    UsersInititalData,
+    CategoriesInititalData,
+    {
+      provide: APP_GUARD,
+      useClass: RolesJwt,
+    },
+  ],
 })
 export class AppModule {}

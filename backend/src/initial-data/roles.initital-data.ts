@@ -16,17 +16,12 @@ export class RolesInititalData implements OnApplicationBootstrap {
 
     await Promise.all(
       names.map(async (name) => {
-        console.info(`[ * ] - Verify role with name: ${name}`);
-
         const existing = await this.roleRepository.findOneBy({ name });
         if (!existing) {
           const newRoom = this.roleRepository.create({
             name,
           });
           await this.roleRepository.save(newRoom);
-          console.log(`[ * ] - Role ${name} criada com sucesso`);
-        } else {
-          console.log(`[ * ] - Role ${name} já existe`);
         }
       }),
     );

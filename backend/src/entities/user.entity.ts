@@ -15,6 +15,12 @@ export class User {
   @Column({ length: 255, nullable: false })
   password: string;
 
+  @Column({ name: 'created_at', nullable: false })
+  createdAt: Date;
+
+  @Column({ name: 'updated_at', nullable: true })
+  updatedAt: Date;
+
   @OneToMany(() => UserRole, (userRole) => userRole.user)
   userRoles: UserRole[];
 }

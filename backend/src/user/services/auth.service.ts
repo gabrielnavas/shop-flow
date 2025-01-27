@@ -3,13 +3,14 @@ import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
-import { SignInDto, SignUpDto } from 'src/user/types';
+import { SignInDto, SignUpDto } from 'src/user/dtos';
 import { User } from 'src/entities/user.entity';
 import { RoleName } from 'src/entities/role-name.enum';
 import { UserRole } from 'src/entities/user-role.entity';
 import { Role } from 'src/entities/role.entity';
 import { JwtService } from '@nestjs/jwt';
 import { UserAlreadyExistsEmail } from 'src/user/exceptions/user-already-exists-email';
+import { Token } from '../models';
 
 @Injectable()
 export class AuthService {
@@ -21,25 +22,33 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signup(data: SignUpDto): Promise<void> {
+  async signup(
+    data: SignUpDto,
+    roleNames: RoleName[] = [RoleName.CONSUMER],
+  ): Promise<void> {
     const queryRunner =
       this.userRepository.manager.connection.createQueryRunner();
 
     await queryRunner.startTransaction();
 
     try {
-      // Tratar os dados, tirar espaços, verificar se dados estão válidos
       const saltOrRounds = 10;
       const passwordHash = await bcrypt.hash(data.password, saltOrRounds);
 
-      const role = await queryRunner.manager.findOne(Role, {
-        where: { name: RoleName.CONSUMER },
-      });
-      if (!role) {
-        throw new Error(`missing role ${RoleName.CONSUMER}`);
+      const roles = (
+        await Promise.all(
+          roleNames.map(async (roleName) => {
+            return await queryRunner.manager.findOne(Role, {
+              where: { name: roleName },
+            });
+          }),
+        )
+      ).filter((role) => role !== null);
+      if (roles.length === 0) {
+        throw new Error(`missing roles ${roleNames.toString()}`);
       }
 
-      const emailAlreadyExists = await this.userRepository.findOneBy({
+      const emailAlreadyExists = await queryRunner.manager.findOneBy(User, {
         email: data.email.trim(),
       });
       if (emailAlreadyExists !== null) {
@@ -50,15 +59,23 @@ export class AuthService {
         email: data.email,
         name: data.fullname,
         password: passwordHash,
+        createdAt: new Date(),
       });
 
       await queryRunner.manager.save(user);
-      const userRole = this.userRoleRepository.create({
-        role: role,
-        user: user,
+
+      const userRoles = roles.map((role) => {
+        return this.userRoleRepository.create({
+          role: role,
+          user: user,
+        });
       });
 
-      await queryRunner.manager.save(userRole);
+      await Promise.all(
+        userRoles.map(async (userRole) => {
+          await queryRunner.manager.save(userRole);
+        }),
+      );
 
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -85,7 +102,7 @@ export class AuthService {
       user: user,
     });
 
-    const payload = {
+    const payload: Token = {
       sub: user.id,
       roles: user.userRoles.map((userRole) => userRole.role.name),
     };
