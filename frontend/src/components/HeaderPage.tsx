@@ -7,6 +7,8 @@ import { BiCart, BiLogOut, BiUser } from "react-icons/bi";
 import { Link, useNavigate } from "react-router";
 import { routes } from "../Routes";
 import { CartContext, CartContextType } from "../contexts/CartContext";
+import { FaSignInAlt } from "react-icons/fa";
+import { GrUserNew } from "react-icons/gr";
 
 export const HeaderPage = () => {
   const { isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
@@ -42,6 +44,17 @@ export const HeaderPage = () => {
     navigate(routes.signin)
   }, [signout, navigate])
 
+
+  const signinOnClick = React.useCallback(() => {
+    navigate(routes.signin)
+  }, [navigate])
+
+
+  const signupOnClick = React.useCallback(() => {
+    navigate(routes.signup)
+  }, [navigate])
+
+
   return (
     <Container>
       <LeftSide to={routes.home}>
@@ -51,28 +64,43 @@ export const HeaderPage = () => {
         <Title>Shop Flow</Title>
       </LeftSide>
       <RightSide>
-        {isAuthencated && (
-          <MenuRightSide onClick={menuOnClick}>
-            <ButtonContainer>
-              <BiUser />
-            </ButtonContainer>
-            <CartButtonContainer>
-              <CartButtonCountContainer>
-                {items.length}
-              </CartButtonCountContainer>
-              <BiCart />
-            </CartButtonContainer>
-          </MenuRightSide>
-        )}
+        <MenuRightSide onClick={menuOnClick}>
+          <ButtonContainer>
+            <BiUser />
+          </ButtonContainer>
+          <CartButtonContainer>
+            <CartButtonCountContainer>
+              {items.length}
+            </CartButtonCountContainer>
+            <BiCart />
+          </CartButtonContainer>
+
+          {openMenu && (
+            <Menu ref={menuRef}>
+              {
+                isAuthencated ? (
+                  <MenuItem onClick={logoutOnClick}>
+                    <BiLogOut />
+                    Sair
+                  </MenuItem>
+                ) : (
+                  <>
+                    <MenuItem onClick={signinOnClick}>
+                      <FaSignInAlt />
+                      Entrar
+                    </MenuItem>
+                    <MenuItem onClick={signupOnClick}>
+                      <GrUserNew />
+                      Criar conta
+                    </MenuItem>
+                  </>
+                )
+              }
+            </Menu>
+          )}
+        </MenuRightSide>
       </RightSide>
-      {isAuthencated && openMenu && (
-        <Menu ref={menuRef}>
-          <MenuItem onClick={logoutOnClick}>
-            <BiLogOut />
-            Sair
-          </MenuItem>
-        </Menu>
-      )}
+
     </Container>
   )
 }
@@ -94,7 +122,6 @@ const Container = styled.div`
 
   box-shadow: ${props => props.theme.shadows.card} 0px 5px 15px;
 
-
   @media (max-width: 768px) {
     height: ${props => props.theme.spacing.sm};
   }
@@ -111,6 +138,8 @@ const RightSide = styled.div`
 `
 
 const MenuRightSide = styled.div`
+  position: relative;
+
   display: flex;
   gap: ${props => props.theme.spacing.sm};
 `
@@ -182,26 +211,22 @@ const CartButtonCountContainer = styled.div`
 const Menu = styled.ul`
   background-color: ${props => props.theme.colors.menuBackgroundColor};
   position: absolute;
-  bottom: calc(
-    calc(
-      -${props => props.theme.spacing.lg} 
-      * 2.5
-    ) 
-    - 0.5rem
-  ); 
-  right: 0.5rem;
-  width: 110px;
+  bottom: -130px; 
+  right: 50%;
   border: 0.5px solid ${props => props.theme.colors.borderColor};
   border-radius: ${props => props.theme.borderRadius.default};
+  width: 150px;
+  padding: 2.5px 5px;
 `
 
 const MenuItem = styled.li`
   box-shadow: ${props => props.theme.shadows.button};
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  margin: 5px 0;
   gap: 10px;
-  padding: calc(${props => props.theme.spacing.sm} * 2);
+  padding: calc(${props => props.theme.spacing.sm});
   background-color: ${props => props.theme.colors.menuBackgroundColor};
   cursor: pointer;
   list-style-type: none;
