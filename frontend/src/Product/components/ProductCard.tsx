@@ -9,10 +9,14 @@ type Props = {
   product: Product
 }
 
+const priceReal = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL',
+});
+
 export const ProductCard = ({ product }: Props) => {
 
   const { addItemCart, existsProduct } = React.useContext(CartContext) as CartContextType
-
   const addedCart = existsProduct(product)
 
   return (
@@ -26,7 +30,7 @@ export const ProductCard = ({ product }: Props) => {
         <CardBottom>
           <PriceContainer>
             <PriceTitle>Preço</PriceTitle>
-            <PriceValue>R$200,00</PriceValue>
+            <PriceValue>{priceReal.format(product.price)}</PriceValue>
           </PriceContainer>
           <AddToCardButton $added={addedCart}>
             {addedCart ? <BsCartCheckFill /> : <FaCartPlus />}
