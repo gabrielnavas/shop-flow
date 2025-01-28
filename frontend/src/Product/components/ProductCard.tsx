@@ -6,16 +6,17 @@ import { CartContext, CartContextType } from "../../contexts/CartContext"
 import React from "react"
 
 type Props = {
-  added: boolean
   product: Product
 }
 
-export const ProductCard = ({ added, product }: Props) => {
+export const ProductCard = ({ product }: Props) => {
 
-  const { addItemCart } = React.useContext(CartContext) as CartContextType
+  const { addItemCart, existsProduct } = React.useContext(CartContext) as CartContextType
+
+  const addedCart = existsProduct(product)
 
   return (
-    <Container onClick={() => addItemCart(product)}>
+    <Container onClick={!addedCart ? () => addItemCart(product) : undefined}>
       <Image src={product.imageUrl} />
       <Info>
         <Titles>
@@ -27,8 +28,8 @@ export const ProductCard = ({ added, product }: Props) => {
             <PriceTitle>Preço</PriceTitle>
             <PriceValue>R$200,00</PriceValue>
           </PriceContainer>
-          <AddToCardButton $added={added}>
-            {added ? <BsCartCheckFill /> : <FaCartPlus />}
+          <AddToCardButton $added={addedCart}>
+            {addedCart ? <BsCartCheckFill /> : <FaCartPlus />}
           </AddToCardButton>
         </CardBottom>
       </Info>

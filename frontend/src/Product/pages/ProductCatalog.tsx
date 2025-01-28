@@ -37,11 +37,10 @@ export const ProductCatalogPage = () => {
           </ProductListEmpty>
         ) : (
           <Products>
-          {products.map((product, index) => (
+          {products.map((product) => (
             <ProductCard 
               key={product.id} 
-              product={product} 
-              added={index % 2 === 0} />
+              product={product} />
           ))}
         </Products>
         )
