@@ -27,6 +27,7 @@ import { routes } from "../../Routes"
 
 import { validateEmail } from "../../validators/email"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext"
+import { AiOutlineLoading } from "react-icons/ai"
 
 
 type Inputs = {
@@ -36,6 +37,7 @@ type Inputs = {
 
 export const SigninPage = () => {
   const [globalError, setGlobalError] = React.useState<string>('')
+  const [isLoading, setIsLoading] = React.useState(false)
 
   const { signin, isAuthencated } = useContext(AuthContext) as AuthContextType
 
@@ -58,6 +60,8 @@ export const SigninPage = () => {
 
 
   const onSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
+    setIsLoading(true)
+
     try {
       const authService = new AuthService()
       const { accessToken } = await authService.signin(data)
@@ -71,6 +75,9 @@ export const SigninPage = () => {
       }
 
       handleScrollToTop()
+    }
+    finally {
+      setIsLoading(false)
     }
   }, [navigate, signin])
 
@@ -135,7 +142,15 @@ export const SigninPage = () => {
                 />
                 {errors.password && <FormError>{errors.password.message}</FormError>}
               </FormGroup>
-              <SubmitButton type="submit">Entrar na conta!</SubmitButton>
+              <SubmitButton type="submit" $isLoading={isLoading}>
+                {isLoading ? (
+                  <AiOutlineLoading />
+                ) : (
+                  <span>
+                    Entrar na conta!
+                  </span>
+                )}
+              </SubmitButton>
             </Form>
           </Card>
         </Row>

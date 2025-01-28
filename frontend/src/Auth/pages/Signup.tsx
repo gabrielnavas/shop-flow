@@ -26,6 +26,7 @@ import { validateEmail } from "../../validators/email"
 import { AuthService } from "../services/auth"
 import { routes } from "../../Routes"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext"
+import { AiOutlineLoading } from "react-icons/ai"
 
 type Inputs = {
   fullname: string
@@ -37,6 +38,7 @@ type Inputs = {
 export const SignupPage = () => {
 
   const [globalError, setGlobalError] = React.useState<string>('')
+  const [isLoading, setIsLoading] = React.useState(false)
 
   const { isAuthencated } = useContext(AuthContext) as AuthContextType
 
@@ -58,6 +60,8 @@ export const SignupPage = () => {
   };
 
   const onSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
+    setIsLoading(true)
+
     try {
       const authService = new AuthService()
       await authService.signup(data)
@@ -68,8 +72,9 @@ export const SignupPage = () => {
       } else {
         setGlobalError('Ocorreu um problema.\nTente novamente mais tarde.')
       }
-
       handleScrollToTop()
+    } finally {
+      setIsLoading(false)
     }
   }, [navigate])
 
@@ -190,7 +195,15 @@ export const SignupPage = () => {
                 />
                 {errors.passwordConfirmation && <FormError>{errors.passwordConfirmation.message}</FormError>}
               </FormGroup>
-              <SubmitButton type="submit">Criar conta!</SubmitButton>
+              <SubmitButton type="submit" $isLoading={isLoading}>
+                {isLoading ? (
+                  <AiOutlineLoading />
+                ) : (
+                  <span>
+                    Criar conta!
+                  </span>
+                )}
+              </SubmitButton>
             </Form>
           </Card>
         </Row>
