@@ -20,7 +20,7 @@ import { MoreLinks } from "../components/MoreLinks"
 import { LinkTitle } from "../components/LinkTitle"
 import { LinkContainer } from "../components/LinkContainer"
 import { EnterLink } from "../components/EnterLink"
-import { GlobalErrors } from "../components/GlobalErrors"
+import { GlobalErrors } from "../../components/GlobalErrors"
 
 import { AuthService } from "../services/auth"
 import { routes } from "../../Routes"

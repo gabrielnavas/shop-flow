@@ -20,7 +20,7 @@ import { MoreLinks } from "../components/MoreLinks"
 import { LinkContainer } from "../components/LinkContainer"
 import { EnterLink } from "../components/EnterLink"
 import { LinkTitle } from "../components/LinkTitle"
-import { GlobalErrors } from "../components/GlobalErrors"
+import { GlobalErrors } from "../../components/GlobalErrors"
 
 import { validateEmail } from "../../validators/email"
 import { AuthService } from "../services/auth"
