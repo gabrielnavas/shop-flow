@@ -1,14 +1,17 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { FaShopify } from "react-icons/fa6";
 
 import styled from "styled-components";
-import { AuthContext, AuthContextType } from "../contexts/auth";
+import { AuthContext, AuthContextType } from "../contexts/AuthContext";
 import { BiCart, BiLogOut, BiUser } from "react-icons/bi";
 import { Link, useNavigate } from "react-router";
 import { routes } from "../Routes";
+import { CartContext, CartContextType } from "../contexts/CartContext";
 
 export const HeaderPage = () => {
   const { isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
+
+  const { items } = React.useContext(CartContext) as CartContextType
 
   const [openMenu, setOpenMenu] = React.useState(false)
   const menuRef = React.useRef<HTMLUListElement | null>(null)
@@ -29,12 +32,12 @@ export const HeaderPage = () => {
     };
   }, []);
 
-  const menuOnClick = useCallback((event: React.MouseEvent) => {
+  const menuOnClick = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
     setOpenMenu((prev) => !prev);
   }, []);
 
-  const logoutOnClick = useCallback(() => {
+  const logoutOnClick = React.useCallback(() => {
     signout()
     navigate(routes.signin)
   }, [signout, navigate])
@@ -55,9 +58,9 @@ export const HeaderPage = () => {
             </ButtonContainer>
             <CartButtonContainer>
               <CartButtonCountContainer>
-                0
+                {items.length}
               </CartButtonCountContainer>
-                <BiCart />
+              <BiCart />
             </CartButtonContainer>
           </MenuRightSide>
         )}

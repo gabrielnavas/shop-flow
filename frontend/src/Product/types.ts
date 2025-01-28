@@ -12,3 +12,8 @@ export type Product = {
     name: string;
   };
 }
+
+export type ProductCart = {
+  product: Product;
+  quantity: number
+}

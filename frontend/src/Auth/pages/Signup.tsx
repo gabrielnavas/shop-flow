@@ -25,7 +25,7 @@ import { GlobalErrors } from "../components/GlobalErrors"
 import { validateEmail } from "../../validators/email"
 import { AuthService } from "../services/auth"
 import { routes } from "../../Routes"
-import { AuthContext, AuthContextType } from "../../contexts/auth"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext"
 
 type Inputs = {
   fullname: string

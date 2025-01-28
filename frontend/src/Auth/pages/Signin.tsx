@@ -26,7 +26,7 @@ import { AuthService } from "../services/auth"
 import { routes } from "../../Routes"
 
 import { validateEmail } from "../../validators/email"
-import { AuthContext, AuthContextType } from "../../contexts/auth"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext"
 
 
 type Inputs = {

@@ -9,6 +9,8 @@ import { ImSad2 } from "react-icons/im"
 export const ProductCatalogPage = () => {
   const [products, setProducts] = useState<Product[]>([])
 
+  
+
   React.useEffect(() => {
     document.title = 'Shop flow | Produtos'
   }, [])

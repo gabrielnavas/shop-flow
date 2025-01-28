@@ -2,6 +2,8 @@ import { BsCartCheckFill } from "react-icons/bs"
 import { FaCartPlus } from "react-icons/fa6"
 import styled from "styled-components"
 import { Product } from "../types"
+import { CartContext, CartContextType } from "../../contexts/CartContext"
+import React from "react"
 
 type Props = {
   added: boolean
@@ -10,8 +12,10 @@ type Props = {
 
 export const ProductCard = ({ added, product }: Props) => {
 
+  const { addItemCart } = React.useContext(CartContext) as CartContextType
+
   return (
-    <Container>
+    <Container onClick={() => addItemCart(product)}>
       <Image src={product.imageUrl} />
       <Info>
         <Titles>
@@ -24,7 +28,7 @@ export const ProductCard = ({ added, product }: Props) => {
             <PriceValue>R$200,00</PriceValue>
           </PriceContainer>
           <AddToCardButton $added={added}>
-            {added ?  <BsCartCheckFill /> : <FaCartPlus />}
+            {added ? <BsCartCheckFill /> : <FaCartPlus />}
           </AddToCardButton>
         </CardBottom>
       </Info>
@@ -128,7 +132,7 @@ const AddToCardButton = styled.div<{ $added: boolean }>`
 
   ${props =>
     !props.$added ?
-    `
+      `
       &:hover {
         transform: scale(1.10);
 
