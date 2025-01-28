@@ -76,7 +76,7 @@ export const HeaderPage = () => {
           </CartButtonContainer>
 
           {openMenu && (
-            <Menu ref={menuRef}>
+            <Menu $menuItemsCount={isAuthencated ? 0.2 : 2.75} ref={menuRef}>
               {
                 isAuthencated ? (
                   <MenuItem onClick={logoutOnClick}>
@@ -208,10 +208,10 @@ const CartButtonCountContainer = styled.div`
   }
 `
 
-const Menu = styled.ul`
+const Menu = styled.ul<{$menuItemsCount: number}>`
   background-color: ${props => props.theme.colors.menuBackgroundColor};
   position: absolute;
-  bottom: -130px; 
+  bottom: calc(-200% + (50% * -${({ $menuItemsCount }) => $menuItemsCount})); 
   right: 50%;
   border: 0.5px solid ${props => props.theme.colors.borderColor};
   border-radius: ${props => props.theme.borderRadius.default};
