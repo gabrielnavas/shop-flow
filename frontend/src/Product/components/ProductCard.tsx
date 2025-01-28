@@ -1,18 +1,23 @@
 import { BsCartCheckFill } from "react-icons/bs"
 import { FaCartPlus } from "react-icons/fa6"
 import styled from "styled-components"
+import { Product } from "../types"
 
 type Props = {
   added: boolean
+  product: Product
 }
 
-export const ProductCard = ({ added }: Props) => {
+export const ProductCard = ({ added, product }: Props) => {
 
   return (
     <Container>
-      <Image src={'/src/assets/imgs/no-image.jpg'} />
+      <Image src={product.imageUrl} />
       <Info>
-        <Title>Blusa bonita</Title>
+        <Titles>
+          <Title>{product.name}</Title>
+          <Subtitles>{product.description}</Subtitles>
+        </Titles>
         <CardBottom>
           <PriceContainer>
             <PriceTitle>Preço</PriceTitle>
@@ -47,18 +52,35 @@ const Container = styled.div`
 `
 
 const Image = styled.img`
+  border-top-left-radius: ${props => props.theme.borderRadius.default};
+  border-top-right-radius: ${props => props.theme.borderRadius.default};
 `
 
 const Info = styled.div`
   display: flex;
   flex-direction: column;
   padding: ${props => props.theme.spacing.sm};
+  border-bottom-left-radius: ${props => props.theme.borderRadius.default};
+  border-bottom-right-radius: ${props => props.theme.borderRadius.default};
+  background-color: ${props => props.theme.colors.background};
 `
 
-const Title = styled.div`
+const Titles = styled.span`
+  display: flex;
+  flex-direction: column;
+`
+
+const Title = styled.span`
   text-align: center;
   font-weight: bold;
   font-size: ${props => props.theme.fontSizes.medium};
+  color: ${props => props.theme.colors.textPrimary};
+`
+
+const Subtitles = styled.div`
+  text-align: center;
+  font-weight: 400;
+  font-size: calc(${props => props.theme.fontSizes.small} * 0.90);
   color: ${props => props.theme.colors.textPrimary};
 `
 
