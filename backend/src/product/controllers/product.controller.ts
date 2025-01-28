@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { AddProductDto } from '../dtos';
+import { AddProductDto, ProductDto } from '../dtos';
 import { Roles } from 'src/guards/roles-jwt.guard';
 import { RoleName } from 'src/entities/role-name.enum';
 import { ProductService } from '../services/product.service';
@@ -15,8 +15,7 @@ export class ProductController {
   }
 
   @Get()
-  @Roles(RoleName.CONSUMER)
-  async findProducts() {
+  async findProducts(): Promise<ProductDto[]> {
     return await this.productService.findProducts();
   }
 }

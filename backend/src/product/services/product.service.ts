@@ -4,6 +4,8 @@ import { AddProductDto, ProductDto } from '../dtos';
 import { Category } from 'src/entities/category.entity';
 import { Product } from 'src/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { ProductAlreadyExistsWithNameException } from '../exceptions/product-already-exists-with-name-exception';
+import { CategoryNotFoundException } from '../exceptions/category-not-found-by-exception';
 
 @Injectable()
 export class ProductService {
@@ -23,7 +25,14 @@ export class ProductService {
         name: dto.categoryName.trim(),
       });
       if (category === null) {
-        throw new Error('Category not found.');
+        throw new CategoryNotFoundException(dto.categoryName);
+      }
+
+      const productFound = await this.entityManager.findOneBy(Product, {
+        name: dto.name.trim(),
+      });
+      if (productFound !== null) {
+        throw new ProductAlreadyExistsWithNameException(dto.name.trim());
       }
 
       const product = this.entityManager.create(Product, {
@@ -61,6 +70,8 @@ export class ProductService {
           stock: product.stock,
           price: product.price,
           imageUrl: product.imageUrl,
+          createdAt: product.createdAt,
+          updatedAt: product.updatedAt,
           category: {
             id: product.category.id,
             name: product.name,

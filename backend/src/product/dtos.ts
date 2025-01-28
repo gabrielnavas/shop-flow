@@ -14,6 +14,8 @@ export type ProductDto = {
   stock: number;
   price: number;
   imageUrl: string;
+  createdAt: Date;
+  updatedAt?: Date;
   category: {
     id: number;
     name: string;

@@ -35,6 +35,9 @@ export class RolesJwt implements CanActivate {
     const payload: Token = this.jwtService.decode(token);
 
     if (
+      !payload ||
+      !payload.sub ||
+      !payload.roles ||
       typeof payload !== 'object' ||
       typeof payload.sub !== 'number' ||
       typeof payload.roles.length !== 'number'

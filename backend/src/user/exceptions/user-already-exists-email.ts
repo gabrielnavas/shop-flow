@@ -4,9 +4,5 @@ export class UserAlreadyExistsEmail extends Error {
 
     // Nome da classe no erro (opcional, mas útil para debug)
     this.name = 'UserAlreadyExistsEmail';
-
-    console.error(
-      `[UserAlreadyExistsEmail] Lançado em: ${new Date().toISOString()}`,
-    );
   }
 }

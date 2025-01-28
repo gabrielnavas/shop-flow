@@ -12,7 +12,15 @@ export class CategoriesInititalData implements OnApplicationBootstrap {
   ) {}
 
   async onApplicationBootstrap() {
-    const categoryNames = ['Cozinha', 'Eletrodoméstico'];
+    const categoryNames = [
+      'Cozinha',
+      'Eletrodoméstico',
+      'Mobília',
+      'Roupas esportivas',
+      'Eletrônicos',
+      'Eletrodomésticos de cozinha',
+      'Transporte',
+    ];
 
     await Promise.all(
       categoryNames.map(async (categoryName): Promise<void> => {
