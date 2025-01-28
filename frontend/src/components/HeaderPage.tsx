@@ -4,7 +4,7 @@ import { FaShopify } from "react-icons/fa6";
 import styled from "styled-components";
 import { AuthContext, AuthContextType } from "../contexts/auth";
 import { BiLogOut, BiUser } from "react-icons/bi";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { routes } from "../Routes";
 
 export const HeaderPage = () => {
@@ -41,7 +41,7 @@ export const HeaderPage = () => {
 
   return (
     <Container>
-      <LeftSide>
+      <LeftSide to={routes.home}>
         <LogoIconContainer>
           <FaShopify />
         </LogoIconContainer>
@@ -91,10 +91,11 @@ const Container = styled.div`
   }
 `
 
-const LeftSide = styled.div`
+const LeftSide = styled(Link)`
   display: flex;
   align-items: center;
   gap: ${props => props.theme.spacing.sm};
+  text-decoration: none;
 `
 
 const RightSide = styled.div`
@@ -112,8 +113,8 @@ const UserButtonContainer = styled.button`
   border-radius: ${props => props.theme.borderRadius.round};
   padding: ${props => props.theme.spacing.xs};
   svg {
-      font-size: calc(${props => props.theme.fontSizes.extraLarge} * 1.5);
-      color: ${props => props.theme.colors.icon}
+    font-size: ${props => props.theme.fontSizes.large};
+    color: ${props => props.theme.colors.icon}
   };
 
   transition: 200ms all;
