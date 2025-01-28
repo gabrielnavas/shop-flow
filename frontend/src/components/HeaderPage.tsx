@@ -3,7 +3,7 @@ import { FaShopify } from "react-icons/fa6";
 
 import styled from "styled-components";
 import { AuthContext, AuthContextType } from "../contexts/auth";
-import { BiLogOut, BiUser } from "react-icons/bi";
+import { BiCart, BiLogOut, BiUser } from "react-icons/bi";
 import { Link, useNavigate } from "react-router";
 import { routes } from "../Routes";
 
@@ -50,9 +50,15 @@ export const HeaderPage = () => {
       <RightSide>
         {isAuthencated && (
           <MenuRightSide onClick={menuOnClick}>
-            <UserButtonContainer>
+            <ButtonContainer>
               <BiUser />
-            </UserButtonContainer>
+            </ButtonContainer>
+            <CartButtonContainer>
+              <CartButtonCountContainer>
+                0
+              </CartButtonCountContainer>
+                <BiCart />
+            </CartButtonContainer>
           </MenuRightSide>
         )}
       </RightSide>
@@ -102,9 +108,11 @@ const RightSide = styled.div`
 `
 
 const MenuRightSide = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.sm};
 `
 
-const UserButtonContainer = styled.button`
+const ButtonContainer = styled.button`
   box-shadow: ${props => props.theme.shadows.button};
   cursor: pointer;
   background-color: #0000;
@@ -113,7 +121,7 @@ const UserButtonContainer = styled.button`
   border-radius: ${props => props.theme.borderRadius.round};
   padding: ${props => props.theme.spacing.xs};
   svg {
-    font-size: ${props => props.theme.fontSizes.large};
+    font-size: ${props => props.theme.fontSizes.extraLarge};
     color: ${props => props.theme.colors.icon}
   };
 
@@ -130,11 +138,41 @@ const UserButtonContainer = styled.button`
     transform: scale(1.1);
   }
 
-
-  @media (max-width: 768px) {
+  @media (max-width: 900px) {
     svg {
-      font-size: calc(${props => props.theme.fontSizes.medium} * 1.5);
+      font-size: calc(${props => props.theme.fontSizes.small});
     };
+  }
+`
+
+const CartButtonContainer = styled(ButtonContainer)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+`
+
+const CartButtonCountContainer = styled.div`
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  background-color: ${props => props.theme.colors.buttonColorPrimary}66;
+  color: ${props => props.theme.colors.textPrimary};
+  font-weight: 500;
+  border-radius: ${props => props.theme.borderRadius.round};
+  padding: 
+    calc(${props => props.theme.spacing.xs} * 1.8)
+    calc(${props => props.theme.spacing.xs} * 2.3);
+  font-size: ${props => props.theme.fontSizes.small};
+
+
+  @media (max-width: 900px) {
+    top: -13px;
+    right: -13px;
+    padding: 
+      calc(${props => props.theme.spacing.xs} * 1.2)
+      calc(${props => props.theme.spacing.xs} * 1.8);
+    font-size: calc(${props => props.theme.fontSizes.small} * 0.85);
   }
 `
 

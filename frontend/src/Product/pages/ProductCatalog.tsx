@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { HeaderPage } from "../../components/HeaderPage"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { ProductCard } from "../components/ProductCard"
 import { Product } from "../types"
 import { ProductService } from "../services/product-service"
@@ -8,6 +8,10 @@ import { ImSad2 } from "react-icons/im"
 
 export const ProductCatalogPage = () => {
   const [products, setProducts] = useState<Product[]>([])
+
+  React.useEffect(() => {
+    document.title = 'Shop flow | Produtos'
+  }, [])
 
   useEffect(() => {
     async function fetchProducts() {
