@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { SignInDto, SignUpDto } from '../dtos';
 import { AuthService } from '../services/auth.service';
-import { UserAlreadyExistsEmail } from '../exceptions/user-already-exists-email';
+import { UserAlreadyExistsEmail } from '../exceptions/user-already-exists-email.exception';
 
 @Controller('auth')
 export class AuthController {

@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { APP_GUARD } from '@nestjs/core';
 
-import { RolesJwt } from './guards/roles-jwt.guard';
+import { RolesJwt } from './user/guards/roles-jwt.guard';
 
 import { UserModule } from './user/user.module';
 import { AuthService } from './user/services/auth.service';
@@ -16,6 +16,7 @@ import { Category } from './entities/category.entity';
 
 import { ProductModule } from './product/product.module';
 import { InititalDataModule } from './initial-data/initial-data.module';
+import { CartModule } from './cart/cart.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { InititalDataModule } from './initial-data/initial-data.module';
     InititalDataModule,
     UserModule,
     ProductModule,
+    CartModule,
   ],
   controllers: [],
   providers: [

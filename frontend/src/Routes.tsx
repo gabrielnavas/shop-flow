@@ -21,7 +21,7 @@ export const MyRoutes = () => (
         <Route path={routes.orders} element={<div>order page</div>} />
         <Route
           path="*"
-          element={<Navigate to={routes.signin} replace={true} />}
+          element={<Navigate to={routes.home} replace={true} />}
         />
       </Routes>
     </BrowserRouter>

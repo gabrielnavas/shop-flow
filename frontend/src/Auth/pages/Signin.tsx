@@ -22,11 +22,11 @@ import { LinkContainer } from "../components/LinkContainer"
 import { EnterLink } from "../components/EnterLink"
 import { GlobalErrors } from "../../components/GlobalErrors"
 
-import { AuthService } from "../services/auth"
+import { AuthService } from "../services/auth-service"
 import { routes } from "../../Routes"
 
 import { validateEmail } from "../../validators/email"
-import { AuthContext, AuthContextType } from "../../contexts/AuthContext"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { AiOutlineLoading } from "react-icons/ai"
 
 

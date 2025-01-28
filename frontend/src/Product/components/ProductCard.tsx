@@ -2,8 +2,10 @@ import { BsCartCheckFill } from "react-icons/bs"
 import { FaCartPlus } from "react-icons/fa6"
 import styled from "styled-components"
 import { Product } from "../types"
-import { CartContext, CartContextType } from "../../contexts/CartContext"
-import React from "react"
+import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
+import React, { useEffect } from "react"
+import { CartService } from "../services/cart-service"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 
 type Props = {
   product: Product
@@ -16,12 +18,31 @@ const priceReal = new Intl.NumberFormat('pt-BR', {
 
 export const ProductCard = ({ product }: Props) => {
 
+  const [imageSrc, setImageSrc] = React.useState(product.imageUrl)
+  const [addedCart, setAddedCart] = React.useState(false)
+
+  const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
   const { addItemCart, existsProduct } = React.useContext(CartContext) as CartContextType
-  const addedCart = existsProduct(product)
+
+  useEffect(() => {
+    function verifyProductAddedToCart() {
+      const addedCart = existsProduct(product)
+      setAddedCart(addedCart)
+    }
+    verifyProductAddedToCart()
+  }, [existsProduct, product])
+
+  const addProductToCartOnClick = React.useCallback((product: Product) => {
+    if (isAuthencated) {
+      const cartService = new CartService(accessToken)
+      cartService.addProductToCart(product)
+    }
+    addItemCart(product)
+  }, [addItemCart, isAuthencated, accessToken])
 
   return (
-    <Container onClick={!addedCart ? () => addItemCart(product) : undefined}>
-      <Image src={product.imageUrl} />
+    <Container onClick={!addedCart ? () => addProductToCartOnClick(product) : undefined}>
+      <Image src={imageSrc} onError={() => setImageSrc('src/assets/imgs/no-image.jpg')} />
       <Info>
         <Titles>
           <Title>{product.name}</Title>

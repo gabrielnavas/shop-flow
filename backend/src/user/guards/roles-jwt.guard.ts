@@ -4,10 +4,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Token } from 'src/user/models';
 
-import { SetMetadata } from '@nestjs/common';
-
-export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
-
 @Injectable()
 export class RolesJwt implements CanActivate {
   constructor(
@@ -44,6 +40,9 @@ export class RolesJwt implements CanActivate {
     ) {
       return false; // Se não encontrar o papel no token, acesso negado
     }
+
+    // Adicionar o payload ao objeto `request` para uso posterior
+    request.loggedUser = payload;
 
     // verifica se todas as roles estão na role do payload do token
     const everyRoles = requiredRoles.every((role) =>

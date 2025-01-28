@@ -2,11 +2,11 @@ import React from "react";
 import { FaShopify } from "react-icons/fa6";
 
 import styled from "styled-components";
-import { AuthContext, AuthContextType } from "../contexts/AuthContext";
+import { AuthContext, AuthContextType } from "../contexts/AuthContext/AuthContext";
 import { BiCart, BiLogOut, BiUser } from "react-icons/bi";
 import { Link, useNavigate } from "react-router";
 import { routes } from "../Routes";
-import { CartContext, CartContextType } from "../contexts/CartContext";
+import { CartContext, CartContextType } from "../contexts/CartContext/CartContext";
 import { FaSignInAlt } from "react-icons/fa";
 import { GrUserNew } from "react-icons/gr";
 
@@ -41,7 +41,8 @@ export const HeaderPage = () => {
 
   const logoutOnClick = React.useCallback(() => {
     signout()
-    navigate(routes.signin)
+    navigate(routes.home)
+    window.location.reload();
   }, [signout, navigate])
 
 

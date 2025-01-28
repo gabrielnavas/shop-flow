@@ -9,7 +9,7 @@ import { RoleName } from 'src/entities/role-name.enum';
 import { UserRole } from 'src/entities/user-role.entity';
 import { Role } from 'src/entities/role.entity';
 import { JwtService } from '@nestjs/jwt';
-import { UserAlreadyExistsEmail } from 'src/user/exceptions/user-already-exists-email';
+import { UserAlreadyExistsEmail } from 'src/user/exceptions/user-already-exists-email.exception';
 import { Token } from '../models';
 
 @Injectable()

@@ -23,9 +23,9 @@ import { LinkTitle } from "../components/LinkTitle"
 import { GlobalErrors } from "../../components/GlobalErrors"
 
 import { validateEmail } from "../../validators/email"
-import { AuthService } from "../services/auth"
+import { AuthService } from "../services/auth-service"
 import { routes } from "../../Routes"
-import { AuthContext, AuthContextType } from "../../contexts/AuthContext"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { AiOutlineLoading } from "react-icons/ai"
 
 type Inputs = {
