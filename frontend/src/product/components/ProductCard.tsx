@@ -69,19 +69,17 @@ const Container = styled.div`
   border-radius: ${props => props.theme.borderRadius.default};
   border: 1px solid ${props => props.theme.colors.borderColor};
   outline: none;
-
   box-shadow: ${props => props.theme.shadows.card};
-
   cursor: pointer;
-
   transition: 500ms;
-
   &:hover {
     transform: scale(1.10);
   }
 `
 
 const Image = styled.img`
+  height: 185px; /* Tamanho fixo para a imagem */
+  object-fit: cover; /* Para a imagem preencher a área sem distorção */
   border-top-left-radius: ${props => props.theme.borderRadius.default};
   border-top-right-radius: ${props => props.theme.borderRadius.default};
 `
@@ -93,11 +91,13 @@ const Info = styled.div`
   border-bottom-left-radius: ${props => props.theme.borderRadius.default};
   border-bottom-right-radius: ${props => props.theme.borderRadius.default};
   background-color: ${props => props.theme.colors.background};
+  flex-grow: 1; /* Faz com que o Info ocupe o restante do espaço */
 `
 
 const Titles = styled.span`
   display: flex;
   flex-direction: column;
+  margin-bottom: auto; /* Para garantir que o conteúdo ocupe a área disponível antes do rodapé */
 `
 
 const Title = styled.span`
