@@ -55,7 +55,7 @@ export const CartProvider = ({ children }: Props) => {
       localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(mergedCartItems))
     }
     fetchCartItems()
-  }, [accessToken, isAuthencated, items])
+  }, [accessToken, isAuthencated,])
 
   const addItemCart = React.useCallback((product: Product): void => {
     const productCart = {
