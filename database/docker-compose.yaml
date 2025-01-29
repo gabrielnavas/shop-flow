@@ -1,10 +1,10 @@
 version: '3.9'
 
 services:
-  mysql:
+  mysql-dev:
     image: mysql:8.0 
-    container_name: mysql_shopflow
-    restart: always
+    container_name: mysql-shopflow-dev
+    restart: unless-stopped  # Reinicia automaticamente em caso de falha ou reinício do Docker
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword 
       MYSQL_DATABASE: shop-flow        
@@ -12,4 +12,3 @@ services:
       MYSQL_PASSWORD: dev       
     ports:
       - "3306:3306" 
-  
