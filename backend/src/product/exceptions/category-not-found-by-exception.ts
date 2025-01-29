@@ -1,6 +1,6 @@
 export class CategoryNotFoundException extends Error {
   constructor(name: string) {
-    super(`Category not found by name: ${name}`);
+    super(`Categoria não encontrada pelo nome: ${name}.`);
     this.name = 'CategoryNotFound';
   }
 }

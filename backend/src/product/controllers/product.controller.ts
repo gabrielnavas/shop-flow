@@ -4,6 +4,7 @@ import {
   Get,
   Post,
   UploadedFile,
+  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 import { AddProductDto, ProductDto } from '../dtos';
@@ -12,7 +13,9 @@ import { ProductService } from '../services/product.service';
 import { SetRoles } from 'src/user/guards/set-roles';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MidiaService } from 'src/midia/midia.service';
+import { ErrorExceptionFilter } from '../filters/error-exception.filter';
 
+@UseFilters(new ErrorExceptionFilter())
 @Controller('product')
 export class ProductController {
   constructor(

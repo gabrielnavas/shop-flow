@@ -1,6 +1,6 @@
 export class ProductAlreadyExistsWithNameException extends Error {
   constructor(name: string) {
-    super(`Product already exists with name: ${name}`);
+    super(`Producto já existe com o nome: ${name}`);
     this.name = 'ProductAlreadyExistsWithNameException';
   }
 }

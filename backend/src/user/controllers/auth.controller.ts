@@ -11,6 +11,7 @@ import { AuthService } from '../services/auth.service';
 import { UserAlreadyExistsEmail } from '../exceptions/user-already-exists-email.exception';
 import { ErrorExceptionFilter } from 'src/user/filters/error-exception.filter';
 
+@UseFilters(new ErrorExceptionFilter())
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -30,7 +31,6 @@ export class AuthController {
     }
   }
 
-  @UseFilters(new ErrorExceptionFilter())
   @Post('signin')
   async signin(@Body() body: SignInDto) {
     return await this.authService.signin(body);
