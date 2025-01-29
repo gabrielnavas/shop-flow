@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
-import { Product, ProductCart } from "../../Product/types"
-import { CartService } from "../../Product/services/cart-service"
+import { Product, ProductCart } from "../../product/types"
+import { CartService } from "../../product/services/cart-service"
 import { AuthContext, AuthContextType } from "../AuthContext/AuthContext"
 import { mergeCartItems } from "./functions"
 

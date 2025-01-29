@@ -12,18 +12,28 @@ export class CartService {
       quantity: quantity,
     }
     const url = `${this.urlEndpoint}/cart-item`
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': 'application/json',
-        'Authorization': `Bearer ${this.accessToken}`
-      },
-      body: JSON.stringify(payload)
-    })
-    if (response.status >= 400) {
-      const { message } = await response.json()
-      throw new Error(message)
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'accept': 'application/json',
+          'Authorization': `Bearer ${this.accessToken}`
+        },
+        body: JSON.stringify(payload)
+      })
+      if (response.status >= 400) {
+        const { message } = await response.json()
+        throw new Error(message)
+      }
+
+    } catch (err) {
+      if ((err as Error).name === 'TypeError' && (err as Error).message === 'Failed to fetch') {
+        throw new Error('Servidor offline.')
+      }
+
+      throw err
     }
   }
 

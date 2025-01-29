@@ -88,14 +88,14 @@ export const SigninPage = () => {
   return (
     <Page>
       <HeaderPage />
-      {!!globalError && (
-        <Row>
-          <GlobalErrors>
-            <FormError>{globalError}</FormError>
-          </GlobalErrors>
-        </Row>
-      )}
       <Rows>
+        {!!globalError && (
+          <Row>
+            <GlobalErrors>
+              <FormError>{globalError}</FormError>
+            </GlobalErrors>
+          </Row>
+        )}
         <Row>
           <Card>
             <CardHeader>
@@ -158,7 +158,7 @@ export const SigninPage = () => {
           <MoreLinks>
             <LinkContainer>
               <LinkTitle>Ainda não tem uma conta?</LinkTitle>
-              <EnterLink to='/sign-up'>Entrar</EnterLink>
+              <EnterLink to='/sign-up'>Criar uma!</EnterLink>
             </LinkContainer>
           </MoreLinks>
         </Row>

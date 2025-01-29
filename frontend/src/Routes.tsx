@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router"
-import { SignupPage } from "./Auth/pages/Signup"
-import { SigninPage } from "./Auth/pages/Signin"
-import { ProductCatalogPage } from "./Product/pages/ProductCatalog"
+import { SignupPage } from "./auth/pages/Signup"
+import { SigninPage } from "./auth/pages/Signin"
+import { ProductCatalogPage } from "./product/pages/ProductCatalog"
 import { AppProviders } from "./AppProviders"
 
 export const routes = {
