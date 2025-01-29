@@ -4,7 +4,7 @@ import { Client } from 'minio';
 import { extname } from 'path';
 
 @Injectable()
-export class MinioService {
+export class MidiaService {
   private minioClient: Client;
 
   constructor() {

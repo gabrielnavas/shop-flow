@@ -17,6 +17,7 @@ import { Category } from './entities/category.entity';
 import { ProductModule } from './product/product.module';
 import { InititalDataModule } from './initial-data/initial-data.module';
 import { CartModule } from './cart/cart.module';
+import { MidiaModule } from './midia/midia.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CartModule } from './cart/cart.module';
       signOptions: { expiresIn: '7d' },
     }),
     InititalDataModule,
+    MidiaModule,
     UserModule,
     ProductModule,
     CartModule,
