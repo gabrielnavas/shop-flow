@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 
 import { RolesJwt } from './user/guards/roles-jwt.guard';
 
@@ -18,6 +18,7 @@ import { ProductModule } from './product/product.module';
 import { InititalDataModule } from './initial-data/initial-data.module';
 import { CartModule } from './cart/cart.module';
 import { MidiaModule } from './midia/midia.module';
+import { ErrorGenericExceptionFilter } from './filters/error-generic-exception.filter';
 
 @Module({
   imports: [
@@ -51,6 +52,10 @@ import { MidiaModule } from './midia/midia.module';
     {
       provide: APP_GUARD,
       useClass: RolesJwt,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ErrorGenericExceptionFilter,
     },
   ],
 })

@@ -11,6 +11,8 @@ import { Role } from 'src/entities/role.entity';
 import { JwtService } from '@nestjs/jwt';
 import { UserAlreadyExistsEmail } from 'src/user/exceptions/user-already-exists-email.exception';
 import { Token } from '../models';
+import { UserPasswordInvalidException } from '../exceptions/user-password-invalid.exception';
+import { RoleNotFoundException } from '../exceptions/role-not-found-exception.exception';
 
 @Injectable()
 export class AuthService {
@@ -45,7 +47,7 @@ export class AuthService {
         )
       ).filter((role) => role !== null);
       if (roles.length === 0) {
-        throw new Error(`missing roles ${roleNames.toString()}`);
+        throw new RoleNotFoundException(roleNames);
       }
 
       const emailAlreadyExists = await queryRunner.manager.findOneBy(User, {
@@ -91,11 +93,11 @@ export class AuthService {
       email: data.email.trim(),
     });
     if (user === null) {
-      throw new Error(`e-mail or password invalid`);
+      throw new UserPasswordInvalidException();
     }
     const passwordEquals = bcrypt.compareSync(data.password, user.password);
     if (!passwordEquals) {
-      throw new Error(`e-mail or password invalid`);
+      throw new UserPasswordInvalidException();
     }
 
     user.userRoles = await this.userRoleRepository.findBy({

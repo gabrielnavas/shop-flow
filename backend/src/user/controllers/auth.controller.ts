@@ -4,10 +4,12 @@ import {
   HttpException,
   HttpStatus,
   Post,
+  UseFilters,
 } from '@nestjs/common';
 import { SignInDto, SignUpDto } from '../dtos';
 import { AuthService } from '../services/auth.service';
 import { UserAlreadyExistsEmail } from '../exceptions/user-already-exists-email.exception';
+import { ErrorExceptionFilter } from 'src/user/filters/error-exception.filter';
 
 @Controller('auth')
 export class AuthController {
@@ -28,6 +30,7 @@ export class AuthController {
     }
   }
 
+  @UseFilters(new ErrorExceptionFilter())
   @Post('signin')
   async signin(@Body() body: SignInDto) {
     return await this.authService.signin(body);
