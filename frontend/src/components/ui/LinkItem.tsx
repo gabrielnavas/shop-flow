@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const LinkContainer = styled.div`
+export const LinkItem = styled.div`
   display: flex;
   width: 100%;
   justify-content: center;

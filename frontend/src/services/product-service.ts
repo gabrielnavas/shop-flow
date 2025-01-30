@@ -1,4 +1,4 @@
-import { Product } from "../types";
+import { Product } from "../pages/ProductCatalog/types";
 
 type ProductResponseBody = Omit<Product, 'createdAt' | 'updatedAt'> & {
   createdAt: string

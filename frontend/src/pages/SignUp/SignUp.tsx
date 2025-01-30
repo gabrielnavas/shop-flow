@@ -2,31 +2,31 @@ import React, { useContext } from "react"
 import { useNavigate } from "react-router"
 import { SubmitHandler, useForm } from "react-hook-form"
 
-import { HeaderPage } from "../../components/HeaderPage"
-import { Page } from "../components/Page"
-import { Rows } from "../components/Rows"
-import { Row } from "../components/Row"
-import { Card } from "../components/Card"
-import { CardHeader } from "../components/CardHeader"
-import { HeaderTitle } from "../components/HeaderTitle"
-import { HeaderSubtitle } from "../components/HeaderSubtitle"
-import { Form } from "../components/Form"
-import { FormGroup } from "../components/FormGroup"
-import { Label } from "../components/Label"
-import { Input } from "../components/Input"
-import { SubmitButton } from "../components/SubmitButton"
-import { FormError } from "../components/FormError"
-import { MoreLinks } from "../components/MoreLinks"
-import { LinkContainer } from "../components/LinkContainer"
-import { EnterLink } from "../components/EnterLink"
-import { LinkTitle } from "../components/LinkTitle"
-import { GlobalErrors } from "../../components/GlobalErrors"
+import { HeaderPage } from "../../components/layout/HeaderPage"
+import { Page } from "../../components/ui/Page"
+import { Rows } from "../../components/ui/Rows"
+import { Row } from "../../components/ui/Row"
+import { PageCard } from "../../components/ui/PageCard"
+import { CardHeader } from "../../components/ui/CardHeader"
+import { HeaderTitle } from "../../components/ui/CardHeaderTitle"
+import { HeaderSubtitle } from "../../components/ui/CardHeaderSubtitle"
+import { Form } from "../../components/ui/Form"
+import { FormGroup } from "../../components/ui/FormGroup"
+import { Label } from "../../components/ui/Label"
+import { Input } from "../../components/ui/Input"
+import { FormButtonSubmit } from "../../components/ui/FormButtonSubmit"
+import { ErrorItem } from "../../components/ui/ErrorItem"
+import { MoreLinks } from "../../components/ui/LinkList"
+import { LinkItem } from "../../components/ui/LinkItem"
+import { LinkCustom } from "../../components/ui/LinkCustom"
+import { LinkItemTitle } from "../../components/ui/LinkItemTitle"
+import { ErrorList } from "../../components/ui/ErrorList"
 
-import { validateEmail } from "../../validators/email"
-import { AuthService } from "../services/auth-service"
-import { routes } from "../../Routes"
-import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { validateEmail } from "../../utils/email-validate"
+import { AuthService } from "../../services/auth-service"
+import { routeNames } from "../../routes/routes-names"
 import { AiOutlineLoading } from "react-icons/ai"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 
 type Inputs = {
   fullname: string
@@ -65,7 +65,7 @@ export const SignupPage = () => {
     try {
       const authService = new AuthService()
       await authService.signup(data)
-      navigate(routes.signin)
+      navigate(routeNames.signin)
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message)
@@ -80,7 +80,7 @@ export const SignupPage = () => {
 
 
   if (isAuthencated) {
-    navigate(routes.home)
+    navigate(routeNames.home)
   }
 
 
@@ -90,13 +90,13 @@ export const SignupPage = () => {
       <Rows>
         {!!globalError && (
           <Row>
-            <GlobalErrors>
-              <FormError>{globalError}</FormError>
-            </GlobalErrors>
+            <ErrorList>
+              <ErrorItem>{globalError}</ErrorItem>
+            </ErrorList>
           </Row>
         )}
         <Row>
-          <Card>
+          <PageCard>
             <CardHeader>
               <HeaderTitle>Criar conta</HeaderTitle>
               <HeaderSubtitle>Crie um conta para continuar</HeaderSubtitle>
@@ -119,7 +119,7 @@ export const SignupPage = () => {
                   })}
                   $error={!!errors.fullname}
                 />
-                {errors.fullname && <FormError>{errors.fullname.message}</FormError>}
+                {errors.fullname && <ErrorList>{errors.fullname.message}</ErrorList>}
               </FormGroup>
               <FormGroup>
                 <Label>E-mail</Label>
@@ -135,7 +135,7 @@ export const SignupPage = () => {
                     validate: validateEmail,
                   })}
                 />
-                {errors.email && <FormError>{errors.email.message}</FormError>}
+                {errors.email && <ErrorList>{errors.email.message}</ErrorList>}
               </FormGroup>
               <FormGroup>
                 <Label>Senha</Label>
@@ -164,7 +164,7 @@ export const SignupPage = () => {
                     },
                   })}
                 />
-                {errors.password && <FormError>{errors.password.message}</FormError>}
+                {errors.password && <ErrorList>{errors.password.message}</ErrorList>}
               </FormGroup>
               <FormGroup>
                 <Label>Confirmação de senha</Label>
@@ -193,9 +193,9 @@ export const SignupPage = () => {
                     },
                   })}
                 />
-                {errors.passwordConfirmation && <FormError>{errors.passwordConfirmation.message}</FormError>}
+                {errors.passwordConfirmation && <ErrorList>{errors.passwordConfirmation.message}</ErrorList>}
               </FormGroup>
-              <SubmitButton type="submit" $isLoading={isLoading}>
+              <FormButtonSubmit type="submit" $isLoading={isLoading}>
                 {isLoading ? (
                   <AiOutlineLoading />
                 ) : (
@@ -203,16 +203,16 @@ export const SignupPage = () => {
                     Criar conta!
                   </span>
                 )}
-              </SubmitButton>
+              </FormButtonSubmit>
             </Form>
-          </Card>
+          </PageCard>
         </Row>
         <Row>
           <MoreLinks>
-            <LinkContainer>
-              <LinkTitle>Já tem uma conta?</LinkTitle>
-              <EnterLink to='/sign-in'>Entrar</EnterLink>
-            </LinkContainer>
+            <LinkItem>
+              <LinkItemTitle>Já tem uma conta?</LinkItemTitle>
+              <LinkCustom to='/sign-in'>Entrar</LinkCustom>
+            </LinkItem>
           </MoreLinks>
         </Row>
       </Rows>

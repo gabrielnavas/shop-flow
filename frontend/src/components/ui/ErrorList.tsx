@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const GlobalErrors = styled.div`
+export const ErrorList = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;

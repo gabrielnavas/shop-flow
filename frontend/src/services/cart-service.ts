@@ -1,4 +1,4 @@
-import { Product, ProductCart } from "../types";
+import { Product, ProductCart } from "../pages/ProductCatalog/types";
 
 export class CartService {
   constructor(

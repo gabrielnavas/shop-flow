@@ -10,7 +10,7 @@ const rotate = keyframes`
   }
 `;
 
-export const SubmitButton = styled.button<{ $isLoading: boolean }>`
+export const FormButtonSubmit = styled.button<{ $isLoading: boolean }>`
   width: 100%;
   padding: ${(props) => props.theme.spacing.sm} ${(props) => props.theme.spacing.sm};
   outline: none;

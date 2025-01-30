@@ -2,13 +2,13 @@ import React from "react";
 import { FaShopify } from "react-icons/fa6";
 
 import styled from "styled-components";
-import { AuthContext, AuthContextType } from "../contexts/AuthContext/AuthContext";
 import { BiCart, BiLogOut, BiUser } from "react-icons/bi";
 import { Link, useNavigate } from "react-router";
-import { routes } from "../Routes";
-import { CartContext, CartContextType } from "../contexts/CartContext/CartContext";
+import { routeNames } from "../../routes/routes-names";
+import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext";
 import { FaSignInAlt } from "react-icons/fa";
 import { GrUserNew } from "react-icons/gr";
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext";
 
 export const HeaderPage = () => {
   const { isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
@@ -41,24 +41,24 @@ export const HeaderPage = () => {
 
   const logoutOnClick = React.useCallback(() => {
     signout()
-    navigate(routes.home)
+    navigate(routeNames.home)
     window.location.reload();
   }, [signout, navigate])
 
 
   const signinOnClick = React.useCallback(() => {
-    navigate(routes.signin)
+    navigate(routeNames.signin)
   }, [navigate])
 
 
   const signupOnClick = React.useCallback(() => {
-    navigate(routes.signup)
+    navigate(routeNames.signup)
   }, [navigate])
 
 
   return (
     <Container>
-      <LeftSide to={routes.home}>
+      <LeftSide to={routeNames.home}>
         <LogoIconContainer>
           <FaShopify />
         </LogoIconContainer>

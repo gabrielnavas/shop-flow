@@ -1,11 +1,11 @@
 import { BsCartCheckFill } from "react-icons/bs"
 import { FaCartPlus } from "react-icons/fa6"
 import styled from "styled-components"
-import { Product } from "../types"
-import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
+import { Product } from "./types"
 import React, { useEffect } from "react"
-import { CartService } from "../services/cart-service"
+import { CartService } from "../../services/cart-service"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
 
 type Props = {
   product: Product
@@ -16,7 +16,7 @@ const priceReal = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 });
 
-export const ProductCard = ({ product }: Props) => {
+export const ProductCardItem = ({ product }: Props) => {
 
   const [imageSrc, setImageSrc] = React.useState(product.imageUrl)
   const [addedCart, setAddedCart] = React.useState(false)

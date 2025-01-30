@@ -1,21 +1,22 @@
 import styled, { keyframes } from "styled-components"
-import { HeaderPage } from "../../components/HeaderPage"
+import { HeaderPage } from "../../components/layout/HeaderPage"
 import React, { useEffect, useState } from "react"
-import { ProductCard } from "../components/ProductCard"
-import { Product } from "../types"
-import { ProductService } from "../services/product-service"
 import { ImSad2 } from "react-icons/im"
 import { AiOutlineLoading } from "react-icons/ai"
-import { GlobalErrors } from "../../components/GlobalErrors"
+import { ErrorList } from "../../components/ui/ErrorList"
+import { ErrorItem } from "../../components/ui/ErrorItem"
 import { BiSad } from "react-icons/bi"
+import { ProductService } from "../../services/product-service"
+import { Product } from "./types"
+import { ProductCardItem } from "./ProductCardItem"
 
 export const ProductCatalogPage = () => {
   const [products, setProducts] = useState<Product[]>([])
-  const [globalError, setGlobalError] = useState('')
+  const [globalError, setGlobalError] = React.useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   React.useEffect(() => {
-    document.title = 'Shop flow | Produtos'
+    document.title = 'Shop Flow | Produtos'
   }, [])
 
   useEffect(() => {
@@ -58,20 +59,24 @@ export const ProductCatalogPage = () => {
     )
   } else if (!isLoading && products.length && !!globalError) {
     contentRender = (
-      <GlobalErrorsProduct>
-        <span>{globalError}</span>
-        <BiSad />
-      </GlobalErrorsProduct>
+      <ErrorListProduct>
+        <ErrorItem>
+          <span>{globalError}</span>
+          <BiSad />
+        </ErrorItem>
+      </ErrorListProduct>
     )
   } else if (!isLoading && !(globalError) && products.length > 0) {
     contentRender = (
-      <Products>
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product} />
-        ))}
-      </Products>
+      <>
+        <Products>
+          {products.map((product) => (
+            <ProductCardItem
+              key={product.id}
+              product={product} />
+          ))}
+        </Products>
+      </>
     )
   }
 
@@ -143,7 +148,7 @@ const Products = styled.ul`
   }
 `
 
-const GlobalErrorsProduct = styled(GlobalErrors)`
+const ErrorListProduct = styled(ErrorList)`
   display: flex;
   flex-direction: column;
   align-items: center;

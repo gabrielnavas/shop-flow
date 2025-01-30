@@ -4,7 +4,7 @@ type Props = {
   children: React.ReactNode
 }
 
-export const Card = ({ children }: Props) => {
+export const PageCard = ({ children }: Props) => {
   return (
     <Container>
       {children}

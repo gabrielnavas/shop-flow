@@ -2,32 +2,32 @@ import React, { useContext } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router"
 
-import { HeaderPage } from "../../components/HeaderPage"
-import { Card } from "../components/Card"
-import { CardHeader } from "../components/CardHeader"
-import { Form } from "../components/Form"
-import { FormGroup } from "../components/FormGroup"
-import { HeaderSubtitle } from "../components/HeaderSubtitle"
-import { HeaderTitle } from "../components/HeaderTitle"
-import { Input } from "../components/Input"
-import { Label } from "../components/Label"
-import { Page } from "../components/Page"
-import { Row } from "../components/Row"
-import { Rows } from "../components/Rows"
-import { FormError } from "../components/FormError"
-import { SubmitButton } from "../components/SubmitButton"
-import { MoreLinks } from "../components/MoreLinks"
-import { LinkTitle } from "../components/LinkTitle"
-import { LinkContainer } from "../components/LinkContainer"
-import { EnterLink } from "../components/EnterLink"
-import { GlobalErrors } from "../../components/GlobalErrors"
+import { HeaderPage } from "../../components/layout/HeaderPage"
+import { PageCard } from "../../components/ui/PageCard"
+import { CardHeader } from "../../components/ui/CardHeader"
+import { Form } from "../../components/ui/Form"
+import { FormGroup } from "../../components/ui/FormGroup"
+import { HeaderSubtitle } from "../../components/ui/CardHeaderSubtitle"
+import { HeaderTitle } from "../../components/ui/CardHeaderTitle"
+import { Input } from "../../components/ui/Input"
+import { Label } from "../../components/ui/Label"
+import { Page } from "../../components/ui/Page"
+import { Row } from "../../components/ui/Row"
+import { Rows } from "../../components/ui/Rows"
+import { ErrorItem } from "../../components/ui/ErrorItem"
+import { FormButtonSubmit } from "../../components/ui/FormButtonSubmit"
+import { MoreLinks } from "../../components/ui/LinkList"
+import { LinkItemTitle } from "../../components/ui/LinkItemTitle"
+import { LinkItem } from "../../components/ui/LinkItem"
+import { LinkCustom } from "../../components/ui/LinkCustom"
+import { ErrorList } from "../../components/ui/ErrorList"
 
-import { AuthService } from "../services/auth-service"
-import { routes } from "../../Routes"
+import { AuthService } from "../../services/auth-service"
+import { routeNames } from "../../routes/routes-names"
 
-import { validateEmail } from "../../validators/email"
-import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { validateEmail } from "../../utils/email-validate"
 import { AiOutlineLoading } from "react-icons/ai"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 
 
 type Inputs = {
@@ -66,7 +66,7 @@ export const SigninPage = () => {
       const authService = new AuthService()
       const { accessToken } = await authService.signin(data)
       signin(accessToken)
-      navigate(routes.home)
+      navigate(routeNames.home)
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message)
@@ -82,7 +82,7 @@ export const SigninPage = () => {
   }, [navigate, signin])
 
   if (isAuthencated) {
-    navigate(routes.home)
+    navigate(routeNames.home)
   }
 
   return (
@@ -91,16 +91,16 @@ export const SigninPage = () => {
       <Rows>
         {!!globalError && (
           <Row>
-            <GlobalErrors>
-              <FormError>{globalError}</FormError>
-            </GlobalErrors>
+            <ErrorList>
+              <ErrorItem>{globalError}</ErrorItem>
+            </ErrorList>
           </Row>
         )}
         <Row>
-          <Card>
+          <PageCard>
             <CardHeader>
               <HeaderTitle>Entrar na conta</HeaderTitle>
-              <HeaderSubtitle>Entra com seu e-mail e senha</HeaderSubtitle>
+              <HeaderSubtitle>Entre com seu e-mail e senha</HeaderSubtitle>
             </CardHeader>
             <Form onSubmit={handleSubmit(onSubmit)}>
               <FormGroup>
@@ -117,7 +117,7 @@ export const SigninPage = () => {
                     validate: validateEmail,
                   })}
                 />
-                {errors.email && <FormError>{errors.email.message}</FormError>}
+                {errors.email && <ErrorList>{errors.email.message}</ErrorList>}
               </FormGroup>
               <FormGroup>
                 <Label>Senha</Label>
@@ -140,9 +140,9 @@ export const SigninPage = () => {
                     },
                   })}
                 />
-                {errors.password && <FormError>{errors.password.message}</FormError>}
+                {errors.password && <ErrorItem>{errors.password.message}</ErrorItem>}
               </FormGroup>
-              <SubmitButton type="submit" $isLoading={isLoading}>
+              <FormButtonSubmit type="submit" $isLoading={isLoading}>
                 {isLoading ? (
                   <AiOutlineLoading />
                 ) : (
@@ -150,16 +150,16 @@ export const SigninPage = () => {
                     Entrar na conta!
                   </span>
                 )}
-              </SubmitButton>
+              </FormButtonSubmit>
             </Form>
-          </Card>
+          </PageCard>
         </Row>
         <Row>
           <MoreLinks>
-            <LinkContainer>
-              <LinkTitle>Ainda não tem uma conta?</LinkTitle>
-              <EnterLink to='/sign-up'>Criar uma!</EnterLink>
-            </LinkContainer>
+            <LinkItem>
+              <LinkItemTitle>Ainda não tem uma conta?</LinkItemTitle>
+              <LinkCustom to='/sign-up'>Criar uma!</LinkCustom>
+            </LinkItem>
           </MoreLinks>
         </Row>
       </Rows>
