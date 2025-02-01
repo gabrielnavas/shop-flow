@@ -1,5 +1,5 @@
 import React from "react";
-import { BiCart, BiLogOut, BiUser } from "react-icons/bi";
+import { BiCart, BiLogOut, BiPackage, BiUser } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import { FaSignInAlt } from "react-icons/fa";
 import { GrUserNew } from "react-icons/gr";
@@ -60,6 +60,11 @@ export const MenuRightSideHeader = ({ items }: Props) => {
   }, [navigate])
 
 
+  const manageProductOnClick = React.useCallback(() => {
+    navigate(routeNames.manageProduct)
+  }, [navigate])
+
+
   return (
 
     <MenuRightSide onClick={menuOnClick}>
@@ -74,13 +79,21 @@ export const MenuRightSideHeader = ({ items }: Props) => {
       </CartButtonContainer>
 
       {openMenu && (
-        <Menu $menuItemsCount={isAuthencated ? 0.2 : 2.75} ref={menuRef}>
+        <Menu $menuItemsCount={2.75} ref={menuRef}>
           {
             isAuthencated ? (
-              <MenuItem onClick={logoutOnClick}>
-                <BiLogOut />
-                Sair
-              </MenuItem>
+              <>
+                {isAuthencated && (
+                  <MenuItem onClick={manageProductOnClick}>
+                    <BiPackage />
+                    Gerenciar produtos
+                  </MenuItem>
+                )}
+                <MenuItem onClick={logoutOnClick}>
+                  <BiLogOut />
+                  Sair
+                </MenuItem>
+              </>
             ) : (
               <>
                 <MenuItem onClick={signinOnClick}>
@@ -109,7 +122,7 @@ const Menu = styled.ul<{ $menuItemsCount: number }>`
   right: 50%;
   border: 0.5px solid ${props => props.theme.colors.borderColor};
   border-radius: ${props => props.theme.borderRadius.default};
-  width: 150px;
+  width: 220px;
   padding: 2.5px 5px;
 `
 

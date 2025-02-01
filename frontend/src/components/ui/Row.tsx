@@ -12,6 +12,6 @@ export const Row = ({ children }: Props) => {
   )
 }
 
-const Container = styled.div`
-  width: 400px;
+const Container = styled.div<{ $width?: string | undefined }>`
+  width: ${props => props.$width || '400px'};
 `

@@ -3,4 +3,5 @@ export const routeNames = {
   signin: '/sign-in',
   home: '/home',
   orders: '/orders',
+  manageProduct: '/manage-product'
 }

@@ -1,6 +1,8 @@
 export const theme = {
   colors: {
-    menuBackgroundColor: "#FFF",
+    tableHeaderBackgroundColor: '#004691',
+    tableHeaderColor: '#004691',
+    menuBackgroundColor: "#f5f5f5",
     menuBackgroundColorHover: "#D0D0D0AB",
     background: "#f5f5f5",
     textPrimary: "#212121",
