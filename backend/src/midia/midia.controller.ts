@@ -17,7 +17,6 @@ export class MidiaController {
         `inline; filename="${fileStream.fileName}"`,
       );
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       fileStream.stream.pipe(res);
     } catch (error) {
       if (error instanceof Error) {

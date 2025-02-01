@@ -6,16 +6,19 @@ import { Product } from 'src/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductAlreadyExistsWithNameException } from '../exceptions/product-already-exists-with-name-exception';
 import { CategoryNotFoundException } from '../exceptions/category-not-found-by-exception';
+import { ProductNotFoundException } from '../exceptions/product-not-found-by-exception';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly entityManager: EntityManager,
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
   ) {}
 
-  async addProduct(dto: AddProductDto): Promise<void> {
+  async addProduct(dto: AddProductDto): Promise<ProductDto> {
     const queryRunner = this.entityManager.connection.createQueryRunner();
 
     await queryRunner.startTransaction();
@@ -47,6 +50,8 @@ export class ProductService {
 
       await queryRunner.manager.save(product);
       await queryRunner.commitTransaction();
+
+      return this.mapEntityToDto(product);
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;
@@ -60,23 +65,59 @@ export class ProductService {
       relations: {
         category: true,
       },
+      order: {
+        createdAt: 'DESC',
+        updatedAt: 'DESC',
+      },
     });
-    return products.map(
-      (product) =>
-        ({
-          id: product.id,
-          name: product.name,
-          description: product.description,
-          stock: product.stock,
-          price: product.price,
-          imageUrl: product.imageUrl,
-          createdAt: product.createdAt,
-          updatedAt: product.updatedAt,
-          category: {
-            id: product.category.id,
-            name: product.name,
-          },
-        }) as ProductDto,
-    );
+    return products.map((product) => this.mapEntityToDto(product));
+  }
+
+  async findProductById(productId: number): Promise<ProductDto> {
+    const product = await this.productRepository.findOne({
+      where: { id: productId },
+      relations: {
+        category: true,
+      },
+    });
+    if (!product) {
+      throw new ProductNotFoundException();
+    }
+    return this.mapEntityToDto(product);
+  }
+
+  async updateProduct(productId: number, dto: ProductDto) {
+    const category = await this.categoryRepository.findOneBy({
+      name: dto.category.name,
+    });
+    if (!category) {
+      throw new CategoryNotFoundException(dto.category.name);
+    }
+    await this.productRepository.update(productId, {
+      name: dto.name,
+      description: dto.description,
+      stock: dto.stock,
+      price: dto.price,
+      imageUrl: dto.imageUrl,
+      category: category,
+      createdAt: new Date(),
+    });
+  }
+
+  private mapEntityToDto(entity: Product): ProductDto {
+    return {
+      id: entity.id,
+      name: entity.name,
+      description: entity.description,
+      stock: entity.stock,
+      price: entity.price,
+      imageUrl: entity.imageUrl,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+      category: {
+        id: entity.category.id,
+        name: entity.category.name,
+      },
+    };
   }
 }

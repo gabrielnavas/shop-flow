@@ -21,3 +21,8 @@ export type ProductDto = {
     name: string;
   };
 };
+
+export type CategoryDto = {
+  id: number;
+  name: string;
+};

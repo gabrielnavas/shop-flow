@@ -53,8 +53,8 @@ export class MidiaService {
 
   async getFileStream(fileUrl: string) {
     const urlObj = new URL(fileUrl);
-    const bucketName = urlObj.pathname.split('/')[1]; // "uploads"
-    const fileName = urlObj.pathname.split('/')[2]; // "1738155793738-325575308.jpeg"
+    const bucketName = urlObj.pathname.split('/')[1]; // "bucketName"
+    const fileName = urlObj.pathname.split('/')[2]; // "nome-midia.ext"
 
     const stream = await this.minioClient.getObject(bucketName, fileName);
     const stat = await this.minioClient.statObject(bucketName, fileName);

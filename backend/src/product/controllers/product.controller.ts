@@ -2,11 +2,14 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
+  Put,
   UploadedFile,
   UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
+
 import { AddProductDto, ProductDto } from '../dtos';
 import { RoleName } from 'src/entities/role-name.enum';
 import { ProductService } from '../services/product.service';
@@ -26,16 +29,25 @@ export class ProductController {
   @Post()
   @SetRoles(RoleName.ADMIN, RoleName.CONSUMER)
   async addProduct(@Body() dto: AddProductDto) {
-    await this.productService.addProduct(dto);
+    const product = await this.productService.addProduct(dto);
+    return product;
   }
 
   // TODO: Otimizar upload para suportar arquivos grandes.
-  @Post()
+  @Put(':productId/image')
   @UseInterceptors(FileInterceptor('file'))
   @SetRoles(RoleName.ADMIN)
-  async addProductImage(@UploadedFile() file: Express.Multer.File) {
+  async addProductImage(
+    @Param('productId') productId: number,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    const product = await this.productService.findProductById(productId);
+
     const productBucketName = 'products-images';
     const url = await this.midiaService.uploadFile(file, productBucketName);
+    product.imageUrl = url;
+
+    await this.productService.updateProduct(product.id, product);
     return { url };
   }
 
