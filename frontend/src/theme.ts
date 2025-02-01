@@ -9,9 +9,18 @@ export const theme = {
     textPrimaryDark: "#FFFFFF",
     textSecondary: "#9E9E9E",
     buttonColorPrimary: "#ffffff",
-    buttonBackgroundPrimary: "#007aff",
+    buttonBackgroundPrimary: "#007aff", // Azul (Botão de adicionar)
     buttonBackgroundHover: "#0056b3",
-    buttonBackgroundSecondary: "#ff6f61",
+    buttonBackgroundSecondary: "#ff6f61", // Vermelho
+
+    // Novas cores adicionadas
+    buttonBackgroundWarning: "#ff9800", // Laranja (Warning)
+    buttonBackgroundWarningHover: "#e68900",
+    buttonBackgroundError: "#e53935", // Vermelho escuro (Error)
+    buttonBackgroundErrorHover: "#c62828",
+    buttonBackgroundCancel: "#f4c430", // Amarelo claro (Cancel)
+    buttonBackgroundCancelHover: "#e0b020",
+
     cardBackground: "#ffffff",
     borderColor: "#D5D5D5",
     borderColorHoverActiveFocus: "#555555",

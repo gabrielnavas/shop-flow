@@ -14,7 +14,6 @@ import { Form } from "../../components/ui/Form"
 import { FormGroup } from "../../components/ui/FormGroup"
 import { Label } from "../../components/ui/Label"
 import { Input } from "../../components/ui/Input"
-import { FormButtonSubmit } from "../../components/ui/FormButtonSubmit"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { MoreLinks } from "../../components/ui/LinkList"
 import { LinkItem } from "../../components/ui/LinkItem"
@@ -22,11 +21,12 @@ import { LinkCustom } from "../../components/ui/LinkCustom"
 import { LinkItemTitle } from "../../components/ui/LinkItemTitle"
 import { ErrorList } from "../../components/ui/ErrorList"
 
-import { validateEmail } from "../../utils/email-validate"
+import { formValidateEmail } from "../../utils/form-email-validate"
 import { AuthService } from "../../services/auth-service"
 import { routeNames } from "../../routes/routes-names"
 import { AiOutlineLoading } from "react-icons/ai"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { Button } from "../../components/ui/Button"
 
 type Inputs = {
   fullname: string
@@ -119,7 +119,7 @@ export const SignupPage = () => {
                   })}
                   $error={!!errors.fullname}
                 />
-                {errors.fullname && <ErrorList>{errors.fullname.message}</ErrorList>}
+                {errors.fullname && <ErrorItem>{errors.fullname.message}</ErrorItem>}
               </FormGroup>
               <FormGroup>
                 <Label>E-mail</Label>
@@ -132,10 +132,10 @@ export const SignupPage = () => {
                       message: 'Esse Campo é requerido.',
                       value: true
                     },
-                    validate: validateEmail,
+                    validate: formValidateEmail,
                   })}
                 />
-                {errors.email && <ErrorList>{errors.email.message}</ErrorList>}
+                {errors.email && <ErrorItem>{errors.email.message}</ErrorItem>}
               </FormGroup>
               <FormGroup>
                 <Label>Senha</Label>
@@ -164,7 +164,7 @@ export const SignupPage = () => {
                     },
                   })}
                 />
-                {errors.password && <ErrorList>{errors.password.message}</ErrorList>}
+                {errors.password && <ErrorItem>{errors.password.message}</ErrorItem>}
               </FormGroup>
               <FormGroup>
                 <Label>Confirmação de senha</Label>
@@ -193,9 +193,9 @@ export const SignupPage = () => {
                     },
                   })}
                 />
-                {errors.passwordConfirmation && <ErrorList>{errors.passwordConfirmation.message}</ErrorList>}
+                {errors.passwordConfirmation && <ErrorItem>{errors.passwordConfirmation.message}</ErrorItem>}
               </FormGroup>
-              <FormButtonSubmit type="submit" $isLoading={isLoading}>
+              <Button type="submit" $variant="add">
                 {isLoading ? (
                   <AiOutlineLoading />
                 ) : (
@@ -203,7 +203,7 @@ export const SignupPage = () => {
                     Criar conta!
                   </span>
                 )}
-              </FormButtonSubmit>
+              </Button>
             </Form>
           </PageCard>
         </Row>

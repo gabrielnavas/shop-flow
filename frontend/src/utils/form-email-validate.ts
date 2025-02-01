@@ -1,4 +1,4 @@
-export const validateEmail = (email: string): boolean => {
+export const formValidateEmail = (email: string) => {
   if (String(email)
     .toLowerCase()
     .match(
@@ -6,5 +6,5 @@ export const validateEmail = (email: string): boolean => {
     )) {
     return true
   }
-  return false
+  return 'E-mail inválido'
 };

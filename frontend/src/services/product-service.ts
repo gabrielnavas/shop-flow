@@ -61,4 +61,8 @@ export class ProductService {
       throw err
     }
   }
+
+  async addProduct(product: string): Promise<Product> {
+    console.log(product);
+  }
 }

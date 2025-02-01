@@ -1,13 +1,17 @@
-import { HeaderPage } from "../../components/layout/HeaderPage"
-import { Page } from "../../components/ui/Page"
 import styled from "styled-components"
 import React from "react"
+
+import { RxUpdate } from "react-icons/rx"
+import { BiTrash } from "react-icons/bi"
+
+import { HeaderPage } from "../../components/layout/HeaderPage"
+import { Page } from "../../components/ui/Page"
 import { Product, ProductService } from "../../services/product-service"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { Button } from "../../components/ui/Button"
-import { BiPlusCircle, BiTrash } from "react-icons/bi"
-import { RxUpdate } from "react-icons/rx"
+import { ButtonIconContainer } from "./ButtonIconContainer"
+import { AddNewProductButton } from "./AddNewProductButton"
 
 type ProductItem = {
   selected: boolean
@@ -16,10 +20,10 @@ type ProductItem = {
 
 export const ManageProductPage = () => {
 
-
   const [products, setProducts] = React.useState<ProductItem[]>([])
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [globalError, setGlobalError] = React.useState<string>('')
+  const [selectedAll, setSelectedAll] = React.useState(false)
 
   const widths = {
     selected: '75px',
@@ -58,91 +62,92 @@ export const ManageProductPage = () => {
     return <div>Carregando...</div>
   }
 
-  return (
-    <Page>
-      <HeaderPage />
-      <Content>
-        <Rows $padding="20px">
-          <Row>
-            {!!globalError && (
-              <ErrorList>
-                <ErrorItem>
-                  {globalError}
-                </ErrorItem>
-              </ErrorList>
-            )}
-          </Row>
-          <Row>
-            <TableTop>
-              <TableTitle>
-                Gerenciar produtos
-              </TableTitle>
-              <TableButtons>
-                <RemoveItemsButtom onClick={() => { }}>
-                  <ButtonIconContainer>
-                    <BiTrash />
-                  </ButtonIconContainer>
-                  Remover todos
-                </RemoveItemsButtom>
-                <AddNewProductButtom onClick={() => { }}>
-                  <ButtonIconContainer>
-                    <BiPlusCircle />
-                  </ButtonIconContainer>
-                  Novo Produto
-                </AddNewProductButtom>
-              </TableButtons>
-            </TableTop>
-          </Row>
-          <Row>
-            <Table>
-              <Tr>
-                <Th $width={widths.selected}>
-                  <SelectAllContainer>
-                    <Selected type="checkbox" checked={false} />
-                    Selecione
-                  </SelectAllContainer>
-                </Th>
-                <Th $width={widths.name}>Nome</Th>
-                <Th $width={widths.stock}>Estoque</Th>
-                <Th $width={widths.price}>Preço</Th>
-                <Th $width={widths.actions} $justifyContent="flex-end">Ações</Th>
-              </Tr>
 
-              {products.map((item, index) => (
-                <Tr key={index}>
-                  <Td $width={widths.selected}>
-                    <Selected type="checkbox" checked={item.product.id % 2 === 0} />
-                  </Td>
-                  <Td $width={widths.name}>
-                    <TableCeilText>{item.product.name}</TableCeilText>
-                  </Td>
-                  <Td $width={widths.stock}>
-                    <TableCeilText>{item.product.stock}</TableCeilText>
-                  </Td>
-                  <Td $width={widths.price}>
-                    <TableCeilText>{item.product.price}</TableCeilText>
-                  </Td>
-                  <Td $width={widths.actions}>
-                    <TableAction>
-                      <EditButton>
-                        <ButtonIconContainer>
-                          <RxUpdate />
-                        </ButtonIconContainer>
-                      </EditButton>
-                      <RemoveButton>
-                        <ButtonIconContainer>
-                          <BiTrash />
-                        </ButtonIconContainer>
-                      </RemoveButton>
-                    </TableAction>
-                  </Td>
-                </Tr>
-              ))}
-            </Table>
-          </Row>
-        </Rows>
-      </Content >
-    </Page>
+  return (
+    <>
+      <Page>
+        <HeaderPage />
+        <Content>
+          <Rows $padding="20px">
+            <Row>
+              {!!globalError && (
+                <ErrorList>
+                  <ErrorItem>
+                    {globalError}
+                  </ErrorItem>
+                </ErrorList>
+              )}
+            </Row>
+            <Row>
+              <TableTop>
+                <TableTitle>
+                  Gerenciar produtos
+                </TableTitle>
+                <TableButtons>
+                  <Button $variant="error">
+                    <ButtonIconContainer>
+                      <BiTrash />
+                    </ButtonIconContainer>
+                    Remover todos
+                  </Button>
+                  <AddNewProductButton />
+                </TableButtons>
+              </TableTop>
+            </Row>
+            <Row>
+              <Table>
+                <thead>
+                  <Tr>
+                    <Th $width={widths.selected}>
+                      <Selected
+                        type="checkbox"
+                        checked={selectedAll}
+                        onChange={() => setSelectedAll(prev => !prev)} />
+                    </Th>
+                    <Th $width={widths.name}>Nome</Th>
+                    <Th $width={widths.stock}>Estoque</Th>
+                    <Th $width={widths.price}>Preço</Th>
+                    <Th $width={widths.actions} $justifyContent="flex-end">Ações</Th>
+                  </Tr>
+                </thead>
+                <tbody>
+                  {products.map((item, index) => (
+                    <Tr key={index}>
+                      <Td $width={widths.selected}>
+                        <Selected type="checkbox" checked={item.product.id % 2 === 0} />
+                      </Td>
+                      <Td $width={widths.name}>
+                        <TableCeilText>{item.product.name}</TableCeilText>
+                      </Td>
+                      <Td $width={widths.stock}>
+                        <TableCeilText>{item.product.stock}</TableCeilText>
+                      </Td>
+                      <Td $width={widths.price}>
+                        <TableCeilText>{item.product.price}</TableCeilText>
+                      </Td>
+                      <Td $width={widths.actions}>
+                        <TableAction>
+                          <Button $variant="cancel">
+                            <ButtonIconContainer>
+                              <RxUpdate />
+                            </ButtonIconContainer>
+                          </Button>
+                          <Button $variant="error">
+                            <ButtonIconContainer>
+                              <BiTrash />
+                            </ButtonIconContainer>
+                          </Button>
+                        </TableAction>
+                      </Td>
+                    </Tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Row>
+          </Rows>
+        </Content >
+      </Page>
+    </>
   )
 }
 
@@ -215,28 +220,6 @@ const TableButtons = styled.ul`
   gap: ${props => props.theme.spacing.xs};
 `
 
-const ButtonIconContainer = styled.span`
-  svg {
-    color: ${props => props.theme.colors.iconDark};
-    font-size: ${props => props.theme.fontSizes.medium};
-  }
-`
-
-const RemoveButtonBase = styled(Button)`
-  background-color: #f8d7da;
-  color: #721c24;
-  border: #f5c6cb;
-`
-
-const RemoveItemsButtom = styled(RemoveButtonBase)``
-const AddNewProductButtom = styled(Button)``
-
-const SelectAllContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.md};
-`
-
 const Selected = styled.input`
   height: 20px;
   width: 20px;
@@ -260,14 +243,4 @@ const TableAction = styled.div`
   display: flex;
   gap: ${props => props.theme.spacing.md};
   justify-content: flex-end;
-`
-
-const EditButton = styled(Button)`
-  background-color: #fff3cd;
-  color: #856404;
-  border: #ffeeba;
-`
-
-
-const RemoveButton = styled(RemoveButtonBase)`
 `

@@ -15,7 +15,6 @@ import { Page } from "../../components/ui/Page"
 import { Row } from "../../components/ui/Row"
 import { Rows } from "../../components/ui/Rows"
 import { ErrorItem } from "../../components/ui/ErrorItem"
-import { FormButtonSubmit } from "../../components/ui/FormButtonSubmit"
 import { MoreLinks } from "../../components/ui/LinkList"
 import { LinkItemTitle } from "../../components/ui/LinkItemTitle"
 import { LinkItem } from "../../components/ui/LinkItem"
@@ -25,9 +24,10 @@ import { ErrorList } from "../../components/ui/ErrorList"
 import { AuthService } from "../../services/auth-service"
 import { routeNames } from "../../routes/routes-names"
 
-import { validateEmail } from "../../utils/email-validate"
+import { formValidateEmail } from "../../utils/form-email-validate"
 import { AiOutlineLoading } from "react-icons/ai"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { Button } from "../../components/ui/Button"
 
 
 type Inputs = {
@@ -54,12 +54,13 @@ export const SigninPage = () => {
   }, [])
 
 
-  const handleScrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
 
   const onSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
+    const handleScrollToTop = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    
     setIsLoading(true)
 
     try {
@@ -114,10 +115,10 @@ export const SigninPage = () => {
                       message: 'Esse Campo é requerido.',
                       value: true
                     },
-                    validate: validateEmail,
+                    validate: formValidateEmail,
                   })}
                 />
-                {errors.email && <ErrorList>{errors.email.message}</ErrorList>}
+                {errors.email && <ErrorItem>{errors.email.message}</ErrorItem>}
               </FormGroup>
               <FormGroup>
                 <Label>Senha</Label>
@@ -142,7 +143,7 @@ export const SigninPage = () => {
                 />
                 {errors.password && <ErrorItem>{errors.password.message}</ErrorItem>}
               </FormGroup>
-              <FormButtonSubmit type="submit" $isLoading={isLoading}>
+              <Button type="submit" $variant="add">
                 {isLoading ? (
                   <AiOutlineLoading />
                 ) : (
@@ -150,7 +151,7 @@ export const SigninPage = () => {
                     Entrar na conta!
                   </span>
                 )}
-              </FormButtonSubmit>
+              </Button>
             </Form>
           </PageCard>
         </Row>
