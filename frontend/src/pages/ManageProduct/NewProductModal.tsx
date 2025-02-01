@@ -15,8 +15,6 @@ import { TextArea } from "../../components/ui/TextArea"
 import { Input } from "../../components/ui/Input"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { ProductService } from "../../services/product-service"
-import { Rows } from "../../components/ui/Rows"
-import { Row } from "../../components/ui/Row"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { AiOutlineLoading } from "react-icons/ai"
@@ -24,6 +22,7 @@ import { Category, CategoryService } from "../../services/category-service"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { routeNames } from "../../routes/routes-names"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
+import { InputFile } from "../../components/ui/InputFile"
 
 type Props = {
   isOpenModal: boolean
@@ -45,6 +44,8 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
   const [imageUrl, setImageUrl] = React.useState('')
   const imageRef = React.useRef<HTMLInputElement | null>(null)
 
+  const formRef = React.useRef<HTMLFormElement | null>(null)
+
   const [categories, setCategories] = React.useState<Category[]>([{
     id: 0,
     name: 'Selecione'
@@ -59,6 +60,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     register,
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<Inputs>()
 
@@ -71,7 +73,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
       try {
         const categoryService = new CategoryService()
         const categories = await categoryService.findCategories()
-        setCategories(prev => [{...prev[0]}, ...categories])
+        setCategories(prev => [{ ...prev[0] }, ...categories])
       } catch (err) {
         if (err instanceof Error) {
           setGlobalError(err.message)
@@ -90,21 +92,21 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     }
   }, [])
 
+  const clearForm = React.useCallback(() => {
+    reset()
+    if(imageRef && imageRef.current) {
+      imageRef.current.value = ""
+    }
+    setImageUrl('')
+  }, [reset])
+
 
   const onSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
-    const handleScrollToTop = () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    if (!imageRef.current || !imageRef.current.files || imageRef.current.files.length === 0) {
-      return
-    }
-
     setIsLoading(true)
 
     try {
       const category = categories.find(category => category.name === data.category)
-      if(!category) {
+      if (!category) {
         throw new Error('Categoria não encontrada.')
       }
       const newProduct = {
@@ -114,20 +116,24 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
         stock: data.stock,
         categoryName: category?.name,
       }
-      const image = imageRef.current?.files[0]
       const productService = new ProductService(accessToken)
 
       const product = await productService.addProduct(newProduct)
-      await productService.updateImageProduct(product.id, image)
+
+      const image = imageRef.current?.files && imageRef.current.files.length > 0 ? imageRef.current?.files[0] : null
+      if (image) {
+        await productService.updateImageProduct(product.id, image)
+      }
+
       addProduct(product)
+
+      clearForm()
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message)
       } else {
         setGlobalError('Ocorreu um problema.\nTente novamente mais tarde.')
       }
-
-      handleScrollToTop()
     }
     finally {
       setIsLoading(false)
@@ -142,26 +148,20 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     <Modal
       isOpen={isOpenModal}
       onClose={onClose}>
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        {!!globalError && (
-          <Rows>
-            <Row>
-              <ErrorList>
-                <ErrorItem>{globalError}</ErrorItem>
-              </ErrorList>
-            </Row>
-          </Rows>
-        )}
+      <Form onSubmit={handleSubmit(onSubmit)} ref={formRef}>
+
         <FormGroup>
-          <Label>Imagem</Label>
           {!!imageUrl && (
             <FormImagePreview src={imageUrl} />
           )}
-          <Input type="file" ref={imageRef} onChange={imageProductOnChange} />
-          {imageRef.current?.files?.length === 0 && <ErrorItem>Selecione uma imagem</ErrorItem>}
+          <InputFile
+            label='Selecione a imagem'
+            ref={imageRef}
+            onChange={imageProductOnChange}
+          />
         </FormGroup>
         <FormGroup>
-          <Label>Nome</Label>
+          <Label required>Nome</Label>
           <Input
             type="text"
             {...register("name", {
@@ -178,7 +178,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
           {!!errors.name && <ErrorItem>{errors.name.message}</ErrorItem>}
         </FormGroup>
         <FormGroup>
-          <Label>Descrição</Label>
+          <Label required>Descrição</Label>
           <TextArea
             $maxLines={4}
             {...register("description", {
@@ -195,13 +195,18 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
           {!!errors.description && <ErrorItem>{errors.description.message}</ErrorItem>}
         </FormGroup>
         <FormGroup>
-          <Label>Estoque</Label>
+          <Label required>Estoque (Unidade)</Label>
           <Input
             type="number"
+            defaultValue={1}
             {...register("stock", {
               required: {
                 message: 'Esse Campo é requerido.',
                 value: true
+              },
+              min: {
+                message: 'Deve ter pelo menos uma unidade',
+                value: 1,
               },
               max: {
                 message: 'Quantidade deve ser no máximo 1.000.000 de unidades',
@@ -212,7 +217,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
           {!!errors.stock && <ErrorItem>{errors.stock.message}</ErrorItem>}
         </FormGroup>
         <FormGroup>
-          <Label>Preço</Label>
+          <Label required>Preço</Label>
           <Controller
             name="price"
             rules={{
@@ -253,7 +258,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
           {!!errors.price && <ErrorItem>{errors.price.message}</ErrorItem>}
         </FormGroup>
         <FormGroup>
-          <Label>Categoria</Label>
+          <Label required>Categoria</Label>
           <Select
             $error={false}
             defaultValue={0}
@@ -263,8 +268,8 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
                 value: true
               },
               validate: (value) => {
-                if(value === 'Selecione') {
-                  return 'Selecione uma categoria'
+                if (value === 'Selecione') {
+                  return 'Selecione uma categoria.'
                 }
                 return true;
               },
@@ -278,6 +283,11 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
           </Select>
           {!!errors.category && <ErrorItem>{errors.category.message}</ErrorItem>}
         </FormGroup>
+        {!!globalError && (
+          <ErrorList>
+            <ErrorItem>{globalError}</ErrorItem>
+          </ErrorList>
+        )}
         <FormGroupButton>
           <Button disabled={isLoading} onClick={() => onClose()} type="button" $variant='warning'>Cancelar</Button>
           <Button
