@@ -6,12 +6,13 @@ import { BiTrash } from "react-icons/bi"
 
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { Page } from "../../components/ui/Page"
-import { Product, ProductService } from "../../services/product-service"
+import { Product } from "../../services/product-service"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { Button } from "../../components/ui/Button"
 import { ButtonIconContainer } from "./ButtonIconContainer"
 import { AddNewProductButton } from "./AddNewProductButton"
+import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 
 type ProductItem = {
   selected: boolean
@@ -21,9 +22,14 @@ type ProductItem = {
 export const ManageProductPage = () => {
 
   const [products, setProducts] = React.useState<ProductItem[]>([])
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [globalError, setGlobalError] = React.useState<string>('')
   const [selectedAll, setSelectedAll] = React.useState(false)
+
+  const {
+    items,
+    globalError: globalErrorContext,
+    isLoading
+  } = React.useContext(ProductContext) as ProductContextType
 
   const widths = {
     selected: '75px',
@@ -34,28 +40,20 @@ export const ManageProductPage = () => {
   }
 
   React.useEffect(() => {
-    async function fetchProducts() {
-      setIsLoading(true)
-      try {
-        const productService = new ProductService()
-        const products = await productService.findProducts()
-        setProducts(products.map(product => ({
-          selected: false,
-          product,
-        })))
-      } catch (err) {
-        if (err instanceof Error) {
-          setGlobalError(err.message)
-        } else {
-          setGlobalError('Tente novamente mais tarde.')
-        }
-      }
-
-      setIsLoading(false)
-
+    if (!items) {
+      return
     }
-    fetchProducts()
-  }, [])
+    if (globalErrorContext) {
+      setGlobalError(globalErrorContext)
+      return
+    }
+
+    setProducts(items.map(product => ({
+      selected: false,
+      product,
+    })))
+
+  }, [items, globalErrorContext])
 
   // TODO: melhorar isso
   if (isLoading) {

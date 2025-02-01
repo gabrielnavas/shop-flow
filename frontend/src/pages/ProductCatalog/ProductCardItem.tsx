@@ -1,11 +1,13 @@
+import styled from "styled-components"
+import React, { useEffect } from "react"
 import { BsCartCheckFill } from "react-icons/bs"
 import { FaCartPlus } from "react-icons/fa6"
-import styled from "styled-components"
-import { Product } from "./types"
-import React, { useEffect } from "react"
+
 import { CartService } from "../../services/cart-service"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
+import { Product } from "../../services/product-service"
+import { MidiaService } from "../../services/midia-service"
 
 type Props = {
   product: Product
@@ -18,11 +20,17 @@ const priceReal = new Intl.NumberFormat('pt-BR', {
 
 export const ProductCardItem = ({ product }: Props) => {
 
-  const [imageSrc, setImageSrc] = React.useState(product.imageUrl)
+  const [imageSrc, setImageSrc] = React.useState('')
   const [addedCart, setAddedCart] = React.useState(false)
 
   const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
   const { addItemCart, existsProduct } = React.useContext(CartContext) as CartContextType
+
+  React.useEffect(() => {
+    const productService = new MidiaService()
+    const imageSrc: string = productService.getUrl(product.imageUrl)
+    setImageSrc(imageSrc)
+  }, [product.imageUrl])
 
   useEffect(() => {
     function verifyProductAddedToCart() {

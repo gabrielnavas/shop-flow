@@ -1,5 +1,6 @@
 import React from "react"
-import { Product, ProductCart } from "../../pages/ProductCatalog/types"
+import { ProductCart } from "../../pages/ProductCatalog/types"
+import { Product } from "../../services/product-service"
 
 export type CartContextType = {
   items: ProductCart[]

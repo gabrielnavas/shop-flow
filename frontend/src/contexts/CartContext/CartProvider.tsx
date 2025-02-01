@@ -1,9 +1,10 @@
 import React, { useEffect } from "react"
-import { Product, ProductCart } from "../../pages/ProductCatalog/types"
+import { ProductCart } from "../../pages/ProductCatalog/types"
 import { CartService } from "../../services/cart-service"
 import { mergeCartItems } from "./functions"
 import { AuthContext, AuthContextType } from "../AuthContext/AuthContext"
 import { CartContext } from "./CartContext"
+import { Product } from "../../services/product-service"
 
 
 type Props = {

@@ -1,45 +1,37 @@
 import styled, { keyframes } from "styled-components"
 import { HeaderPage } from "../../components/layout/HeaderPage"
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { ImSad2 } from "react-icons/im"
 import { AiOutlineLoading } from "react-icons/ai"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { BiSad } from "react-icons/bi"
-import { ProductService } from "../../services/product-service"
-import { Product } from "./types"
+import { Product } from "../../services/product-service"
 import { ProductCardItem } from "./ProductCardItem"
+import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 
 export const ProductCatalogPage = () => {
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = React.useState<Product[]>([])
   const [globalError, setGlobalError] = React.useState('')
-  const [isLoading, setIsLoading] = useState(false)
+
+    const {
+      items,
+      globalError: globalErrorContext,
+      isLoading
+    } = React.useContext(ProductContext) as ProductContextType
+  
 
   React.useEffect(() => {
     document.title = 'Shop Flow | Produtos'
   }, [])
 
-  useEffect(() => {
-    async function fetchProducts() {
-      setIsLoading(true)
-
-      try {
-        const productService = new ProductService()
-        const products = await productService.findProducts()
-        setProducts(products)
-      } catch (err) {
-        if (err instanceof Error) {
-          setGlobalError(err.message)
-        } else {
-          setGlobalError('Algo aconteceu. Aguarde e tente novamente.')
-        }
-      } finally {
-        setIsLoading(false)
-      }
+  React.useEffect(() => {
+    if (globalErrorContext) {
+      setGlobalError(globalErrorContext)
+      return
     }
-
-    fetchProducts()
-  }, [])
+    setProducts(items)
+  }, [items, globalErrorContext])
 
 
   let contentRender = null

@@ -1,9 +1,12 @@
+import React from "react"
+import { useNavigate } from "react-router"
+import accounting from "accounting"
+
 import { Button } from "../../components/ui/Button"
 import { Form } from "../../components/ui/Form"
 import { FormGroup } from "../../components/ui/FormGroup"
 import { Label } from "../../components/ui/Label"
 import Modal from "../../components/ui/Modal"
-import React from "react"
 import { Select } from "../../components/ui/Select"
 import { SelectOption } from "../../components/ui/SelectOption"
 import { FormImagePreview } from "../../components/ui/FormImagePreview"
@@ -17,7 +20,10 @@ import { Row } from "../../components/ui/Row"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { AiOutlineLoading } from "react-icons/ai"
-import accounting from "accounting"
+import { Category, CategoryService } from "../../services/category-service"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { routeNames } from "../../routes/routes-names"
+import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 
 type Props = {
   isOpenModal: boolean
@@ -32,7 +38,6 @@ type Inputs = {
   category: string
 }
 
-
 export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState(false)
@@ -40,13 +45,15 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
   const [imageUrl, setImageUrl] = React.useState('')
   const imageRef = React.useRef<HTMLInputElement | null>(null)
 
-  const categories = [{
-    id: 1,
-    name: 'Cozinha',
-  }, {
-    id: 2,
-    name: 'Auto',
-  },]
+  const [categories, setCategories] = React.useState<Category[]>([{
+    id: 0,
+    name: 'Selecione'
+  }])
+
+  const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
+  const { addProduct } = React.useContext(ProductContext) as ProductContextType
+
+  const navigate = useNavigate()
 
   const {
     register,
@@ -54,6 +61,27 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     control,
     formState: { errors },
   } = useForm<Inputs>()
+
+  React.useEffect(() => {
+    document.title = 'Shop Flow | Gerenciar Produtos'
+  }, [])
+
+  React.useLayoutEffect(() => {
+    async function fetchCategories() {
+      try {
+        const categoryService = new CategoryService()
+        const categories = await categoryService.findCategories()
+        setCategories(prev => [{...prev[0]}, ...categories])
+      } catch (err) {
+        if (err instanceof Error) {
+          setGlobalError(err.message)
+        } else {
+          setGlobalError('Problemas no servidor. Tente novamente mais tarde.')
+        }
+      }
+    }
+    fetchCategories().catch(console.error)
+  }, [])
 
   const imageProductOnChange = React.useCallback(() => {
     if (imageRef.current?.files && imageRef.current.files.length > 0) {
@@ -68,14 +96,30 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    if (!imageRef.current || !imageRef.current.files || imageRef.current.files.length === 0) {
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      const productService = new ProductService()
-      await productService.addProduct(data.name)
-      console.log(data);
-      
+      const category = categories.find(category => category.name === data.category)
+      if(!category) {
+        throw new Error('Categoria não encontrada.')
+      }
+      const newProduct = {
+        name: data.name,
+        description: data.description,
+        price: Number(data.price),
+        stock: data.stock,
+        categoryName: category?.name,
+      }
+      const image = imageRef.current?.files[0]
+      const productService = new ProductService(accessToken)
 
+      const product = await productService.addProduct(newProduct)
+      await productService.updateImageProduct(product.id, image)
+      addProduct(product)
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message)
@@ -88,7 +132,11 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [accessToken, categories, addProduct])
+
+  if (!isAuthencated) {
+    navigate(routeNames.home)
+  }
 
   return (
     <Modal
@@ -206,9 +254,26 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
         </FormGroup>
         <FormGroup>
           <Label>Categoria</Label>
-          <Select $error={false}>
+          <Select
+            $error={false}
+            defaultValue={0}
+            {...register("category", {
+              required: {
+                message: 'Esse Campo é requerido.',
+                value: true
+              },
+              validate: (value) => {
+                if(value === 'Selecione') {
+                  return 'Selecione uma categoria'
+                }
+                return true;
+              },
+            })}
+          >
             {categories.map(category => (
-              <SelectOption key={category.id}>{category.name}</SelectOption>
+              <SelectOption key={category.id} value={category.name}>
+                {category.name}
+              </SelectOption>
             ))}
           </Select>
           {!!errors.category && <ErrorItem>{errors.category.message}</ErrorItem>}
