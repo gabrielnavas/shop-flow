@@ -1,12 +1,13 @@
-import { GrUpdate } from "react-icons/gr"
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { Page } from "../../components/ui/Page"
-import { CgAdd, CgRemove } from "react-icons/cg"
 import styled from "styled-components"
 import React from "react"
 import { Product, ProductService } from "../../services/product-service"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
+import { Button } from "../../components/ui/Button"
+import { BiPlusCircle, BiTrash } from "react-icons/bi"
+import { RxUpdate } from "react-icons/rx"
 
 type ProductItem = {
   selected: boolean
@@ -21,11 +22,11 @@ export const ManageProductPage = () => {
   const [globalError, setGlobalError] = React.useState<string>('')
 
   const widths = {
-    selected: '100px',
-    name: '250px',
-    stock: '100px',
-    price: '100px',
-    actions: '100px',
+    selected: '75px',
+    name: '450px',
+    stock: '50px',
+    price: '50px',
+    actions: '50px',
   }
 
   React.useEffect(() => {
@@ -78,15 +79,15 @@ export const ManageProductPage = () => {
               </TableTitle>
               <TableButtons>
                 <RemoveItemsButtom onClick={() => { }}>
-                  <TableButtonIconContainer>
-                    <CgRemove />
-                  </TableButtonIconContainer>
+                  <ButtonIconContainer>
+                    <BiTrash />
+                  </ButtonIconContainer>
                   Remover todos
                 </RemoveItemsButtom>
                 <AddNewProductButtom onClick={() => { }}>
-                  <TableButtonIconContainer>
-                    <CgAdd />
-                  </TableButtonIconContainer>
+                  <ButtonIconContainer>
+                    <BiPlusCircle />
+                  </ButtonIconContainer>
                   Novo Produto
                 </AddNewProductButtom>
               </TableButtons>
@@ -124,10 +125,14 @@ export const ManageProductPage = () => {
                   <Td $width={widths.actions}>
                     <TableAction>
                       <EditButton>
-                        <GrUpdate />
+                        <ButtonIconContainer>
+                          <RxUpdate />
+                        </ButtonIconContainer>
                       </EditButton>
                       <RemoveButton>
-                        <CgRemove />
+                        <ButtonIconContainer>
+                          <BiTrash />
+                        </ButtonIconContainer>
                       </RemoveButton>
                     </TableAction>
                   </Td>
@@ -210,42 +215,26 @@ const TableButtons = styled.ul`
   gap: ${props => props.theme.spacing.xs};
 `
 
-const TableButtonIconContainer = styled.span`
+const ButtonIconContainer = styled.span`
   svg {
     color: ${props => props.theme.colors.iconDark};
     font-size: ${props => props.theme.fontSizes.medium};
   }
-  
 `
 
-const ButtonHeaderBase = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.xs};
-  padding: ${props => props.theme.spacing.sm};
-  color: ${props => props.theme.colors.buttonColorPrimary};
-  background-color: ${props => props.theme.colors.buttonBackgroundPrimary};
-  outline: none;
-  cursor: pointer;
-  border: none;
-
-  font-weight: 500;
-  font-size: ${props => props.theme.fontSizes.small};
-  border-radius: ${props => props.theme.borderRadius.default};
-
-  &:hover, &:active {
-    color: ${props => props.theme.colors.buttonBackgroundPrimary};
-    background-color: ${props => props.theme.colors.buttonColorPrimary};
-  }
+const RemoveButtonBase = styled(Button)`
+  background-color: #f8d7da;
+  color: #721c24;
+  border: #f5c6cb;
 `
 
-const RemoveItemsButtom = styled(ButtonHeaderBase)``
-const AddNewProductButtom = styled(ButtonHeaderBase)``
+const RemoveItemsButtom = styled(RemoveButtonBase)``
+const AddNewProductButtom = styled(Button)``
 
 const SelectAllContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: ${props => props.theme.spacing.md};
 `
 
 const Selected = styled.input`
@@ -273,30 +262,12 @@ const TableAction = styled.div`
   justify-content: flex-end;
 `
 
-const ButtonActionBase = styled.button`
-  display: flex;
-  align-items: center;
-  gap: ${props => props.theme.spacing.xs};
-  padding: ${props => props.theme.spacing.sm};
-  color: ${props => props.theme.colors.buttonColorPrimary};
-  background-color: ${props => props.theme.colors.buttonBackgroundPrimary};
-  outline: none;
-  cursor: pointer;
-  border: none;
-
-  font-weight: 500;
-  font-size: ${props => props.theme.fontSizes.small};
-  border-radius: ${props => props.theme.borderRadius.default};
-
-  &:hover, &:active {
-    color: ${props => props.theme.colors.buttonBackgroundPrimary};
-    background-color: ${props => props.theme.colors.buttonColorPrimary};
-  }
+const EditButton = styled(Button)`
+  background-color: #fff3cd;
+  color: #856404;
+  border: #ffeeba;
 `
 
-const EditButton = styled(ButtonActionBase)`
-  background-color: ${props => props.theme.colors.buttonBackgroundPrimary};
-`
-const RemoveButton = styled(ButtonActionBase)`
 
+const RemoveButton = styled(RemoveButtonBase)`
 `
