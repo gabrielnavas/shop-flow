@@ -155,14 +155,14 @@ export const ManageProductPage = () => {
                     </Td>
                     <Td $width={widths.actions}>
                       <TableAction>
-                        <Button $variant="cancel">
-                          <ButtonIconContainer>
-                            <RxUpdate />
-                          </ButtonIconContainer>
-                        </Button>
                         <Button $variant="error">
                           <ButtonIconContainer>
                             <BiTrash />
+                          </ButtonIconContainer>
+                        </Button>
+                        <Button $variant="cancel">
+                          <ButtonIconContainer>
+                            <RxUpdate />
                           </ButtonIconContainer>
                         </Button>
                       </TableAction>
