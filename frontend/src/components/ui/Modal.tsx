@@ -7,32 +7,6 @@ interface ModalProps {
   children: React.ReactNode;
 }
 
-const Overlay = styled.div<{ $isOpen: boolean }>`
-  display: ${props => (props.$isOpen ? "flex" : "none")};
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-`;
-
-const ModalContainer = styled.div`
-  justify-content: center;
-  align-items: center;
-  background: white;
-  border-radius: 8px;
-  width: 90%;
-  max-width: 92vw;
-  max-height: 92vh; /* Limita a altura do modal */
-  overflow-y: auto; /* Adiciona scroll apenas dentro do modal */
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-  padding: ${props => props.theme.spacing.lg}
-`;
-
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   useEffect(() => {
     if (isOpen) {
@@ -55,4 +29,28 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
   );
 };
 
-export default Modal;
+
+const Overlay = styled.div<{ $isOpen: boolean }>`
+  display: ${props => (props.$isOpen ? "flex" : "none")};
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContainer = styled.div`
+  justify-content: center;
+  align-items: center;
+  background: white;
+  border-radius: 8px;
+  max-width: 92vw;
+  max-height: 92vh; /* Limita a altura do modal */
+  overflow-y: auto; /* Adiciona scroll apenas dentro do modal */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: ${props => props.theme.spacing.lg};
+`;

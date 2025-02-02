@@ -6,7 +6,6 @@ import { Button } from "../../components/ui/Button"
 import { Form } from "../../components/ui/Form"
 import { FormGroup } from "../../components/ui/FormGroup"
 import { Label } from "../../components/ui/Label"
-import Modal from "../../components/ui/Modal"
 import { Select } from "../../components/ui/Select"
 import { SelectOption } from "../../components/ui/SelectOption"
 import { FormImagePreview } from "../../components/ui/FormImagePreview"
@@ -18,11 +17,13 @@ import { ProductService } from "../../services/product-service"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { AiOutlineLoading } from "react-icons/ai"
-import { Category, CategoryService } from "../../services/category-service"
+import { CategoryService } from "../../services/category-service"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { routeNames } from "../../routes/routes-names"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 import { InputFile } from "../../components/ui/InputFile"
+import { Category } from "../../services/entities"
+import { Modal } from "../../components/ui/Modal"
 
 type Props = {
   isOpenModal: boolean
@@ -94,7 +95,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
 
   const clearForm = React.useCallback(() => {
     reset()
-    if(imageRef && imageRef.current) {
+    if (imageRef && imageRef.current) {
       imageRef.current.value = ""
     }
     setImageUrl('')
@@ -138,7 +139,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     finally {
       setIsLoading(false)
     }
-  }, [accessToken, categories, addProduct])
+  }, [accessToken, categories, addProduct, clearForm])
 
   if (!isAuthencated) {
     navigate(routeNames.home)

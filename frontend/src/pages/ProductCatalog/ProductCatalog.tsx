@@ -1,14 +1,14 @@
-import styled, { keyframes } from "styled-components"
+import styled from "styled-components"
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import React from "react"
 import { ImSad2 } from "react-icons/im"
-import { AiOutlineLoading } from "react-icons/ai"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { BiSad } from "react-icons/bi"
-import { Product } from "../../services/product-service"
 import { ProductCardItem } from "./ProductCardItem"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
+import { LoadingIcon } from "../../components/ui/LoadingContainer"
+import { Product } from "../../services/entities"
 
 export const ProductCatalogPage = () => {
   const [products, setProducts] = React.useState<Product[]>([])
@@ -38,9 +38,7 @@ export const ProductCatalogPage = () => {
 
   if (isLoading) {
     contentRender = (
-      <IsLoadingContainer>
-        <AiOutlineLoading />
-      </IsLoadingContainer>
+      <LoadingIcon />
     )
   } else if (!isLoading && products.length === 0) {
     contentRender = (
@@ -156,25 +154,5 @@ const ErrorListProduct = styled(ErrorList)`
 
   svg {
     font-size: calc(${(props) => props.theme.fontSizes.extraLarge} * 2.5);
-  }
-`
-
-
-// Keyframes para a animação de rotação
-const rotate = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-const IsLoadingContainer = styled.div`
-  margin-top: calc(${props => props.theme.spacing.md} * 6);
-  svg { /* Estiliza o ícone de loading */
-    font-size: calc(${(props) => props.theme.fontSizes.extraLarge} * 2.5);
-    color: ${(props) => props.theme.colors.darkIcon};
-    animation: ${rotate} 1s linear infinite; /* Aplica a animação */
   }
 `

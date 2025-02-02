@@ -1,6 +1,7 @@
 import React from "react"
-import { Product, ProductService } from "../../services/product-service"
+import { ProductService } from "../../services/product-service"
 import { ProductContext } from "./ProductContext"
+import { Product } from "../../services/entities"
 
 type Props = {
   children: React.ReactNode

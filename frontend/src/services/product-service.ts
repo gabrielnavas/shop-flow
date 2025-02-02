@@ -1,4 +1,4 @@
-import { Category } from "./category-service";
+import { Product } from "./entities";
 
 
 export type AddNewProduct = {
@@ -9,26 +9,13 @@ export type AddNewProduct = {
   categoryName: string;
 }
 
-
-export type Product = {
-  id: number;
-  name: string;
-  description: string;
-  stock: number;
-  price: number;
-  imageUrl: string;
-  createdAt: Date
-  updatedAt?: Date
-  category: Category;
-}
-
-
 type BodyProduct = Omit<Product, 'createdAt' | 'updatedAt'> & {
   createdAt: string
   updatedAt: string
 }
 
 export class ProductService {
+  
   
   constructor(
     private accessToken?: string,
@@ -112,6 +99,22 @@ export class ProductService {
     await fetch(url, requestOptions)
   }
 
+  async removeProduct(product: Product) {
+    if (!this.accessToken) {
+      throw new Error('Você não tem permissão')
+    }
+    const url = `${this.urlEndpoint}/${product.id}`
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${this.accessToken}`
+      },
+    })
+    if (response.status >= 400) {
+      const { message } = await response.json()
+      throw new Error(message)
+    }
+  }
 
   private mapBodyToProduct(body: BodyProduct): Product {
     return ({

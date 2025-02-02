@@ -1,5 +1,5 @@
 import React from "react"
-import { Product } from "../../services/product-service"
+import { Product } from "../../services/entities"
 
 export type ProductContextType = {
   items: Product[]

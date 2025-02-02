@@ -1,4 +1,4 @@
-import { Product } from "../../services/product-service";
+import { Product } from "../../services/entities";
 
 export type ProductCart = {
   product: Product;

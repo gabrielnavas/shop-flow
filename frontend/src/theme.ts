@@ -18,8 +18,8 @@ export const theme = {
     buttonBackgroundWarningHover: "#e68900",
     buttonBackgroundError: "#e53935", // Vermelho escuro (Error)
     buttonBackgroundErrorHover: "#c62828",
-    buttonBackgroundCancel: "#f4c430", // Amarelo claro (Cancel)
-    buttonBackgroundCancelHover: "#e0b020",
+    buttonBackgroundCancel: "#FFD350", // Amarelo claro (Cancel)
+    buttonBackgroundCancelHover: "#FFBF00",
 
     cardBackground: "#ffffff",
     borderColor: "#D5D5D5",

@@ -1,8 +1,4 @@
-
-export type Category = {
-  id: number
-  name: string
-}
+import { Category } from "./entities"
 
 type BodyCategory = Category
 

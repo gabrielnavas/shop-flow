@@ -6,13 +6,15 @@ import { BiTrash } from "react-icons/bi"
 
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { Page } from "../../components/ui/Page"
-import { Product } from "../../services/product-service"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { Button } from "../../components/ui/Button"
 import { ButtonIconContainer } from "./ButtonIconContainer"
 import { AddNewProductItemButton } from "./AddNewProductItemButton"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
+import { RemoveProductItemButton } from "./RemoveProductItemButton"
+import { Product } from "../../services/entities"
+import { LoadingIcon } from "../../components/ui/LoadingContainer"
 
 type ProductItem = {
   selected: boolean
@@ -70,7 +72,6 @@ export const ManageProductPage = () => {
     })
   }, [])
 
-
   const toggleSelectAllProductItemsOnClick = React.useCallback(() => {
     setSelectedAll(prev => !prev)
     setProductItems(prev => prev.map(item => {
@@ -80,14 +81,9 @@ export const ManageProductPage = () => {
     }))
   }, [])
 
-
-  const removeProductItemOnClick = React.useCallback((product: Product) => {
-    alert(product.id)
-  }, [])
-
   // TODO: melhorar isso
   if (isLoading) {
-    return <div>Carregando...</div>
+    return <LoadingIcon />
   }
 
   return (
@@ -160,11 +156,7 @@ export const ManageProductPage = () => {
                     </Td>
                     <Td $width={widths.actions}>
                       <TableAction>
-                        <Button $variant="error" onClick={() => removeProductItemOnClick(item.product)}>
-                          <ButtonIconContainer>
-                            <BiTrash />
-                          </ButtonIconContainer>
-                        </Button>
+                        <RemoveProductItemButton product={item.product} />
                         <Button $variant="cancel">
                           <ButtonIconContainer>
                             <RxUpdate />

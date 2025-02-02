@@ -6,11 +6,12 @@ import { FaCartPlus } from "react-icons/fa6"
 import { CartService } from "../../services/cart-service"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
-import { Product } from "../../services/product-service"
 import { MidiaService } from "../../services/midia-service"
+import { Product } from "../../services/entities"
 
 type Props = {
   product: Product
+  readonly?: boolean | undefined
 }
 
 const priceReal = new Intl.NumberFormat('pt-BR', {
@@ -18,7 +19,7 @@ const priceReal = new Intl.NumberFormat('pt-BR', {
   currency: 'BRL',
 });
 
-export const ProductCardItem = ({ product }: Props) => {
+export const ProductCardItem = ({ product, readonly }: Props) => {
 
   const [imageSrc, setImageSrc] = React.useState('')
   const [addedCart, setAddedCart] = React.useState(false)
@@ -49,7 +50,7 @@ export const ProductCardItem = ({ product }: Props) => {
   }, [addItemCart, isAuthencated, accessToken])
 
   return (
-    <Container onClick={!addedCart ? () => addProductToCartOnClick(product) : undefined}>
+    <Container $readonly={readonly} onClick={!addedCart && !readonly ? () => addProductToCartOnClick(product) : undefined}>
       <Image src={imageSrc} onError={() => setImageSrc('src/assets/imgs/no-image.jpg')} />
       <Info>
         <Titles>
@@ -61,16 +62,19 @@ export const ProductCardItem = ({ product }: Props) => {
             <PriceTitle>Preço</PriceTitle>
             <PriceValue>{priceReal.format(product.price)}</PriceValue>
           </PriceContainer>
+          {!readonly && (
           <AddToCardButton $added={addedCart}>
             {addedCart ? <BsCartCheckFill /> : <FaCartPlus />}
           </AddToCardButton>
+
+          )}
         </CardBottom>
       </Info>
     </Container>
   )
 }
 
-const Container = styled.div`
+const Container = styled.div<{$readonly?: boolean | undefined}>`
   display: flex;
   flex-direction: column;
   width: 250px;
@@ -78,11 +82,15 @@ const Container = styled.div`
   border: 1px solid ${props => props.theme.colors.borderColor};
   outline: none;
   box-shadow: ${props => props.theme.shadows.card};
-  cursor: pointer;
   transition: 500ms;
-  &:hover {
-    transform: scale(1.10);
-  }
+
+  ${props => !props.$readonly && `
+    cursor: pointer;
+    
+    &:hover {
+      transform: scale(1.10);
+    }
+  `}
 `
 
 const Image = styled.img`
