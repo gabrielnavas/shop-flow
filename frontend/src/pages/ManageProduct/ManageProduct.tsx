@@ -21,7 +21,7 @@ type ProductItem = {
 
 export const ManageProductPage = () => {
 
-  const [products, setProducts] = React.useState<ProductItem[]>([])
+  const [productItems, setProductItems] = React.useState<ProductItem[]>([])
   const [globalError, setGlobalError] = React.useState<string>('')
   const [selectedAll, setSelectedAll] = React.useState(false)
 
@@ -48,104 +48,128 @@ export const ManageProductPage = () => {
       return
     }
 
-    setProducts(items.map(product => ({
+    setProductItems(items.map(product => ({
       selected: false,
       product,
     })))
 
   }, [items, globalErrorContext])
 
+  const toggleSelectProductItemOnClick = React.useCallback((productId: number) => {
+    setProductItems(prev => {
+      const index = prev.findIndex(item => item.product.id === productId)
+      if (index < 0) {
+        return prev
+      }
+
+      const productItems = [...prev]
+
+      productItems[index].selected = true
+      return productItems
+    })
+  }, [])
+
+
+  const toggleSelectAllProductItemsOnClick = React.useCallback(() => {
+    setSelectedAll(prev => !prev)
+    setProductItems(prev => prev.map(item => {
+      const newItems = { ...item }
+      newItems.selected = !newItems.selected
+      return newItems
+    }))
+  }, [])
+
   // TODO: melhorar isso
   if (isLoading) {
     return <div>Carregando...</div>
   }
 
-
   return (
-    <>
-      <Page>
-        <HeaderPage />
-        <Content>
-          <Rows $padding="20px">
-            <Row>
-              {!!globalError && (
-                <ErrorList>
-                  <ErrorItem>
-                    {globalError}
-                  </ErrorItem>
-                </ErrorList>
-              )}
-            </Row>
-            <Row>
-              <TableTop>
-                <TableTitle>
-                  Gerenciar produtos
-                </TableTitle>
-                <TableButtons>
-                  <Button $variant="error">
-                    <ButtonIconContainer>
-                      <BiTrash />
-                    </ButtonIconContainer>
-                    Remover todos
-                  </Button>
-                  <AddNewProductButton />
-                </TableButtons>
-              </TableTop>
-            </Row>
-            <Row>
-              <Table>
-                <thead>
-                  <Tr>
-                    <Th $width={widths.selected}>
+    <Page>
+      <HeaderPage />
+      <Content>
+        <Rows $padding="20px">
+          <Row>
+            {!!globalError && (
+              <ErrorList>
+                <ErrorItem>
+                  {globalError}
+                </ErrorItem>
+              </ErrorList>
+            )}
+          </Row>
+          <Row>
+            <TableTop>
+              <TableTitle>
+                Gerenciar produtos
+              </TableTitle>
+              <TableButtons>
+                <Button $variant="error">
+                  <ButtonIconContainer>
+                    <BiTrash />
+                  </ButtonIconContainer>
+                  Remover selecionados
+                </Button>
+                <AddNewProductButton />
+              </TableButtons>
+            </TableTop>
+          </Row>
+          <Row>
+            <Table>
+              <thead>
+                <Tr>
+                  <Th $width={widths.selected}>
+                    <Selected
+                      type="checkbox"
+                      checked={selectedAll}
+                      onChange={() => toggleSelectAllProductItemsOnClick()} />
+                  </Th>
+                  <Th $width={widths.name}>Nome</Th>
+                  <Th $width={widths.stock}>Estoque</Th>
+                  <Th $width={widths.price}>Preço</Th>
+                  <Th $width={widths.actions} $justifyContent="flex-end">Ações</Th>
+                </Tr>
+              </thead>
+              <tbody>
+                {productItems.map((item, index) => (
+                  <Tr key={index}>
+                    <Td $width={widths.selected}>
                       <Selected
                         type="checkbox"
-                        checked={selectedAll}
-                        onChange={() => setSelectedAll(prev => !prev)} />
-                    </Th>
-                    <Th $width={widths.name}>Nome</Th>
-                    <Th $width={widths.stock}>Estoque</Th>
-                    <Th $width={widths.price}>Preço</Th>
-                    <Th $width={widths.actions} $justifyContent="flex-end">Ações</Th>
+                        checked={item.selected}
+                        onClick={() => toggleSelectProductItemOnClick(item.product.id)} />
+                    </Td>
+                    <Td $width={widths.name}>
+                      <TableCeilText>{item.product.name}</TableCeilText>
+                    </Td>
+                    <Td $width={widths.stock}>
+                      <TableCeilText>{item.product.stock}</TableCeilText>
+                    </Td>
+                    <Td $width={widths.price}>
+                      <TableCeilText>{item.product.price}</TableCeilText>
+                    </Td>
+                    <Td $width={widths.actions}>
+                      <TableAction>
+                        <Button $variant="cancel">
+                          <ButtonIconContainer>
+                            <RxUpdate />
+                          </ButtonIconContainer>
+                        </Button>
+                        <Button $variant="error">
+                          <ButtonIconContainer>
+                            <BiTrash />
+                          </ButtonIconContainer>
+                        </Button>
+                      </TableAction>
+                    </Td>
                   </Tr>
-                </thead>
-                <tbody>
-                  {products.map((item, index) => (
-                    <Tr key={index}>
-                      <Td $width={widths.selected}>
-                        <Selected type="checkbox" checked={item.product.id % 2 === 0} />
-                      </Td>
-                      <Td $width={widths.name}>
-                        <TableCeilText>{item.product.name}</TableCeilText>
-                      </Td>
-                      <Td $width={widths.stock}>
-                        <TableCeilText>{item.product.stock}</TableCeilText>
-                      </Td>
-                      <Td $width={widths.price}>
-                        <TableCeilText>{item.product.price}</TableCeilText>
-                      </Td>
-                      <Td $width={widths.actions}>
-                        <TableAction>
-                          <Button $variant="cancel">
-                            <ButtonIconContainer>
-                              <RxUpdate />
-                            </ButtonIconContainer>
-                          </Button>
-                          <Button $variant="error">
-                            <ButtonIconContainer>
-                              <BiTrash />
-                            </ButtonIconContainer>
-                          </Button>
-                        </TableAction>
-                      </Td>
-                    </Tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Row>
-          </Rows>
-        </Content >
-      </Page>
-    </>
+                ))}
+              </tbody>
+            </Table>
+          </Row>
+        </Rows>
+      </Content >
+    </Page>
   )
 }
 

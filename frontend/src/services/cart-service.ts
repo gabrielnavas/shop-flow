@@ -1,4 +1,5 @@
-import { Product, ProductCart } from "../pages/ProductCatalog/types";
+import { ProductCart } from "../pages/ProductCatalog/types";
+import { Product } from "./product-service";
 
 export class CartService {
   constructor(
