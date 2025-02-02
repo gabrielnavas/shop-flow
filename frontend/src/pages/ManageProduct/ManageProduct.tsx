@@ -33,7 +33,8 @@ export const ManageProductPage = () => {
 
   const widths = {
     selected: '75px',
-    name: '450px',
+    name: '150px',
+    description: '450px',
     stock: '50px',
     price: '50px',
     actions: '50px',
@@ -125,6 +126,7 @@ export const ManageProductPage = () => {
                       onChange={() => toggleSelectAllProductItemsOnClick()} />
                   </Th>
                   <Th $width={widths.name}>Nome</Th>
+                  <Th $width={widths.description}>Descrição</Th>
                   <Th $width={widths.stock}>Estoque</Th>
                   <Th $width={widths.price}>Preço</Th>
                   <Th $width={widths.actions} $justifyContent="flex-end">Ações</Th>
@@ -141,6 +143,9 @@ export const ManageProductPage = () => {
                     </Td>
                     <Td $width={widths.name}>
                       <TableCeilText>{item.product.name}</TableCeilText>
+                    </Td>
+                    <Td $width={widths.description}>
+                      <TableCeilText>{item.product.description}</TableCeilText>
                     </Td>
                     <Td $width={widths.stock}>
                       <TableCeilText>{item.product.stock}</TableCeilText>
