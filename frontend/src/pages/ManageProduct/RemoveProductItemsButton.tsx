@@ -1,41 +1,43 @@
 import React from "react"
+import styled from "styled-components"
+
+import { BiTrash } from "react-icons/bi"
+import { MdCancel } from "react-icons/md"
+
 import { ProductService } from "../../services/product-service"
 import { Button } from "../../components/ui/Button"
 import { ButtonIconContainer } from "./ButtonIconContainer"
-import { BiTrash } from "react-icons/bi"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { Product } from "../../services/entities"
 import { LoadingIcon } from "../../components/ui/LoadingContainer"
-import { ProductCardItem } from "../ProductCatalog/ProductCardItem"
 import { Modal } from "../../components/ui/Modal"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
-import { MdCancel } from "react-icons/md"
 import { ModalContent } from "./ModalContent"
 import { ModalQuestion } from "./ModalQuestion"
 import { ModalQuestionButtons } from "./ModalQuestionButtons"
 
 type Props = {
-  product: Product
+  products: Product[]
 }
 
 
-export const RemoveProductItemButton = ({ product }: Props) => {
+export const RemoveProductItemsButton = ({ products }: Props) => {
   const [globalError, setGlobalError] = React.useState('')
   const [isModalOpen, setIsModalOpen] = React.useState(false)
   const [isLoading, setIsLoading] = React.useState(false)
 
   const { accessToken } = React.useContext(AuthContext) as AuthContextType
-  const { removerProduct } = React.useContext(ProductContext) as ProductContextType
+  const { removerProducts } = React.useContext(ProductContext) as ProductContextType
 
   const removeProductItemOnClick = React.useCallback(async () => {
     setIsLoading(true)
 
     try {
       const productService = new ProductService(accessToken)
-      await productService.removeProduct(product)
-      removerProduct(product.id)
+      await productService.removeProducts(products)
+      removerProducts(products.map(product => product.id))
       setIsModalOpen(false)
     } catch (err) {
       if (err instanceof Error) {
@@ -46,7 +48,7 @@ export const RemoveProductItemButton = ({ product }: Props) => {
     } finally {
       setIsLoading(false)
     }
-  }, [accessToken, product, removerProduct])
+  }, [accessToken, products, removerProducts])
 
   const cancelRemoveProductItemOnClick = React.useCallback(() => {
     setIsModalOpen(false)
@@ -54,16 +56,54 @@ export const RemoveProductItemButton = ({ product }: Props) => {
 
   return (
     <>
-      <Button $variant="error" onClick={() => setIsModalOpen(true)}>
+      <Button $variant="error" onClick={() => setIsModalOpen(true)} disabled={products.length === 0}>
         <ButtonIconContainer>
           <BiTrash />
         </ButtonIconContainer>
+        Remover selecionados
       </Button>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <ModalContent>
-          <ProductCardItem product={product} readonly />
-          <ModalQuestion>Deseja realmente remover esse Produto?</ModalQuestion>
+          <ModalQuestion>Deseja realmente remover os Produtos selecionados?</ModalQuestion>
+
+          <ProductList>
+            <>
+              <ProductItem>
+                <ProductItemHeader $width="100px">
+                  Nome
+                </ProductItemHeader>
+                <ProductItemHeader $width="100px">
+                  Descrição
+                </ProductItemHeader>
+                <ProductItemHeader $width="100px">
+                  Estoque
+                </ProductItemHeader>
+                <ProductItemHeader $width="100px">
+                  Preço
+                </ProductItemHeader>
+              </ProductItem>
+            </>
+            {
+              products.map(product => (
+                <ProductItem key={product.id}>
+                  <ProductItemData $width="100px">
+                    {product.name}
+                  </ProductItemData>
+                  <ProductItemData $width="100px">
+                    {product.description}
+                  </ProductItemData>
+                  <ProductItemData $width="100px">
+                    {product.stock}
+                  </ProductItemData>
+                  <ProductItemData $width="100px">
+                    {product.price}
+                  </ProductItemData>
+                </ProductItem>
+              ))
+            }
+          </ProductList>
+
           {!!globalError && (
             <ErrorList>
               <ErrorItem>{globalError}</ErrorItem>
@@ -78,7 +118,7 @@ export const RemoveProductItemButton = ({ product }: Props) => {
                 <ButtonIconContainer>
                   <BiTrash />
                 </ButtonIconContainer>
-                Remover
+                Remover todos
               </Button>
 
               <Button $variant="cancel" onClick={() => cancelRemoveProductItemOnClick()}>
@@ -95,3 +135,32 @@ export const RemoveProductItemButton = ({ product }: Props) => {
     </>
   )
 }
+
+
+const ProductList = styled.ul`
+  list-style-type: square;
+  width: 100%;
+  overflow-y: auto;
+  max-height: 500px;
+  gap: ${props=> props.theme.spacing.xs};
+`
+const ProductItem = styled.li`
+  display: flex;
+  justify-content: space-around;
+`
+
+const ProductItemRow = styled.span<{ $width?: string | undefined }>`
+  width: ${props => props.$width || 'auto'};
+`
+
+const ProductItemHeader = styled(ProductItemRow)`
+  font-weight: bold;
+  font-size: ${props => props.theme.fontSizes.medium};
+  margin: 3px 0;
+`
+
+const ProductItemData = styled(ProductItemRow)`
+  font-weight: 500;
+  font-size: ${props => props.theme.fontSizes.medium};
+`
+

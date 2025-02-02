@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
   Put,
+  Query,
   UploadedFile,
   UseFilters,
   UseInterceptors,
@@ -31,6 +33,19 @@ export class ProductController {
   async addProduct(@Body() dto: AddProductDto) {
     const product = await this.productService.addProduct(dto);
     return product;
+  }
+
+  @Delete(':productId')
+  @SetRoles(RoleName.ADMIN, RoleName.CONSUMER)
+  async removeProduct(@Param('productId') productId: number) {
+    await this.productService.removeProduct(productId);
+  }
+
+  @Delete()
+  @SetRoles(RoleName.ADMIN, RoleName.CONSUMER)
+  async removeProducts(@Query('productIds') productIds: string) {
+    const ids = productIds.split(',').map(Number); // Converte para array de números
+    await this.productService.removeProducts({ productIds: ids });
   }
 
   // TODO: Otimizar upload para suportar arquivos grandes.

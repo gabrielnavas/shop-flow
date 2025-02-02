@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager, Repository } from 'typeorm';
-import { AddProductDto, ProductDto } from '../dtos';
+import { AddProductDto, ProductDto, RemoveProductsDto } from '../dtos';
 import { Category } from 'src/entities/category.entity';
 import { Product } from 'src/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -102,6 +102,44 @@ export class ProductService {
       category: category,
       createdAt: new Date(),
     });
+  }
+
+  async removeProduct(productId: number) {
+    const productFound = await this.productRepository.findOneBy({
+      id: productId,
+    });
+    if (productFound === null) {
+      throw new ProductNotFoundException();
+    }
+    await this.productRepository.delete({
+      id: productFound.id,
+    });
+  }
+
+  async removeProducts(dto: RemoveProductsDto) {
+    const queryRunner = this.entityManager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      const promises = dto.productIds.map(async (productId: number) => {
+        const productFound = await queryRunner.manager.findOneBy(Product, {
+          id: productId,
+        });
+        if (productFound === null) {
+          throw new ProductNotFoundException();
+        }
+        return queryRunner.manager.delete(Product, {
+          id: productFound.id,
+        });
+      });
+      await Promise.all(promises);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   private mapEntityToDto(entity: Product): ProductDto {

@@ -7,6 +7,10 @@ export type AddProductDto = {
   categoryName: string;
 };
 
+export type RemoveProductsDto = {
+  productIds: number[];
+};
+
 export type ProductDto = {
   id: number;
   name: string;

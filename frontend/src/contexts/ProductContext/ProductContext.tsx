@@ -5,6 +5,7 @@ export type ProductContextType = {
   items: Product[]
   addProduct: (product: Product) => void
   removerProduct: (productId: number) => void
+  removerProducts: (productIds: number[]) => void
   updateProduct: (productId: number, product: Product) => void
   isLoading: boolean
   globalError: string

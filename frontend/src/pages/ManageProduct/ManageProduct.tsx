@@ -2,7 +2,6 @@ import styled from "styled-components"
 import React from "react"
 
 import { RxUpdate } from "react-icons/rx"
-import { BiTrash } from "react-icons/bi"
 
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { Page } from "../../components/ui/Page"
@@ -15,6 +14,7 @@ import { ProductContext, ProductContextType } from "../../contexts/ProductContex
 import { RemoveProductItemButton } from "./RemoveProductItemButton"
 import { Product } from "../../services/entities"
 import { LoadingIcon } from "../../components/ui/LoadingContainer"
+import { RemoveProductItemsButton } from "./RemoveProductItemsButton"
 
 type ProductItem = {
   selected: boolean
@@ -43,33 +43,34 @@ export const ManageProductPage = () => {
   }
 
   React.useEffect(() => {
-    if (!items) {
-      return
-    }
-    if (globalErrorContext) {
-      setGlobalError(globalErrorContext)
-      return
+    console.log(productItems);
+    
+    function fetchProductItems() {
+      if (!items) {
+        return
+      }
+      if (globalErrorContext) {
+        setGlobalError(globalErrorContext)
+        return
+      }
+
+      setProductItems(items.map(product => ({
+        product: product,
+        selected: false,
+      })))
     }
 
-    setProductItems(items.map(product => ({
-      selected: false,
-      product,
-    })))
-
+    fetchProductItems()
   }, [items, globalErrorContext])
 
   const toggleSelectProductItemOnClick = React.useCallback((productId: number) => {
-    setProductItems(prev => {
-      const index = prev.findIndex(item => item.product.id === productId)
-      if (index < 0) {
-        return prev
+    setProductItems(prev => prev.map(productItem => {
+      const newProductItem = {...productItem}
+      if(newProductItem.product.id === productId) {
+        newProductItem.selected = !newProductItem.selected
       }
-
-      const productItems = [...prev]
-
-      productItems[index].selected = true
-      return productItems
-    })
+      return {...newProductItem}
+    }))
   }, [])
 
   const toggleSelectAllProductItemsOnClick = React.useCallback(() => {
@@ -81,7 +82,7 @@ export const ManageProductPage = () => {
     }))
   }, [])
 
-  // TODO: melhorar isso
+  // TODO: melhorar a forma que o loading é mostrado
   if (isLoading) {
     return <LoadingIcon />
   }
@@ -106,12 +107,11 @@ export const ManageProductPage = () => {
                 Gerenciar produtos
               </TableTitle>
               <TableButtons>
-                <Button $variant="error">
-                  <ButtonIconContainer>
-                    <BiTrash />
-                  </ButtonIconContainer>
-                  Remover selecionados
-                </Button>
+                <RemoveProductItemsButton
+                  products={
+                    productItems.filter(productItem => productItem.selected)
+                      .map(productItem => productItem.product)}
+                />
                 <AddNewProductItemButton />
               </TableButtons>
             </TableTop>

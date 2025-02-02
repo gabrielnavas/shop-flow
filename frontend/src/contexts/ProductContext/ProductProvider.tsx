@@ -42,6 +42,13 @@ export const ProductProvider = ({ children }: Props) => {
     setItems(prev => prev.filter(product => product.id !== productId))
   }, [])
 
+  const removerProducts= React.useCallback((productIds: number[]) => {
+    setItems(prev => prev.filter(product => {
+      const found = productIds.some(productId => product.id === productId)
+      return !found
+    }))
+  }, [])
+
   const updateProduct = React.useCallback((productId: number, product: Product) => {
     setItems(prev => {
       const index = prev.findIndex(product => product.id !== productId)
@@ -67,6 +74,7 @@ export const ProductProvider = ({ children }: Props) => {
     <ProductContext.Provider value={{
       addProduct,
       removerProduct,
+      removerProducts,
       updateProduct,
       items,
       isLoading,
