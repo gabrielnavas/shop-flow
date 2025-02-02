@@ -5,7 +5,7 @@ import { ButtonIconContainer } from "./ButtonIconContainer"
 import { Button } from "../../components/ui/Button"
 import { NewProductModal } from "./NewProductModal"
 
-export const AddNewProductButton = () => {
+export const AddNewProductItemButton = () => {
   const [isOpenModal, setIsOpenModal] = React.useState(false)
 
   return (

@@ -11,7 +11,7 @@ import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { Button } from "../../components/ui/Button"
 import { ButtonIconContainer } from "./ButtonIconContainer"
-import { AddNewProductButton } from "./AddNewProductButton"
+import { AddNewProductItemButton } from "./AddNewProductItemButton"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 
 type ProductItem = {
@@ -80,6 +80,11 @@ export const ManageProductPage = () => {
     }))
   }, [])
 
+
+  const removeProductItemOnClick = React.useCallback((product: Product) => {
+    alert(product.id)
+  }, [])
+
   // TODO: melhorar isso
   if (isLoading) {
     return <div>Carregando...</div>
@@ -111,7 +116,7 @@ export const ManageProductPage = () => {
                   </ButtonIconContainer>
                   Remover selecionados
                 </Button>
-                <AddNewProductButton />
+                <AddNewProductItemButton />
               </TableButtons>
             </TableTop>
           </Row>
@@ -155,7 +160,7 @@ export const ManageProductPage = () => {
                     </Td>
                     <Td $width={widths.actions}>
                       <TableAction>
-                        <Button $variant="error">
+                        <Button $variant="error" onClick={() => removeProductItemOnClick(item.product)}>
                           <ButtonIconContainer>
                             <BiTrash />
                           </ButtonIconContainer>
