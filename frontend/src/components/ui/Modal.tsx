@@ -20,6 +20,25 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    function onClosePressKeyEsc() {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === "Escape") {
+          console.log("Tecla Esc pressionada!");
+          onClose()
+        }
+      };
+  
+      document.addEventListener("keydown", handleKeyDown);
+  
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+
+    onClosePressKeyEsc()
+  }, [onClose]);
+
   return (
     <Overlay $isOpen={isOpen} onClick={onClose}>
       <ModalContainer onClick={(e) => e.stopPropagation()}>
