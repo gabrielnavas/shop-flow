@@ -87,7 +87,7 @@ export class ProductController {
   }
 
   @Get()
-  async findProducts(): Promise<ProductDto[]> {
-    return await this.productService.findProducts();
+  async findProducts(@Query('q') query: string): Promise<ProductDto[]> {
+    return await this.productService.findProducts(query);
   }
 }

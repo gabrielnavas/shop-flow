@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, ILike, Repository } from 'typeorm';
 import {
   AddProductDto,
   ProductDto,
@@ -65,8 +65,13 @@ export class ProductService {
     }
   }
 
-  async findProducts(): Promise<ProductDto[]> {
+  async findProducts(query: string): Promise<ProductDto[]> {
+    const whereCondition = query
+      ? [{ name: ILike(`%${query}%`) }, { description: ILike(`%${query}%`) }]
+      : {};
+
     const products = await this.productRepository.find({
+      where: whereCondition,
       relations: {
         category: true,
       },
