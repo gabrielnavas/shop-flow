@@ -39,7 +39,7 @@ export const ManageProductPage = () => {
     price: '50px',
     actions: '50px',
   }
-  
+
   React.useEffect(() => {
     document.title = 'Shop flow | Gerenciar produtos'
   }, [])
@@ -65,11 +65,11 @@ export const ManageProductPage = () => {
 
   const toggleSelectProductItemOnClick = React.useCallback((productId: number) => {
     setProductItems(prev => prev.map(productItem => {
-      const newProductItem = {...productItem}
-      if(newProductItem.product.id === productId) {
+      const newProductItem = { ...productItem }
+      if (newProductItem.product.id === productId) {
         newProductItem.selected = !newProductItem.selected
       }
-      return {...newProductItem}
+      return { ...newProductItem }
     }))
   }, [])
 
@@ -83,96 +83,105 @@ export const ManageProductPage = () => {
   }, [])
 
   // TODO: melhorar a forma que o loading é mostrado
-  if (isLoading) {
-    return <LoadingIcon />
-  }
+  const loadingComponent = (
+    <Content>
+      <LoadingIcon />
+    </Content>
+  )
+
+  const contentComponent = (
+    <Content>
+      <Rows $padding="20px">
+        <Row>
+          {!!globalError && (
+            <ErrorList>
+              <ErrorItem>
+                {globalError}
+              </ErrorItem>
+            </ErrorList>
+          )}
+        </Row>
+        <Row>
+          <TableTop>
+            <TableTitle>
+              Gerenciar produtos
+            </TableTitle>
+            <TableButtons>
+              <RemoveProductItemsButton
+                products={
+                  productItems.filter(productItem => productItem.selected)
+                    .map(productItem => productItem.product)}
+              />
+              <AddNewProductItemButton />
+            </TableButtons>
+          </TableTop>
+        </Row>
+        <Row>
+          <Table>
+            <thead>
+              <Tr>
+                <Th $width={widths.selected}>
+                  <Selected
+                    type="checkbox"
+                    checked={selectedAll}
+                    onChange={() => toggleSelectAllProductItemsOnClick()} />
+                </Th>
+                <Th $width={widths.name}>Nome</Th>
+                <Th $width={widths.description}>Descrição</Th>
+                <Th $width={widths.stock}>Estoque</Th>
+                <Th $width={widths.price}>Preço</Th>
+                <Th $width={widths.actions} $justifyContent="flex-end">Ações</Th>
+              </Tr>
+            </thead>
+            <tbody>
+              {productItems.map((item, index) => (
+                <Tr key={index}>
+                  <Td $width={widths.selected}>
+                    <Selected
+                      type="checkbox"
+                      checked={item.selected}
+                      onClick={() => toggleSelectProductItemOnClick(item.product.id)} />
+                  </Td>
+                  <Td $width={widths.name}>
+                    <TableCeilText>{item.product.name}</TableCeilText>
+                  </Td>
+                  <Td $width={widths.description}>
+                    <TableCeilText>{item.product.description}</TableCeilText>
+                  </Td>
+                  <Td $width={widths.stock}>
+                    <TableCeilText>{item.product.stock}</TableCeilText>
+                  </Td>
+                  <Td $width={widths.price}>
+                    <TableCeilText>{transformToMoney(item.product.price.toString())}</TableCeilText>
+                  </Td>
+                  <Td $width={widths.actions}>
+                    <TableAction>
+                      <RemoveProductItemButton product={item.product} />
+                      <UpdateProductItemButton product={item.product} />
+                    </TableAction>
+                  </Td>
+                </Tr>
+              ))}
+            </tbody>
+          </Table>
+        </Row>
+      </Rows>
+    </Content >
+  )
 
   return (
     <Page>
       <HeaderPage />
-      <Content>
-        <Rows $padding="20px">
-          <Row>
-            {!!globalError && (
-              <ErrorList>
-                <ErrorItem>
-                  {globalError}
-                </ErrorItem>
-              </ErrorList>
-            )}
-          </Row>
-          <Row>
-            <TableTop>
-              <TableTitle>
-                Gerenciar produtos
-              </TableTitle>
-              <TableButtons>
-                <RemoveProductItemsButton
-                  products={
-                    productItems.filter(productItem => productItem.selected)
-                      .map(productItem => productItem.product)}
-                />
-                <AddNewProductItemButton />
-              </TableButtons>
-            </TableTop>
-          </Row>
-          <Row>
-            <Table>
-              <thead>
-                <Tr>
-                  <Th $width={widths.selected}>
-                    <Selected
-                      type="checkbox"
-                      checked={selectedAll}
-                      onChange={() => toggleSelectAllProductItemsOnClick()} />
-                  </Th>
-                  <Th $width={widths.name}>Nome</Th>
-                  <Th $width={widths.description}>Descrição</Th>
-                  <Th $width={widths.stock}>Estoque</Th>
-                  <Th $width={widths.price}>Preço</Th>
-                  <Th $width={widths.actions} $justifyContent="flex-end">Ações</Th>
-                </Tr>
-              </thead>
-              <tbody>
-                {productItems.map((item, index) => (
-                  <Tr key={index}>
-                    <Td $width={widths.selected}>
-                      <Selected
-                        type="checkbox"
-                        checked={item.selected}
-                        onClick={() => toggleSelectProductItemOnClick(item.product.id)} />
-                    </Td>
-                    <Td $width={widths.name}>
-                      <TableCeilText>{item.product.name}</TableCeilText>
-                    </Td>
-                    <Td $width={widths.description}>
-                      <TableCeilText>{item.product.description}</TableCeilText>
-                    </Td>
-                    <Td $width={widths.stock}>
-                      <TableCeilText>{item.product.stock}</TableCeilText>
-                    </Td>
-                    <Td $width={widths.price}>
-                      <TableCeilText>{transformToMoney(item.product.price.toString())}</TableCeilText>
-                    </Td>
-                    <Td $width={widths.actions}>
-                      <TableAction>
-                        <RemoveProductItemButton product={item.product} />
-                        <UpdateProductItemButton product={item.product} />
-                      </TableAction>
-                    </Td>
-                  </Tr>
-                ))}
-              </tbody>
-            </Table>
-          </Row>
-        </Rows>
-      </Content >
+      {isLoading 
+        ? loadingComponent 
+        : contentComponent}
     </Page>
   )
 }
 
 const Content = styled.section`
   display: flex;
+  justify-content: center;
   flex-direction: column;
   width: 100%;
 `

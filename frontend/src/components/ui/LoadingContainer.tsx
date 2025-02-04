@@ -21,6 +21,8 @@ const rotate = keyframes`
 `;
 
 const Container = styled.div`
+  display: flex;
+  justify-content: center;
   margin-top: calc(${props => props.theme.spacing.md} * 6);
   svg { /* Estiliza o ícone de loading */
     font-size: calc(${(props) => props.theme.fontSizes.extraLarge} * 2.5);
