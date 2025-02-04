@@ -82,11 +82,16 @@ export const ManageProductPage = () => {
     }))
   }, [])
 
-  // TODO: melhorar a forma que o loading é mostrado
   const loadingComponent = (
     <Content>
       <LoadingIcon />
     </Content>
+  )
+
+  const emptyProductList = (
+    <TrMessage>
+      <TdMessage colSpan={6}>Nenhum produto encontrado.</TdMessage>
+    </TrMessage>
   )
 
   const contentComponent = (
@@ -134,6 +139,7 @@ export const ManageProductPage = () => {
               </Tr>
             </thead>
             <tbody>
+              {productItems.length === 0 && emptyProductList}
               {productItems.map((item, index) => (
                 <Tr key={index}>
                   <Td $width={widths.selected}>
@@ -271,4 +277,14 @@ const TableAction = styled.div`
   display: flex;
   gap: ${props => props.theme.spacing.md};
   justify-content: flex-end;
+`
+
+const TrMessage = styled.tr`
+`
+
+const TdMessage = styled.td`
+  text-align: center;
+  padding: ${props => props.theme.spacing.lg};
+  font-weight: bold;
+  font-size: ${props => props.theme.fontSizes.large};
 `
