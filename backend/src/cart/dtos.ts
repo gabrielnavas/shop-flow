@@ -1,6 +1,6 @@
 import { ProductDto } from 'src/product/dtos';
 
-export type AddProductToCartDto = {
+export type AddItemToCart = {
   productId: number;
   quantity: number;
 };

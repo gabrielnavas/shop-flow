@@ -1,6 +1,6 @@
 import React from "react"
 
-import { ButtonIconContainer } from "./ButtonIconContainer"
+import { ButtonIconContainer } from "../../components/ui/ButtonIconContainer"
 import { Button } from "../../components/ui/Button"
 import { Product } from "../../services/entities"
 import { ProductModal } from "./ProductModal"

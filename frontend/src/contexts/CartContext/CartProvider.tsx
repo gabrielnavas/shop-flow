@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import { ProductCart } from "../../pages/ProductCatalog/types"
+import { ProductCart } from "../../pages/Cart/types"
 import { CartService } from "../../services/cart-service"
 import { AuthContext, AuthContextType } from "../AuthContext/AuthContext"
 import { CartContext } from "./CartContext"
@@ -17,6 +17,7 @@ const localStorageKeys = {
 export const CartProvider = ({ children }: Props) => {
   const [items, setItems] = React.useState<ProductCart[]>([])
   const [globalError, setGlobalError] = React.useState<string>('')
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
   const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
 
@@ -33,17 +34,28 @@ export const CartProvider = ({ children }: Props) => {
         return
       }
 
-      const cartService = new CartService(accessToken)
-      const cartItems = await cartService.fetchCartItems()
-      // const mergedCartItems = mergeCartItems(cartItems, items)
+      setIsLoading(true)
+      try {
+        const cartService = new CartService(accessToken)
+        const cartItems = await cartService.fetchCartItems()
+        // const mergedCartItems = mergeCartItems(cartItems, items)
 
-      // const promises = mergedCartItems.map(async item => (
-      //   await cartService.addProductToCart(item.product)
-      // ))
-      // await Promise.all(promises)
+        // const promises = mergedCartItems.map(async item => (
+        //   await cartService.addProductToCart(item.product)
+        // ))
+        // await Promise.all(promises)
 
-      setItems(cartItems)
-      localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(cartItems))
+        setItems(cartItems)
+        localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(cartItems))
+      } catch (err) {
+        if (err instanceof Error) {
+          setGlobalError(err.message)
+        } else {
+          setGlobalError('Tente novamente mais tarde.')
+        }
+      } finally {
+        setIsLoading(false)
+      }
     }
 
 
@@ -55,12 +67,36 @@ export const CartProvider = ({ children }: Props) => {
     fetchCartItemsWithAuth()
   }, [accessToken, isAuthencated,])
 
+
+  const clearGlobalError = React.useCallback(() => {
+    setGlobalError('')
+  }, [])
+
+
+  // TODO: Mover a logica do add item to cart da api da home pra cá
   const addItemCart = React.useCallback((product: Product): void => {
-    resetGlobalError()
+    clearGlobalError()
+
+    if (isAuthencated) {
+      setIsLoading(true)
+      try {
+        const cartService = new CartService(accessToken)
+        cartService.addProductToCart(product)
+      } catch (err) {
+        if (err instanceof Error) {
+          setGlobalError(err.message)
+        } else {
+          setGlobalError('Tente novamente mais tarde.')
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
     const productCart = {
       product: product,
       quantity: 1,
+      createdAt: new Date()
     } as ProductCart
 
     setItems(prev => {
@@ -68,15 +104,16 @@ export const CartProvider = ({ children }: Props) => {
       localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(updatedItems))
       return updatedItems
     })
-  }, [])
+  }, [clearGlobalError, accessToken, isAuthencated])
 
   const existsProduct = React.useCallback((product: Product): boolean => {
     return items.some(item => product.id === item.product.id)
   }, [items])
 
-  const incrementQuantityItem = async (productId: number, quantity: number): Promise<void> => {
-    resetGlobalError()
+  const incrementQuantityItem = React.useCallback(async (productId: number, quantity: number): Promise<void> => {
+    clearGlobalError()
 
+    setIsLoading(true)
     const cartService = new CartService(accessToken)
     cartService.incrementQuantityItem(productId, quantity)
       .then(() => {
@@ -96,10 +133,15 @@ export const CartProvider = ({ children }: Props) => {
           setGlobalError('Tente novamente mais tarde.')
         }
       })
-  }
-  const decrementQuantityItem = async (productId: number, quantity: number): Promise<void> => {
-    resetGlobalError()
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [clearGlobalError, accessToken, items])
 
+  const decrementQuantityItem = React.useCallback(async (productId: number, quantity: number): Promise<void> => {
+    clearGlobalError()
+
+    setIsLoading(true)
     const cartService = new CartService(accessToken)
     cartService.decrementQuantityItem(productId, quantity)
       .then(() => {
@@ -119,32 +161,44 @@ export const CartProvider = ({ children }: Props) => {
           setGlobalError('Tente novamente mais tarde.')
         }
       })
-  }
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [accessToken, items, clearGlobalError])
 
-  const removeItem = async (productId: number): Promise<void> => {
-    resetGlobalError()
+  const removeItem = React.useCallback(async (productId: number): Promise<void> => {
+    clearGlobalError()
 
-    const index = items.findIndex(item => item.product.id === productId)
-    if (index < 0) {
-      return
-    }
-    const newItems = items.slice(index, 1)
-
-    // const cartService = new CartService(accessToken)
-    // await cartService.removeItem(productId)
-
-    setItems(newItems)
-    localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
-  }
-
-  const resetGlobalError = React.useCallback(() => {
-    setGlobalError('')
-  }, [])
+    const cartService = new CartService(accessToken)
+    await cartService.removeItem(productId)
+      .then(() => {
+        const index = items.findIndex(item => item.product.id === productId)
+        if (index < 0) {
+          return
+        }
+        const newItems = [...items]
+        newItems.splice(index, 1)
+        setItems(newItems)
+        localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
+      })
+      .catch((err) => {
+        if (err instanceof Error) {
+          setGlobalError(err.message)
+        } else {
+          setGlobalError('Tente novamente mais tarde.')
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [accessToken, items, clearGlobalError])
 
   return (
     <CartContext.Provider value={{
       items,
       globalError,
+      clearGlobalError,
+      isLoading,
       addItemCart,
       existsProduct,
       incrementQuantityItem,

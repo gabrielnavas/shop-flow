@@ -7,7 +7,7 @@ import styled from "styled-components";
 
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext";
 import { routeNames } from "../../routes/routes-names";
-import { ProductCart } from "../../pages/ProductCatalog/types";
+import { ProductCart } from "../../pages/Cart/types";
 
 type Props = {
   items: ProductCart[]

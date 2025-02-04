@@ -1,4 +1,4 @@
-import { ProductCart } from "../../pages/ProductCatalog/types"
+import { ProductCart } from "../../pages/Cart/types"
 
 export function mergeCartItems(cartItems1: ProductCart[], cartItems2: ProductCart[]) {
   const mergedItemsMap = new Map<number, ProductCart>();

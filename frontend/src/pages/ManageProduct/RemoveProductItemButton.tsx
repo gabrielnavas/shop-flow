@@ -1,7 +1,7 @@
 import React from "react"
 import { ProductService } from "../../services/product-service"
 import { Button } from "../../components/ui/Button"
-import { ButtonIconContainer } from "./ButtonIconContainer"
+import { ButtonIconContainer } from "../../components/ui/ButtonIconContainer"
 import { BiTrash } from "react-icons/bi"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
@@ -12,9 +12,9 @@ import { Modal } from "../../components/ui/Modal"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { MdCancel } from "react-icons/md"
-import { ModalContent } from "./ModalContent"
-import { ModalQuestion } from "./ModalQuestion"
-import { ModalQuestionButtons } from "./ModalQuestionButtons"
+import { ModalContent } from "../../components/ui/ModalContent"
+import { ModalQuestion } from "../../components/ui/ModalQuestion"
+import { ModalQuestionButtons } from "../../components/ui/ModalQuestionButtons"
 
 type Props = {
   product: Product
@@ -92,7 +92,7 @@ export const RemoveProductItemButton = ({ product }: Props) => {
             </ModalQuestionButtons>
           )}
         </ModalContent>
-      </Modal >
+      </Modal>
     </>
   )
 }

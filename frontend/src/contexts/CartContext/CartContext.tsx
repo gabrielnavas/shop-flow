@@ -1,10 +1,12 @@
 import React from "react"
-import { ProductCart } from "../../pages/ProductCatalog/types"
+import { ProductCart } from "../../pages/Cart/types"
 import { Product } from "../../services/entities"
 
 export type CartContextType = {
   items: ProductCart[]
   globalError: string
+  clearGlobalError: () => void
+  isLoading: boolean
   addItemCart: (product: Product) => void
   existsProduct: (product: Product) => boolean
   incrementQuantityItem: (productId: number, quantityIncrement: number) => void

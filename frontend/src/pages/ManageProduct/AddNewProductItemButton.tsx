@@ -1,7 +1,7 @@
 import React from "react"
 import { BiPlusCircle } from "react-icons/bi"
 
-import { ButtonIconContainer } from "./ButtonIconContainer"
+import { ButtonIconContainer } from "../../components/ui/ButtonIconContainer"
 import { Button } from "../../components/ui/Button"
 import { ProductModal } from "./ProductModal"
 

@@ -1,5 +1,14 @@
-import { Body, Controller, Get, Post, Put, UseFilters } from '@nestjs/common';
-import { AddProductToCartDto, QuantityItemBody } from '../dtos';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseFilters,
+} from '@nestjs/common';
+import { AddItemToCart, QuantityItemBody } from '../dtos';
 import { CartService } from '../services/cart.service';
 import { SetRoles } from 'src/user/guards/set-roles';
 import { RoleName } from 'src/entities/role-name.enum';
@@ -14,11 +23,11 @@ export class CartController {
 
   @Post()
   @SetRoles(RoleName.CONSUMER)
-  async addProductToCart(
-    @Body() dto: AddProductToCartDto,
+  async addItemToCart(
+    @Body() dto: AddItemToCart,
     @LoggedUser() loggedUser: Token,
   ) {
-    await this.cartService.addProductToCart(dto, loggedUser.sub);
+    await this.cartService.addItemToCart(dto, loggedUser.sub);
   }
 
   @Get()
@@ -44,5 +53,14 @@ export class CartController {
     @Body() dto: QuantityItemBody,
   ) {
     await this.cartService.decrementQuantityItem(loggedUser.sub, dto);
+  }
+
+  @Delete('product/:productId')
+  @SetRoles(RoleName.CONSUMER)
+  async removeItem(
+    @LoggedUser() loggedUser: Token,
+    @Param('productId') productId: string,
+  ) {
+    await this.cartService.removeItem(loggedUser.sub, Number(productId));
   }
 }

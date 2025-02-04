@@ -1,4 +1,4 @@
-import { ProductCart } from "../pages/ProductCatalog/types";
+import { ProductCart } from "../pages/Cart/types";
 import { Product } from "./entities";
 
 type ProductCartBody = Omit<ProductCart, 'createdAt'> & {
@@ -109,6 +109,21 @@ export class CartService {
         'Authorization': `Bearer ${this.accessToken}`
       },
       body: JSON.stringify(payload)
+    })
+    if (response.status >= 400) {
+      const { message } = await response.json()
+      throw new Error(message)
+    }
+  }
+
+  async removeItem(productId: number) {
+    const url = `${this.urlEndpoint}/cart-item/product/${productId}`
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.accessToken}`
+      },
     })
     if (response.status >= 400) {
       const { message } = await response.json()

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AddProductToCartDto, CartItemDto, QuantityItemBody } from '../dtos';
+import { AddItemToCart, CartItemDto, QuantityItemBody } from '../dtos';
 import { CartItem } from 'src/entities/cart-item.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,10 +19,7 @@ export class CartService {
     private readonly cartRepository: Repository<CartItem>,
   ) {}
 
-  async addProductToCart(
-    dto: AddProductToCartDto,
-    loggedUserId: number,
-  ): Promise<void> {
+  async addItemToCart(dto: AddItemToCart, loggedUserId: number): Promise<void> {
     const userFound = await this.entityManager.findOneBy(User, {
       id: loggedUserId,
     });
@@ -188,6 +185,39 @@ export class CartService {
       cartItem.quantity = totalQuantity;
       await this.entityManager.save(cartItem);
 
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async removeItem(loggedUserId: number, productId: number) {
+    const queryRunner = this.entityManager.connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
+    try {
+      const userFound = await this.entityManager.findOneBy(User, {
+        id: loggedUserId,
+      });
+      if (!userFound) {
+        throw new UserNotFoundException();
+      }
+
+      const cartItem = await this.entityManager.findOne(CartItem, {
+        where: {
+          userId: userFound.id,
+          productId: productId,
+        },
+      });
+      if (cartItem === null) {
+        throw new CartItemNotFoundException();
+      }
+
+      await this.entityManager.delete(CartItem, cartItem);
       await queryRunner.commitTransaction();
     } catch (error) {
       await queryRunner.rollbackTransaction();

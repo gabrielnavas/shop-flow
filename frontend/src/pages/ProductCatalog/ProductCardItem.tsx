@@ -3,8 +3,6 @@ import React, { useEffect } from "react"
 import { BsCartCheckFill } from "react-icons/bs"
 import { FaCartPlus } from "react-icons/fa6"
 
-import { CartService } from "../../services/cart-service"
-import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
 import { MidiaService } from "../../services/midia-service"
 import { Product } from "../../services/entities"
@@ -24,7 +22,6 @@ export const ProductCardItem = ({ product, readonly }: Props) => {
   const [imageSrc, setImageSrc] = React.useState('')
   const [addedCart, setAddedCart] = React.useState(false)
 
-  const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
   const { addItemCart, existsProduct } = React.useContext(CartContext) as CartContextType
 
   React.useEffect(() => {
@@ -42,12 +39,8 @@ export const ProductCardItem = ({ product, readonly }: Props) => {
   }, [existsProduct, product])
 
   const addProductToCartOnClick = React.useCallback((product: Product) => {
-    if (isAuthencated) {
-      const cartService = new CartService(accessToken)
-      cartService.addProductToCart(product)
-    }
     addItemCart(product)
-  }, [addItemCart, isAuthencated, accessToken])
+  }, [addItemCart])
 
   return (
     <Container $readonly={readonly} onClick={!addedCart && !readonly ? () => addProductToCartOnClick(product) : undefined}>
@@ -63,9 +56,9 @@ export const ProductCardItem = ({ product, readonly }: Props) => {
             <PriceValue>{priceReal.format(product.price)}</PriceValue>
           </PriceContainer>
           {!readonly && (
-          <AddToCardButton $added={addedCart}>
-            {addedCart ? <BsCartCheckFill /> : <FaCartPlus />}
-          </AddToCardButton>
+            <AddToCardButton $added={addedCart}>
+              {addedCart ? <BsCartCheckFill /> : <FaCartPlus />}
+            </AddToCardButton>
 
           )}
         </CardBottom>
@@ -74,7 +67,7 @@ export const ProductCardItem = ({ product, readonly }: Props) => {
   )
 }
 
-const Container = styled.div<{$readonly?: boolean | undefined}>`
+const Container = styled.div<{ $readonly?: boolean | undefined }>`
   display: flex;
   flex-direction: column;
   width: 250px;
