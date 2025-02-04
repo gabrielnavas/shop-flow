@@ -67,8 +67,8 @@ export const MenuRightSideHeader = ({ items }: Props) => {
 
   return (
 
-    <MenuRightSide onClick={menuOnClick}>
-      <ButtonContainer>
+    <MenuRightSide>
+      <ButtonContainer onClick={menuOnClick}>
         <BiUser />
       </ButtonContainer>
       <CartButtonContainer>
