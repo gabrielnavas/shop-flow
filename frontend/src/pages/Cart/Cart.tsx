@@ -7,11 +7,14 @@ import { useNavigate } from "react-router"
 import { Page } from "../../components/ui/Page"
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
+import { CartItem } from "./CartItem"
+import { ErrorList } from "../../components/ui/ErrorList"
+import { ErrorItem } from "../../components/ui/ErrorItem"
 
 export const CartPage = () => {
 
   const { isAuthencated } = React.useContext(AuthContext) as AuthContextType
-  const { items } = React.useContext(CartContext) as CartContextType
+  const { items, globalError } = React.useContext(CartContext) as CartContextType
 
   const navigate = useNavigate()
 
@@ -28,9 +31,14 @@ export const CartPage = () => {
     <Page>
       <HeaderPage />
       <Content>
+        {!!globalError && (
+          <ErrorList>
+            <ErrorItem>{globalError}</ErrorItem>
+          </ErrorList>
+        )}
         <CartList>
           {items.map(item => (
-            <CartItem>{item.product.name}</CartItem>
+            <CartItem productCart={item} />
           ))}
         </CartList>
       </Content>
@@ -47,4 +55,3 @@ const Content = styled.section`
 `
 
 const CartList = styled.ul``
-const CartItem = styled.li``

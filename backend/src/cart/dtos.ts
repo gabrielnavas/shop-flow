@@ -10,3 +10,8 @@ export type CartItemDto = {
   quantity: number;
   createdAt: Date;
 };
+
+export type IncrementQuantityItemBody = {
+  productId: number;
+  quantityIncrement: number;
+};

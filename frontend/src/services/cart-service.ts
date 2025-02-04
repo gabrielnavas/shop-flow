@@ -11,6 +11,7 @@ type ProductCartBody = Omit<ProductCart, 'createdAt'> & {
 
 
 export class CartService {
+
   constructor(
     private accessToken: string,
     private urlEndpoint: string = import.meta.env.VITE_API_ENDPOINT
@@ -72,5 +73,25 @@ export class CartService {
       createdAt: new Date(item.createdAt),
     }))
     return cartItemsWrapped
+  }
+
+  async incrementQuantityItem(productId: number, quantityIncrement: number) {
+    const url = `${this.urlEndpoint}/cart-item/increment-quantity`
+    const payload = {
+      productId,
+      quantityIncrement,
+    }
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.accessToken}`
+      },
+      body: JSON.stringify(payload)
+    })
+    if (response.status >= 400) {
+      const { message } = await response.json()
+      throw new Error(message)
+    }
   }
 }

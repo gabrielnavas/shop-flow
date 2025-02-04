@@ -21,6 +21,8 @@ export const theme = {
     buttonBackgroundCancel: "#FFD350", // Amarelo claro (Cancel)
     buttonBackgroundCancelHover: "#FFBF00",
 
+    separatorColor: "#ddd",
+
     cardBackground: "#ffffff",
     borderColor: "#D5D5D5",
     borderColorHoverActiveFocus: "#555555",
