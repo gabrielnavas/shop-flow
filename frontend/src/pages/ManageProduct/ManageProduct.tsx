@@ -32,14 +32,14 @@ export const ManageProductPage = () => {
   } = React.useContext(ProductContext) as ProductContextType
 
   const widths = {
-    selected: '75px',
-    name: '150px',
-    description: '450px',
+    selected: '25px',
+    name: '100px',
+    description: '225px',
     stock: '50px',
     price: '50px',
     actions: '50px',
   }
-
+  
   React.useEffect(() => {
     document.title = 'Shop flow | Gerenciar produtos'
   }, [])
@@ -226,7 +226,6 @@ const Td = styled.td<{
   $width?: string,
 }>`
   width: ${props => props.$width};
-  min-width: ${props => props.$width}; /* Garante que a célula não fique menor */
   padding: 10px;
   border-bottom: 1px solid ${props => props.theme.colors.borderColor};
 `
