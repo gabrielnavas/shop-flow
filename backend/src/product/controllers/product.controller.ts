@@ -12,7 +12,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 
-import { AddProductDto, ProductDto } from '../dtos';
+import { AddProductDto, ProductDto, UpdateProductDto } from '../dtos';
 import { RoleName } from 'src/entities/role-name.enum';
 import { ProductService } from '../services/product.service';
 import { SetRoles } from 'src/user/guards/set-roles';
@@ -48,6 +48,19 @@ export class ProductController {
     await this.productService.removeProducts({ productIds: ids });
   }
 
+  @Put(':productId')
+  @SetRoles(RoleName.ADMIN, RoleName.CONSUMER)
+  async updateProduct(
+    @Param('productId') productId: string,
+    @Body() dto: UpdateProductDto,
+  ) {
+    const productUpdated = await this.productService.updateProduct(
+      Number(productId),
+      dto,
+    );
+    return productUpdated;
+  }
+
   // TODO: Otimizar upload para suportar arquivos grandes.
   @Put(':productId/image')
   @UseInterceptors(FileInterceptor('file'))
@@ -62,7 +75,14 @@ export class ProductController {
     const url = await this.midiaService.uploadFile(file, productBucketName);
     product.imageUrl = url;
 
-    await this.productService.updateProduct(product.id, product);
+    await this.productService.updateProduct(product.id, {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      stock: product.stock,
+      imageUrl: product.imageUrl,
+      categoryName: product.category.name,
+    });
     return { url };
   }
 

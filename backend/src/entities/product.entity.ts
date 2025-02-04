@@ -14,25 +14,25 @@ export class Product {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 45, nullable: false })
+  @Column({ type: 'varchar', length: 45, nullable: false })
   name: string;
 
-  @Column({ length: 255, nullable: false })
+  @Column({ type: 'varchar', length: 255, nullable: false })
   description: string;
 
-  @Column({ nullable: false })
+  @Column({ type: 'int', nullable: false })
   stock: number;
 
-  @Column({ nullable: false })
+  @Column('decimal', { precision: 6, scale: 2 })
   price: number;
 
-  @Column({ name: 'created_at', nullable: false })
+  @Column({ type: 'datetime', name: 'created_at', nullable: false })
   createdAt: Date;
 
-  @Column({ name: 'updated_at', nullable: true })
+  @Column({ type: 'datetime', name: 'updated_at', nullable: true })
   updatedAt: Date;
 
-  @Column({ name: 'image_url', length: 255, nullable: true })
+  @Column({ type: 'varchar', name: 'image_url', length: 255, nullable: true })
   imageUrl: string;
 
   @ManyToOne(() => Category, (category) => category.products, {

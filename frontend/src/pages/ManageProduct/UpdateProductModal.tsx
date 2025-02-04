@@ -22,16 +22,18 @@ import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthCon
 import { routeNames } from "../../routes/routes-names"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 import { InputFile } from "../../components/ui/InputFile"
-import { Category } from "../../services/entities"
+import { Category, Product } from "../../services/entities"
 import { Modal } from "../../components/ui/Modal"
-import { midiaUrldefaults } from "../../services/midia-service"
+import { midiaUrldefaults, MidiaService } from "../../services/midia-service"
 
 type Props = {
   isOpenModal: boolean
   onClose: () => void
+  product: Product
 }
 
 type Inputs = {
+  id: number
   name: string
   description: string
   stock: number
@@ -39,7 +41,8 @@ type Inputs = {
   category: string
 }
 
-export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
+
+export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => {
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState(false)
 
@@ -52,7 +55,7 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
   const [categories, setCategories] = React.useState<Category[]>([{ id: 0, name: 'Selecione' }])
 
   const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
-  const { addProduct } = React.useContext(ProductContext) as ProductContextType
+  const { updateProduct } = React.useContext(ProductContext) as ProductContextType
 
   const navigate = useNavigate()
 
@@ -61,15 +64,69 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors },
-  } = useForm<Inputs>()
+  } = useForm<Inputs>({
+    defaultValues: {
+      id: product.id,
+      name: product.name,
+      description: product.description,
+      price: product.price.toString(),
+      category: product.category.name,
+      stock: product.stock
+    }
+  })
+
 
   React.useEffect(() => {
-    async function fetchCategories() {
+    async function setImageUrlFromProduct() {
+      
+      if (product.imageUrl) {
+        const midiaService = new MidiaService()
+
+        const imageUrl = midiaService.getUrl(product.imageUrl)
+        setImageUrl(imageUrl)
+
+        const imageUrlSplited = product.imageUrl.split('/')
+        const fileName = imageUrlSplited[imageUrlSplited.length - 1]
+
+        try {
+
+          const blob: Blob = await midiaService.fetchImage(imageUrl)
+          const file = new File([blob], fileName, { type: blob.type });
+          if(imageRef?.current && imageRef?.current) {
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            imageRef.current.files = dataTransfer.files
+            console.log('setImageUrlFromProduct', product.imageUrl);
+          }
+
+        } catch (err) {
+          console.log(err);
+        }
+      } else {
+        setImageUrl(midiaUrldefaults.product)
+      }
+    }
+
+    setImageUrlFromProduct()
+  }, [product.imageUrl])
+
+  React.useEffect(() => {
+    async function fetchCategoriesAndSetSelectCategory() {
       try {
         const categoryService = new CategoryService()
         const categories = await categoryService.findCategories()
+        console.log('fetchCategories');
+
         setCategories(prev => [{ ...prev[0] }, ...categories])
+
+        const category = categories.find(category => category.name === product.category.name)
+        if (!category) {
+          throw new Error('Categoria do produto não disponível na tela.')
+        }
+        setValue('category', category.name)
+
       } catch (err) {
         if (err instanceof Error) {
           setGlobalError(err.message)
@@ -78,23 +135,20 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
         }
       }
     }
-    fetchCategories().catch(console.error)
-  }, [])
+    fetchCategoriesAndSetSelectCategory().catch(console.error)
+  }, [product.category.name, setValue])
+
 
   const imageProductOnChange = React.useCallback(() => {
-    let imageUrl = ''
-    let hasFile = false
-    if (imageRef.current?.files && imageRef.current.files.length > 0) {
-      const image = imageRef.current!.files![0]
-      imageUrl = URL.createObjectURL(image)
-      hasFile = true
+    if (imageRef.current && imageRef.current.files && imageRef.current.files.length > 0) {
+      const image = imageRef.current.files[0]
+      setImageUrl(URL.createObjectURL(image))
+      setHasFile(true)
     } else {
-      imageUrl = midiaUrldefaults.product
+      setImageUrl(midiaUrldefaults.product)
+      setHasFile(false)
     }
-    setImageUrl(imageUrl)
-    setHasFile(hasFile)
-  }, [imageRef.current?.files])
-
+  }, [imageRef])
 
   const onClearImage = React.useCallback(() => {
     if (imageRef && imageRef.current) {
@@ -112,30 +166,47 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     setIsLoading(true)
 
     try {
+      const productService = new ProductService(accessToken)
+
       const category = categories.find(category => category.name === data.category)
       if (!category) {
         throw new Error('Categoria não encontrada.')
       }
-      const newProduct = {
+
+      const image = hasFile
+        ? imageRef.current!.files![0]
+        : null
+
+      const payload = {
         name: data.name,
         description: data.description,
         price: Number(data.price),
-        stock: data.stock,
+        stock: Number(data.stock),
         categoryName: category?.name,
       }
-      const productService = new ProductService(accessToken)
 
-      const product = await productService.addProduct(newProduct)
+      const productUpdated = await productService.updateProduct(data.id, payload)
 
-      const image = hasFile ? imageRef.current!.files![0] : null
       if (image) {
-        const { url } = await productService.updateImageProduct(product.id, image)
-        product.imageUrl = url
+        productService.updateImageProduct(data.id, image)
+          .then(({ url }) => {
+            product.name = productUpdated.name
+            product.description = productUpdated.description
+            product.price = productUpdated.price
+            product.stock = productUpdated.stock
+            product.updatedAt = productUpdated.updatedAt
+            product.imageUrl = url
+            updateProduct(data.id, product)
+            clearForm()
+            onClose()
+          })
+      } else {
+        productUpdated.imageUrl = ''
+        updateProduct(data.id, productUpdated)
+        clearForm()
+        onClose()
       }
 
-      addProduct(product)
-
-      clearForm()
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message)
@@ -146,7 +217,9 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
     finally {
       setIsLoading(false)
     }
-  }, [accessToken, categories, addProduct, clearForm, hasFile, imageRef])
+  }, [accessToken, categories, clearForm, updateProduct, imageRef, onClose, product, hasFile])
+
+
 
   if (!isAuthencated) {
     navigate(routeNames.home)
@@ -159,14 +232,12 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
       <Form onSubmit={handleSubmit(onSubmit)} ref={formRef}>
 
         <FormGroup>
-          <FormImagePreview src={imageUrl} onError={() => setImageUrl(midiaUrldefaults.product)} />
+          <FormImagePreview src={imageUrl}  />
           <InputFile
             label='Selecione a imagem'
             ref={imageRef}
             onChange={imageProductOnChange}
-            onClearFile={imageRef.current?.files && imageRef.current?.files.length > 0
-              ? () => onClearImage()
-              : undefined}
+            onClearFile={hasFile ? () => onClearImage() : undefined}
           />
         </FormGroup>
         <FormGroup>
@@ -298,19 +369,28 @@ export const NewProductModal = ({ isOpenModal, onClose }: Props) => {
           </ErrorList>
         )}
         <FormGroupButton>
-          <Button disabled={isLoading} onClick={() => onClose()} type="button" $variant='warning'>Cancelar</Button>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            $variant='add'>
-            {isLoading ? (
-              <AiOutlineLoading />
-            ) : (
-              <span>
-                Adicionar produto
-              </span>
-            )}
-          </Button>
+          {isLoading ? (
+            <AiOutlineLoading />
+          ) : (
+            <>
+              <Button
+                disabled={isLoading}
+                onClick={() => onClose()}
+                type="button" $variant='warning'>
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                $variant='add'>
+
+                <span>
+                  Atualizar produto
+                </span>
+
+              </Button>
+            </>
+          )}
         </FormGroupButton>
       </Form>
     </Modal>

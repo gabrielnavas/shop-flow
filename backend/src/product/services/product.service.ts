@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager, Repository } from 'typeorm';
-import { AddProductDto, ProductDto, RemoveProductsDto } from '../dtos';
+import {
+  AddProductDto,
+  ProductDto,
+  RemoveProductsDto,
+  UpdateProductDto,
+} from '../dtos';
 import { Category } from 'src/entities/category.entity';
 import { Product } from 'src/entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -70,7 +75,10 @@ export class ProductService {
         updatedAt: 'DESC',
       },
     });
-    return products.map((product) => this.mapEntityToDto(product));
+    const productsMapped = products.map((product) =>
+      this.mapEntityToDto(product),
+    );
+    return productsMapped;
   }
 
   async findProductById(productId: number): Promise<ProductDto> {
@@ -86,12 +94,15 @@ export class ProductService {
     return this.mapEntityToDto(product);
   }
 
-  async updateProduct(productId: number, dto: ProductDto) {
+  async updateProduct(
+    productId: number,
+    dto: UpdateProductDto,
+  ): Promise<ProductDto> {
     const category = await this.categoryRepository.findOneBy({
-      name: dto.category.name,
+      name: dto.categoryName,
     });
     if (!category) {
-      throw new CategoryNotFoundException(dto.category.name);
+      throw new CategoryNotFoundException(dto.categoryName);
     }
     await this.productRepository.update(productId, {
       name: dto.name,
@@ -100,8 +111,9 @@ export class ProductService {
       price: dto.price,
       imageUrl: dto.imageUrl,
       category: category,
-      createdAt: new Date(),
+      updatedAt: new Date(),
     });
+    return await this.findProductById(productId);
   }
 
   async removeProduct(productId: number) {
@@ -147,8 +159,8 @@ export class ProductService {
       id: entity.id,
       name: entity.name,
       description: entity.description,
-      stock: entity.stock,
-      price: entity.price,
+      stock: Number(entity.stock),
+      price: Number(entity.price),
       imageUrl: entity.imageUrl,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,

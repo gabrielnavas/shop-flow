@@ -13,26 +13,26 @@ export const ProductProvider = ({ children }: Props) => {
   const [globalError, setGlobalError] = React.useState('')
 
 
-    React.useEffect(() => {
-      async function fetchProducts() {
-        setIsLoading(true)
-        try {
-          const productService = new ProductService()
-          const products = await productService.findProducts()
-          setItems(products)
-        } catch (err) {
-          if (err instanceof Error) {
-            setGlobalError(err.message)
-          } else {
-            setGlobalError('Tente novamente mais tarde.')
-          }
+  React.useEffect(() => {
+    async function fetchProducts() {
+      setIsLoading(true)
+      try {
+        const productService = new ProductService()
+        const products = await productService.findProducts()
+        setItems(products)
+      } catch (err) {
+        if (err instanceof Error) {
+          setGlobalError(err.message)
+        } else {
+          setGlobalError('Tente novamente mais tarde.')
         }
-  
-        setIsLoading(false)
-  
       }
-      fetchProducts()
-    }, [])
+
+      setIsLoading(false)
+
+    }
+    fetchProducts()
+  }, [])
 
   const addProduct = React.useCallback((product: Product) => {
     setItems(prev => [{ ...product }, ...prev])
@@ -42,7 +42,7 @@ export const ProductProvider = ({ children }: Props) => {
     setItems(prev => prev.filter(product => product.id !== productId))
   }, [])
 
-  const removerProducts= React.useCallback((productIds: number[]) => {
+  const removerProducts = React.useCallback((productIds: number[]) => {
     setItems(prev => prev.filter(product => {
       const found = productIds.some(productId => product.id === productId)
       return !found
@@ -51,24 +51,28 @@ export const ProductProvider = ({ children }: Props) => {
 
   const updateProduct = React.useCallback((productId: number, product: Product) => {
     setItems(prev => {
-      const index = prev.findIndex(product => product.id !== productId)
-      if (index < 0) {
+      const indexDelete = prev.findIndex(p => p.id === productId)
+      if (indexDelete < 0) {
         return prev
       }
-      const productFound = items[index]
-  
-      productFound.name = product.name
-      productFound.description = product.description
-      productFound.category = product.category
-      productFound.updatedAt = product.updatedAt
-      productFound.stock = product.stock
-      productFound.price = product.price
 
       const newItems = [...prev]
-      newItems[index] = productFound
+      const newProduct = {...newItems[indexDelete]}
+
+      newProduct.name = product.name
+      newProduct.description = product.description
+      newProduct.category = product.category
+      newProduct.updatedAt = product.updatedAt
+      newProduct.stock = product.stock
+      newProduct.price = product.price
+      newProduct.imageUrl = product.imageUrl
+
+      const countItemsToDelete = 1
+      newItems.splice(indexDelete, countItemsToDelete, newProduct)
+
       return newItems
     })
-  }, [items])
+  }, [])
 
   return (
     <ProductContext.Provider value={{

@@ -1,20 +1,17 @@
 import styled from "styled-components"
 import React from "react"
 
-import { RxUpdate } from "react-icons/rx"
-
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { Page } from "../../components/ui/Page"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
-import { Button } from "../../components/ui/Button"
-import { ButtonIconContainer } from "./ButtonIconContainer"
-import { AddNewProductItemButton } from "./AddNewProductItemButton"
 import { ProductContext, ProductContextType } from "../../contexts/ProductContext/ProductContext"
 import { RemoveProductItemButton } from "./RemoveProductItemButton"
 import { Product } from "../../services/entities"
 import { LoadingIcon } from "../../components/ui/LoadingContainer"
 import { RemoveProductItemsButton } from "./RemoveProductItemsButton"
+import { UpdateProductItemButton } from "./UpdateProductItemButton"
+import { AddNewProductItemButton } from "./AddNewProductItemButton"
 
 type ProductItem = {
   selected: boolean
@@ -43,8 +40,10 @@ export const ManageProductPage = () => {
   }
 
   React.useEffect(() => {
-    console.log(productItems);
-    
+    document.title = 'Shop flow | Gerenciar produtos'
+  }, [])
+
+  React.useEffect(() => {
     function fetchProductItems() {
       if (!items) {
         return
@@ -157,11 +156,7 @@ export const ManageProductPage = () => {
                     <Td $width={widths.actions}>
                       <TableAction>
                         <RemoveProductItemButton product={item.product} />
-                        <Button $variant="cancel">
-                          <ButtonIconContainer>
-                            <RxUpdate />
-                          </ButtonIconContainer>
-                        </Button>
+                        <UpdateProductItemButton product={item.product} />
                       </TableAction>
                     </Td>
                   </Tr>

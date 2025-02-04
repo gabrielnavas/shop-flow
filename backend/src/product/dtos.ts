@@ -7,6 +7,8 @@ export type AddProductDto = {
   categoryName: string;
 };
 
+export type UpdateProductDto = AddProductDto;
+
 export type RemoveProductsDto = {
   productIds: number[];
 };
