@@ -13,6 +13,11 @@ import { RemoveProductItemsButton } from "./RemoveProductItemsButton"
 import { UpdateProductItemButton } from "./UpdateProductItemButton"
 import { AddNewProductItemButton } from "./AddNewProductItemButton"
 import { transformToMoney } from "../../utils/money-transform"
+import { Input } from "../../components/ui/Input"
+import { BiSearch } from "react-icons/bi"
+import { Button } from "../../components/ui/Button"
+import { ProductService } from "../../services/product-service"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 
 type ProductItem = {
   selected: boolean
@@ -24,6 +29,10 @@ export const ManageProductPage = () => {
   const [productItems, setProductItems] = React.useState<ProductItem[]>([])
   const [globalError, setGlobalError] = React.useState<string>('')
   const [selectedAll, setSelectedAll] = React.useState(false)
+
+  const [searchInput, setSearchInput] = React.useState('')
+
+  const {accessToken, isAuthencated} = React.useContext(AuthContext) as AuthContextType
 
   const {
     items,
@@ -82,6 +91,18 @@ export const ManageProductPage = () => {
     }))
   }, [])
 
+  const searchItemsOnClick = React.useCallback(async () => {
+    const productService = new ProductService(accessToken)
+    const products = await productService.findProducts(searchInput)
+
+    setProductItems(products.map(product => ({
+      product: product,
+      selected: false,
+    })))
+
+    console.log(searchInput);
+  }, [searchInput, accessToken])
+
   const loadingComponent = (
     <Content>
       <LoadingIcon />
@@ -120,6 +141,15 @@ export const ManageProductPage = () => {
               <AddNewProductItemButton />
             </TableButtons>
           </TableTop>
+        </Row>
+        <Row $flexDirection="row">
+          <Input
+            placeholder="Pesquise por nome ou descrição."
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)} />
+          <SearchButton onClick={() => searchItemsOnClick()}>
+            <BiSearch />
+          </SearchButton>
         </Row>
         <Row>
           <Table>
@@ -175,11 +205,15 @@ export const ManageProductPage = () => {
     </Content >
   )
 
+  if(!isAuthencated) {
+    return
+  }
+
   return (
     <Page>
       <HeaderPage />
-      {isLoading 
-        ? loadingComponent 
+      {isLoading
+        ? loadingComponent
         : contentComponent}
     </Page>
   )
@@ -202,7 +236,10 @@ const Rows = styled.div<{ $padding: string }>`
 `
 
 
-const Row = styled.div`
+const Row = styled.div<{ $flexDirection?: 'row' | 'column' }>`
+  display: ${props => props.$flexDirection ? 'flex' : 'block'};
+  flex-direction: ${props => props.$flexDirection};
+  gap: ${props => props.theme.spacing.md};
   width: 100%;
 `
 
@@ -287,4 +324,12 @@ const TdMessage = styled.td`
   padding: ${props => props.theme.spacing.lg};
   font-weight: bold;
   font-size: ${props => props.theme.fontSizes.large};
+`
+
+const SearchButton = styled(Button)`
+  width: 100px;
+  padding: 2px;
+  svg {
+    font-size: calc(${props => props.theme.spacing.md} * 1.3);
+  }
 `

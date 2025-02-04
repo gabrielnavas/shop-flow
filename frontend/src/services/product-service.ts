@@ -22,9 +22,10 @@ export class ProductService {
     private urlEndpoint: string = `${import.meta.env.VITE_API_ENDPOINT}/product`,
   ) { }
 
-  async findProducts(): Promise<Product[]> {
+  async findProducts(query: string = ''): Promise<Product[]> {
     try {
-      const response = await fetch(this.urlEndpoint, {
+      const url = `${this.urlEndpoint}?q=${query}`
+      const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
