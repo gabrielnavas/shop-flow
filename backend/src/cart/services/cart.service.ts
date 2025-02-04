@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AddProductToCartDto } from '../dtos';
+import { AddProductToCartDto, CartItemDto } from '../dtos';
 import { CartItem } from 'src/entities/cart-item.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -51,7 +51,7 @@ export class CartService {
     }
   }
 
-  async getCartItems(loggedUserId: number): Promise<CartItem[]> {
+  async findCartItems(loggedUserId: number): Promise<CartItemDto[]> {
     const userFound = await this.entityManager.findOneBy(User, {
       id: loggedUserId,
     });
@@ -67,6 +67,24 @@ export class CartService {
         },
       },
     });
-    return cartItems;
+
+    return cartItems.map(
+      (cartItem) =>
+        ({
+          product: {
+            id: cartItem.product.id,
+            name: cartItem.product.name,
+            description: cartItem.product.description,
+            price: cartItem.product.price,
+            stock: cartItem.product.stock,
+            createdAt: cartItem.product.createdAt,
+            imageUrl: cartItem.product.imageUrl,
+            category: cartItem.product.category,
+            updatedAt: cartItem.product.updatedAt,
+          },
+          quantity: cartItem.quantity,
+          createdAt: cartItem.createdAt,
+        }) as CartItemDto,
+    );
   }
 }

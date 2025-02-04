@@ -18,6 +18,8 @@ import { BiSearch } from "react-icons/bi"
 import { Button } from "../../components/ui/Button"
 import { ProductService } from "../../services/product-service"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { routeNames } from "../../routes/routes-names"
+import { useNavigate } from "react-router"
 
 type ProductItem = {
   selected: boolean
@@ -33,6 +35,8 @@ export const ManageProductPage = () => {
   const [searchInput, setSearchInput] = React.useState('')
 
   const {accessToken, isAuthencated} = React.useContext(AuthContext) as AuthContextType
+
+  const navigate = useNavigate()
 
   const {
     items,
@@ -206,7 +210,8 @@ export const ManageProductPage = () => {
   )
 
   if(!isAuthencated) {
-    return
+    navigate(routeNames.home)
+    return null
   }
 
   return (

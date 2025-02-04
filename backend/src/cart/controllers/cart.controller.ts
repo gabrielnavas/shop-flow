@@ -19,28 +19,10 @@ export class CartController {
     await this.cartService.addProductToCart(dto, loggedUser.sub);
   }
 
-  // TODO: adicionar isso no context no frontend, pra quando carregar, vir os cartitems
   @Get()
   @SetRoles(RoleName.CONSUMER)
   async getCartItems(@LoggedUser() loggedUser: Token) {
-    const cartItems = await this.cartService.getCartItems(loggedUser.sub);
-    const cartItemsMapped = cartItems.map((cartItem) => ({
-      product: {
-        id: cartItem.product.id,
-        name: cartItem.product.name,
-        description: cartItem.product.description,
-        price: cartItem.product.price,
-        stock: cartItem.product.stock,
-        createdAt: cartItem.product.createdAt,
-        updatedAt: cartItem.product.updatedAt,
-        category: {
-          id: cartItem.product.category.id,
-          name: cartItem.product.category.name,
-        },
-      },
-      quantity: cartItem.quantity,
-      createdAt: cartItem.createdAt,
-    }));
-    return cartItemsMapped;
+    const cartItems = await this.cartService.findCartItems(loggedUser.sub);
+    return cartItems;
   }
 }

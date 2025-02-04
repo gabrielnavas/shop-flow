@@ -1,6 +1,7 @@
 import { Product } from "../../services/entities";
 
 export type ProductCart = {
-  product: Product;
+  product: Product
   quantity: number
+  createdAt: Date
 }

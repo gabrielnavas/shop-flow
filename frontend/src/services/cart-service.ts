@@ -1,6 +1,15 @@
 import { ProductCart } from "../pages/ProductCatalog/types";
 import { Product } from "./entities";
 
+type ProductCartBody = Omit<ProductCart, 'createdAt'> & {
+  product: Omit<Product, 'createdAt' & 'updatedAt'> & {
+    createdAt: string
+    updatedAt?: string
+  }
+  createdAt: string
+}
+
+
 export class CartService {
   constructor(
     private accessToken: string,
@@ -53,6 +62,15 @@ export class CartService {
       throw new Error(message)
     }
     const cartItems = await response.json()
-    return cartItems
+    const cartItemsWrapped = cartItems.map((item: ProductCartBody) => ({
+      product: {
+        ...item.product,
+        createdAt: new Date(item.product.createdAt),
+        updatedAt: item.product.updatedAt ? new Date(item.product.updatedAt) : undefined,
+      },
+      quantity: item.quantity,
+      createdAt: new Date(item.createdAt),
+    }))
+    return cartItemsWrapped
   }
 }
