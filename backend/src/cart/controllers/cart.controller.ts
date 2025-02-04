@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, Put, UseFilters } from '@nestjs/common';
-import { AddProductToCartDto, IncrementQuantityItemBody } from '../dtos';
+import { AddProductToCartDto, QuantityItemBody } from '../dtos';
 import { CartService } from '../services/cart.service';
 import { SetRoles } from 'src/user/guards/set-roles';
 import { RoleName } from 'src/entities/role-name.enum';
@@ -32,8 +32,17 @@ export class CartController {
   @SetRoles(RoleName.CONSUMER)
   async incrementQuantityItem(
     @LoggedUser() loggedUser: Token,
-    @Body() dto: IncrementQuantityItemBody,
+    @Body() dto: QuantityItemBody,
   ) {
     await this.cartService.incrementQuantityItem(loggedUser.sub, dto);
+  }
+
+  @Put('decrement-quantity')
+  @SetRoles(RoleName.CONSUMER)
+  async decrementQuantityItem(
+    @LoggedUser() loggedUser: Token,
+    @Body() dto: QuantityItemBody,
+  ) {
+    await this.cartService.decrementQuantityItem(loggedUser.sub, dto);
   }
 }

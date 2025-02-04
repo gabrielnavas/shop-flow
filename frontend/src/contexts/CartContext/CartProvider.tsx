@@ -56,6 +56,8 @@ export const CartProvider = ({ children }: Props) => {
   }, [accessToken, isAuthencated,])
 
   const addItemCart = React.useCallback((product: Product): void => {
+    resetGlobalError()
+
     const productCart = {
       product: product,
       quantity: 1,
@@ -72,16 +74,18 @@ export const CartProvider = ({ children }: Props) => {
     return items.some(item => product.id === item.product.id)
   }, [items])
 
-  const incrementQuantityItem = async (productId: number, quantityIncrement: number): Promise<void> => {
+  const incrementQuantityItem = async (productId: number, quantity: number): Promise<void> => {
+    resetGlobalError()
+
     const cartService = new CartService(accessToken)
-    cartService.incrementQuantityItem(productId, quantityIncrement)
+    cartService.incrementQuantityItem(productId, quantity)
       .then(() => {
         const index = items.findIndex(item => item.product.id === productId)
         if (index < 0) {
           return
         }
         const newItems = [...items]
-        newItems[index].quantity += quantityIncrement
+        newItems[index].quantity += quantity
         setItems(newItems)
         localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
       })
@@ -93,22 +97,33 @@ export const CartProvider = ({ children }: Props) => {
         }
       })
   }
-  const decrementQuantityItem = async (productId: number, quantityIncrement: number): Promise<void> => {
-    const index = items.findIndex(item => item.product.id === productId)
-    if (index < 0) {
-      return
-    }
-    const newItems = [...items]
-    newItems[index].quantity -= quantityIncrement
+  const decrementQuantityItem = async (productId: number, quantity: number): Promise<void> => {
+    resetGlobalError()
 
-    // const cartService = new CartService(accessToken)
-    // await cartService.decrementQuantityItem(productId, quantityIncrement)
-
-    setItems(newItems)
-    localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
+    const cartService = new CartService(accessToken)
+    cartService.decrementQuantityItem(productId, quantity)
+      .then(() => {
+        const index = items.findIndex(item => item.product.id === productId)
+        if (index < 0) {
+          return
+        }
+        const newItems = [...items]
+        newItems[index].quantity -= quantity
+        setItems(newItems)
+        localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
+      })
+      .catch((err) => {
+        if (err instanceof Error) {
+          setGlobalError(err.message)
+        } else {
+          setGlobalError('Tente novamente mais tarde.')
+        }
+      })
   }
 
   const removeItem = async (productId: number): Promise<void> => {
+    resetGlobalError()
+
     const index = items.findIndex(item => item.product.id === productId)
     if (index < 0) {
       return
@@ -121,6 +136,10 @@ export const CartProvider = ({ children }: Props) => {
     setItems(newItems)
     localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
   }
+
+  const resetGlobalError = React.useCallback(() => {
+    setGlobalError('')
+  }, [])
 
   return (
     <CartContext.Provider value={{

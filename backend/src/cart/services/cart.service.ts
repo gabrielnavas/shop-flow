@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import {
-  AddProductToCartDto,
-  CartItemDto,
-  IncrementQuantityItemBody,
-} from '../dtos';
+import { AddProductToCartDto, CartItemDto, QuantityItemBody } from '../dtos';
 import { CartItem } from 'src/entities/cart-item.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -13,6 +9,7 @@ import { CartItemNotFoundException } from '../exceptions/cart-item-not-found-exc
 import { Product } from 'src/entities/product.entity';
 import { ProductNotFoundException } from 'src/product/exceptions/product-not-found-by-exception';
 import { QuantityExceedsStockException } from '../exceptions/quantity-exceeds-stock-exception';
+import { QuantityZeroException } from '../exceptions/quantity-zero-exception';
 
 @Injectable()
 export class CartService {
@@ -98,7 +95,7 @@ export class CartService {
 
   async incrementQuantityItem(
     loggedUserId: number,
-    dto: IncrementQuantityItemBody,
+    dto: QuantityItemBody,
   ): Promise<void> {
     const queryRunner = this.entityManager.connection.createQueryRunner();
 
@@ -131,9 +128,61 @@ export class CartService {
         throw new CartItemNotFoundException();
       }
 
-      const totalQuantity = cartItem.quantity + dto.quantityIncrement;
+      const totalQuantity = cartItem.quantity + dto.quantity;
       if (totalQuantity > product.stock) {
         throw new QuantityExceedsStockException();
+      }
+
+      cartItem.quantity = totalQuantity;
+      await this.entityManager.save(cartItem);
+
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  async decrementQuantityItem(
+    loggedUserId: number,
+    dto: QuantityItemBody,
+  ): Promise<void> {
+    const queryRunner = this.entityManager.connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
+    try {
+      const userFound = await this.entityManager.findOneBy(User, {
+        id: loggedUserId,
+      });
+      if (!userFound) {
+        throw new UserNotFoundException();
+      }
+
+      const product = await this.entityManager.findOne(Product, {
+        where: {
+          id: dto.productId,
+        },
+      });
+      if (product === null) {
+        throw new ProductNotFoundException();
+      }
+
+      const cartItem = await this.entityManager.findOne(CartItem, {
+        where: {
+          userId: userFound.id,
+          productId: dto.productId,
+        },
+      });
+      if (cartItem === null) {
+        throw new CartItemNotFoundException();
+      }
+
+      const totalQuantity = cartItem.quantity - dto.quantity;
+      if (totalQuantity <= 0) {
+        throw new QuantityZeroException();
       }
 
       cartItem.quantity = totalQuantity;

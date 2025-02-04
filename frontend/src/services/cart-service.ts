@@ -75,11 +75,32 @@ export class CartService {
     return cartItemsWrapped
   }
 
-  async incrementQuantityItem(productId: number, quantityIncrement: number) {
+  async incrementQuantityItem(productId: number, quantity: number) {
     const url = `${this.urlEndpoint}/cart-item/increment-quantity`
     const payload = {
       productId,
-      quantityIncrement,
+      quantity,
+    }
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.accessToken}`
+      },
+      body: JSON.stringify(payload)
+    })
+    if (response.status >= 400) {
+      const { message } = await response.json()
+      throw new Error(message)
+    }
+  }
+
+
+  async decrementQuantityItem(productId: number, quantity: number) {
+    const url = `${this.urlEndpoint}/cart-item/decrement-quantity`
+    const payload = {
+      productId,
+      quantity,
     }
     const response = await fetch(url, {
       method: 'PUT',

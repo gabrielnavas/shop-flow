@@ -13,8 +13,6 @@ type Props = {
 }
 
 export const CartItem = ({ productCart }: Props) => {
-  console.log(productCart);
-
   const [imageUrl, setImageUrl] = React.useState(productCart.product.imageUrl)
 
   const {

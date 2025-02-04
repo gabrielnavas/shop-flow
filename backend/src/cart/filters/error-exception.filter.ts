@@ -11,12 +11,14 @@ import { UserNotFoundException } from 'src/user/exceptions/user-not-found.except
 import { ProductNotFoundException } from 'src/product/exceptions/product-not-found-by-exception';
 import { CartItemNotFoundException } from '../exceptions/cart-item-not-found-exception';
 import { QuantityExceedsStockException } from '../exceptions/quantity-exceeds-stock-exception';
+import { QuantityZeroException } from '../exceptions/quantity-zero-exception';
 
 @Catch(
   UserNotFoundException,
   ProductNotFoundException,
   CartItemNotFoundException,
   QuantityExceedsStockException,
+  QuantityZeroException,
 )
 export class ErrorExceptionFilter implements ExceptionFilter {
   catch(error: Error, host: ArgumentsHost) {
