@@ -1,6 +1,5 @@
 import React from "react"
 import { useNavigate } from "react-router"
-import accounting from "accounting"
 
 import { Button } from "../../components/ui/Button"
 import { Form } from "../../components/ui/Form"
@@ -25,6 +24,7 @@ import { InputFile } from "../../components/ui/InputFile"
 import { Category, Product } from "../../services/entities"
 import { Modal } from "../../components/ui/Modal"
 import { midiaUrldefaults, MidiaService } from "../../services/midia-service"
+import { transformToMoney, transformToValueAmerican } from "../../utils/money-transform"
 
 type Props = {
   isOpenModal: boolean
@@ -447,16 +447,10 @@ export const ProductModal = ({ product, isOpenModal, onClose }: Props) => {
                 type="text"
                 value={
                   // pega o valor de string formato americano e transforma pra formato br com R$ virgulas e pontos e duas casas
-                  accounting.formatMoney(parseFloat(field.value || "0"), "R$ ", 2, ".", ",")
+                  transformToMoney(field.value)
                 }
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  // pega o valor que tem R$, pontos e virgulas virgulas e 
-                  // transforma pra uma string, mas formato americano
-                  // Remove tudo que não for número
-                  const value: string = e.target.value
-                  const rawValue = value.replace(/\D/g, "");
-                  // Divide por 100 para manter duas casas decimais
-                  const numericValue = (Number(rawValue) / 100).toString();
+                  const numericValue = transformToValueAmerican(e.target.value)
                   field.onChange(numericValue);
                 }}
               />

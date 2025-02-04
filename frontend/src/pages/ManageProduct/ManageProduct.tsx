@@ -12,6 +12,7 @@ import { LoadingIcon } from "../../components/ui/LoadingContainer"
 import { RemoveProductItemsButton } from "./RemoveProductItemsButton"
 import { UpdateProductItemButton } from "./UpdateProductItemButton"
 import { AddNewProductItemButton } from "./AddNewProductItemButton"
+import { transformToMoney } from "../../utils/money-transform"
 
 type ProductItem = {
   selected: boolean
@@ -151,7 +152,7 @@ export const ManageProductPage = () => {
                       <TableCeilText>{item.product.stock}</TableCeilText>
                     </Td>
                     <Td $width={widths.price}>
-                      <TableCeilText>{item.product.price}</TableCeilText>
+                      <TableCeilText>{transformToMoney(item.product.price.toString())}</TableCeilText>
                     </Td>
                     <Td $width={widths.actions}>
                       <TableAction>
