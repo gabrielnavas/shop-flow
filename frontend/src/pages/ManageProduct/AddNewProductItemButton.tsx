@@ -3,14 +3,14 @@ import { BiPlusCircle } from "react-icons/bi"
 
 import { ButtonIconContainer } from "./ButtonIconContainer"
 import { Button } from "../../components/ui/Button"
-import { NewProductModal } from "./NewProductModal"
+import { ProductModal } from "./ProductModal"
 
 export const AddNewProductItemButton = () => {
   const [isOpenModal, setIsOpenModal] = React.useState(false)
 
   return (
     <>
-      <NewProductModal
+      <ProductModal
         isOpenModal={isOpenModal}
         onClose={() => setIsOpenModal(false)} />
       <Button $variant="add" onClick={() => setIsOpenModal(true)}>

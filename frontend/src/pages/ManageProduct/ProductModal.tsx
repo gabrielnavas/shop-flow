@@ -29,7 +29,7 @@ import { midiaUrldefaults, MidiaService } from "../../services/midia-service"
 type Props = {
   isOpenModal: boolean
   onClose: () => void
-  product: Product
+  product?: Product | undefined
 }
 
 type Inputs = {
@@ -42,7 +42,7 @@ type Inputs = {
 }
 
 
-export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => {
+export const ProductModal = ({ product, isOpenModal, onClose }: Props) => {
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState(false)
 
@@ -52,10 +52,14 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
 
   const formRef = React.useRef<HTMLFormElement | null>(null)
 
-  const [categories, setCategories] = React.useState<Category[]>([{ id: 0, name: 'Selecione' }])
+  const defaultCategory = { id: 0, name: 'Selecione' }
+  const [categories, setCategories] = React.useState<Category[]>([defaultCategory])
 
   const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
-  const { updateProduct } = React.useContext(ProductContext) as ProductContextType
+  const {
+    addProduct,
+    updateProduct
+  } = React.useContext(ProductContext) as ProductContextType
 
   const navigate = useNavigate()
 
@@ -67,7 +71,14 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
     setValue,
     formState: { errors },
   } = useForm<Inputs>({
-    defaultValues: {
+    defaultValues: product === undefined ? {
+      id: 0,
+      name: '',
+      description: '',
+      price: '',
+      category: '',
+      stock: 10
+    } : {
       id: product.id,
       name: product.name,
       description: product.description,
@@ -77,10 +88,49 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
     }
   })
 
+  const onClearImage = React.useCallback(() => {
+    if (imageRef && imageRef.current) {
+      imageRef.current.value = ""
+    }
+    setImageUrl(midiaUrldefaults.product)
+  }, [])
+
+  const clearForm = React.useCallback(() => {
+    reset()
+    onClearImage()
+  }, [reset, onClearImage])
+
+  const initForm = React.useCallback((product: Product) => {
+    setValue('name', product.name)
+    setValue('description', product.description)
+    setValue('stock', product.stock)
+    setValue('price', product.price.toFixed(2))
+    setValue('category', product.category.name)
+  }, [setValue])
+
+  React.useEffect(() => {
+    if(product) {
+      initForm(product)
+    } else {
+      initForm({
+        id: 0,
+        name: '',
+        description: '',
+        price: 0,
+        category: defaultCategory,
+        stock: 10,
+        createdAt: new Date(),
+        imageUrl: '',
+      })
+    }
+  }, [defaultCategory, product, initForm])
 
   React.useEffect(() => {
     async function setImageUrlFromProduct() {
-      
+      if (!product) {
+        return
+      }
+
       if (product.imageUrl) {
         const midiaService = new MidiaService()
 
@@ -94,30 +144,50 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
 
           const blob: Blob = await midiaService.fetchImage(imageUrl)
           const file = new File([blob], fileName, { type: blob.type });
-          if(imageRef?.current && imageRef?.current) {
+          if (imageRef?.current && imageRef?.current) {
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             imageRef.current.files = dataTransfer.files
-            console.log('setImageUrlFromProduct', product.imageUrl);
           }
 
         } catch (err) {
-          console.log(err);
+          console.error(err);
         }
       } else {
         setImageUrl(midiaUrldefaults.product)
       }
     }
 
-    setImageUrlFromProduct()
-  }, [product.imageUrl])
+    function setImageFromRef() {
+      let imageUrl = ''
+      let hasFile = false
+      if (imageRef.current?.files && imageRef.current.files.length > 0) {
+        const image = imageRef.current!.files![0]
+        imageUrl = URL.createObjectURL(image)
+        hasFile = true
+      } else {
+        imageUrl = midiaUrldefaults.product
+      }
+      setImageUrl(imageUrl)
+      setHasFile(hasFile)
+    }
+
+    if (product) {
+      setImageUrlFromProduct()
+    } else {
+      setImageFromRef()
+    }
+  }, [product, imageRef])
 
   React.useEffect(() => {
     async function fetchCategoriesAndSetSelectCategory() {
+      if (!product) {
+        return
+      }
+
       try {
         const categoryService = new CategoryService()
         const categories = await categoryService.findCategories()
-        console.log('fetchCategories');
 
         setCategories(prev => [{ ...prev[0] }, ...categories])
 
@@ -135,8 +205,26 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
         }
       }
     }
-    fetchCategoriesAndSetSelectCategory().catch(console.error)
-  }, [product.category.name, setValue])
+
+    async function fetchInititalCategories() {
+      try {
+        const categoryService = new CategoryService()
+        const categories = await categoryService.findCategories()
+        setCategories(prev => [{ ...prev[0] }, ...categories])
+      } catch (err) {
+        if (err instanceof Error) {
+          setGlobalError(err.message)
+        } else {
+          setGlobalError('Problemas no servidor. Tente novamente mais tarde.')
+        }
+      }
+    }
+    if (product) {
+      fetchCategoriesAndSetSelectCategory().catch(console.error)
+    } else {
+      fetchInititalCategories().catch(console.error)
+    }
+  }, [product, setValue])
 
 
   const imageProductOnChange = React.useCallback(() => {
@@ -150,19 +238,53 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
     }
   }, [imageRef])
 
-  const onClearImage = React.useCallback(() => {
-    if (imageRef && imageRef.current) {
-      imageRef.current.value = ""
+
+  const addNewProductOnSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
+    setIsLoading(true)
+
+    try {
+      const category = categories.find(category => category.name === data.category)
+      if (!category) {
+        throw new Error('Categoria não encontrada.')
+      }
+      const newProduct = {
+        name: data.name,
+        description: data.description,
+        price: Number(data.price),
+        stock: data.stock,
+        categoryName: category?.name,
+      }
+      const productService = new ProductService(accessToken)
+
+      const product = await productService.addProduct(newProduct)
+
+      const image = hasFile ? imageRef.current!.files![0] : null
+      if (image) {
+        const { url } = await productService.updateImageProduct(product.id, image)
+        product.imageUrl = url
+      }
+
+      addProduct(product)
+
+      clearForm()
+    } catch (err) {
+      if (err instanceof Error) {
+        setGlobalError(err.message)
+      } else {
+        setGlobalError('Ocorreu um problema.\nTente novamente mais tarde.')
+      }
     }
-    setImageUrl(midiaUrldefaults.product)
-  }, [])
+    finally {
+      setIsLoading(false)
+    }
+  }, [accessToken, categories, addProduct, clearForm, hasFile, imageRef])
 
-  const clearForm = React.useCallback(() => {
-    reset()
-    onClearImage()
-  }, [reset, onClearImage])
 
-  const onSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
+  const updateProductOnSubmit: SubmitHandler<Inputs> = React.useCallback(async (data) => {
+    if (!product) {
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -182,13 +304,13 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
         description: data.description,
         price: Number(data.price),
         stock: Number(data.stock),
-        categoryName: category?.name,
+        categoryName: category.name,
       }
 
-      const productUpdated = await productService.updateProduct(data.id, payload)
+      const productUpdated = await productService.updateProduct(data.id!, payload)
 
       if (image) {
-        productService.updateImageProduct(data.id, image)
+        productService.updateImageProduct(data.id!, image)
           .then(({ url }) => {
             product.name = productUpdated.name
             product.description = productUpdated.description
@@ -196,13 +318,13 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
             product.stock = productUpdated.stock
             product.updatedAt = productUpdated.updatedAt
             product.imageUrl = url
-            updateProduct(data.id, product)
+            updateProduct(data.id!, product)
             clearForm()
             onClose()
           })
       } else {
         productUpdated.imageUrl = ''
-        updateProduct(data.id, productUpdated)
+        updateProduct(data.id!, productUpdated)
         clearForm()
         onClose()
       }
@@ -229,10 +351,13 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
     <Modal
       isOpen={isOpenModal}
       onClose={onClose}>
-      <Form onSubmit={handleSubmit(onSubmit)} ref={formRef}>
-
+      <Form
+        onSubmit={handleSubmit(product
+          ? updateProductOnSubmit
+          : addNewProductOnSubmit)}
+        ref={formRef}>
         <FormGroup>
-          <FormImagePreview src={imageUrl}  />
+          <FormImagePreview src={imageUrl} />
           <InputFile
             label='Selecione a imagem'
             ref={imageRef}
@@ -244,6 +369,7 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
           <Label required>Nome</Label>
           <Input
             type="text"
+            placeholder="Nome único para o produto"
             {...register("name", {
               required: {
                 message: 'Esse Campo é requerido.',
@@ -261,6 +387,7 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
           <Label required>Descrição</Label>
           <TextArea
             $maxLines={4}
+            placeholder="Descreva o produto, suas características..."
             {...register("description", {
               required: {
                 message: 'Esse Campo é requerido.',
@@ -385,7 +512,7 @@ export const UpdateProductModal = ({ product, isOpenModal, onClose }: Props) => 
                 $variant='add'>
 
                 <span>
-                  Atualizar produto
+                  {product ? 'Atualizar produto' : 'Adicionar produto'}
                 </span>
 
               </Button>

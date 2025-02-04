@@ -3,7 +3,7 @@ import React from "react"
 import { ButtonIconContainer } from "./ButtonIconContainer"
 import { Button } from "../../components/ui/Button"
 import { Product } from "../../services/entities"
-import { UpdateProductModal } from "./UpdateProductModal"
+import { ProductModal } from "./ProductModal"
 import { RxUpdate } from "react-icons/rx"
 
 type Props = {
@@ -15,7 +15,7 @@ export const UpdateProductItemButton = ({ product }: Props) => {
 
   return (
     <>
-      <UpdateProductModal
+      <ProductModal
         product={product}
         isOpenModal={isOpenModal}
         onClose={() => setIsOpenModal(false)} />

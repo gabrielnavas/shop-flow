@@ -20,7 +20,8 @@ type Props = {
   product: Product
 }
 
-
+// TODO: Limpar form quando cancelar ou dar o submit
+// Remover errors global e todos os estados do componente
 export const RemoveProductItemButton = ({ product }: Props) => {
   const [globalError, setGlobalError] = React.useState('')
   const [isModalOpen, setIsModalOpen] = React.useState(false)
@@ -73,7 +74,7 @@ export const RemoveProductItemButton = ({ product }: Props) => {
             <LoadingIcon />
           ) : (
             <ModalQuestionButtons>
-
+              {/* TODO: inverter botões de remove e cancelar */}
               <Button $variant="error" onClick={() => removeProductItemOnClick()}>
                 <ButtonIconContainer>
                   <BiTrash />
