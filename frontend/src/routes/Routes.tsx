@@ -4,6 +4,7 @@ import { SigninPage } from "../pages/SignIn/Signin"
 import { ProductCatalogPage } from "../pages/ProductCatalog/ProductCatalog"
 import { routeNames } from "./routes-names"
 import { ManageProductPage } from "../pages/ManageProduct/ManageProduct"
+import { CartPage } from "../pages/Cart/Cart"
 
 
 export const MyRoutes = () => (
@@ -13,6 +14,7 @@ export const MyRoutes = () => (
       <Route path={routeNames.signin} element={<SigninPage />} />
       <Route path={routeNames.home} element={<ProductCatalogPage />} />
       <Route path={routeNames.manageProduct} element={<ManageProductPage />} />
+      <Route path={routeNames.cart} element={<CartPage />} />
       <Route path={routeNames.orders} element={<div>order page</div>} />
       <Route
         path="*"

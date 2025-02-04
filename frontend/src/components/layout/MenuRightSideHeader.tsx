@@ -16,9 +16,10 @@ type Props = {
 export const MenuRightSideHeader = ({ items }: Props) => {
   const { isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
 
-
   const [openMenu, setOpenMenu] = React.useState(false)
   const menuRef = React.useRef<HTMLUListElement | null>(null)
+
+  const navigate = useNavigate()
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -39,9 +40,10 @@ export const MenuRightSideHeader = ({ items }: Props) => {
     setOpenMenu((prev) => !prev);
   }, []);
 
-
-  const navigate = useNavigate()
-
+  const cartOnClick = React.useCallback((event: React.MouseEvent) => {
+    event.stopPropagation();
+    navigate(routeNames.cart)
+  }, [navigate]);
 
   const logoutOnClick = React.useCallback(() => {
     signout()
@@ -52,8 +54,7 @@ export const MenuRightSideHeader = ({ items }: Props) => {
 
   const signinOnClick = React.useCallback(() => {
     navigate(routeNames.signin)
-  }, [navigate]
-  )
+  }, [navigate])
 
   const signupOnClick = React.useCallback(() => {
     navigate(routeNames.signup)
@@ -71,7 +72,7 @@ export const MenuRightSideHeader = ({ items }: Props) => {
       <ButtonContainer onClick={menuOnClick}>
         <BiUser />
       </ButtonContainer>
-      <CartButtonContainer>
+      <CartButtonContainer onClick={cartOnClick}>
         <CartButtonCountContainer>
           {items.length}
         </CartButtonCountContainer>
