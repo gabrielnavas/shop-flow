@@ -41,7 +41,7 @@ type Inputs = {
   category: string
 }
 
-
+// TODO: Limitar o tamanho da imagem que é exibida no modal, maximo e minimo
 export const ProductModal = ({ product, isOpenModal, onClose }: Props) => {
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState(false)
@@ -52,7 +52,7 @@ export const ProductModal = ({ product, isOpenModal, onClose }: Props) => {
 
   const formRef = React.useRef<HTMLFormElement | null>(null)
 
-  const defaultCategory = { id: 0, name: 'Selecione' }
+  const defaultCategory = React.useMemo(() => ({ id: 0, name: 'Selecione' }), [])
   const [categories, setCategories] = React.useState<Category[]>([defaultCategory])
 
   const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
