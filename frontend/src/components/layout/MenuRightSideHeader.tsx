@@ -2,10 +2,10 @@ import React from "react";
 import { BiCart, BiLogOut, BiPackage, BiUser } from "react-icons/bi";
 import { useNavigate } from "react-router";
 import { FaSignInAlt } from "react-icons/fa";
-import { GrUserNew } from "react-icons/gr";
+import { GrUserNew, GrOrderedList } from "react-icons/gr";
 import styled from "styled-components";
 
-import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext";
+import { AuthContext, AuthContextType, PermissionRole } from "../../contexts/AuthContext/AuthContext";
 import { routeNames } from "../../routes/routes-names";
 import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext";
 import { CartService } from "../../services/cart-service";
@@ -16,8 +16,10 @@ import { LoadingIcon } from "../ui/LoadingContainer";
 export const MenuRightSideHeader = () => {
   const [isLoading, setIsLoading] = React.useState(false)
 
-  const { accessToken, isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
+  const { accessToken, isAuthencated, permissionRoles, signout } = React.useContext(AuthContext) as AuthContextType
   const { cartItems, setCartItems } = React.useContext(CartContext) as CartContextType
+
+  const isAdmin = permissionRoles.some(permissionRole => permissionRole === PermissionRole.ADMIN)
 
   const [openMenu, setOpenMenu] = React.useState(false)
   const menuRef = React.useRef<HTMLUListElement | null>(null)
@@ -88,6 +90,9 @@ export const MenuRightSideHeader = () => {
     navigate(routeNames.manageProduct)
   }, [navigate])
 
+  const manageOrdersOnClick = React.useCallback(() => {
+    navigate(routeNames.orders)
+  }, [navigate])
 
   return (
 
@@ -107,14 +112,22 @@ export const MenuRightSideHeader = () => {
       </CartButtonContainer>
 
       {openMenu && (
-        <Menu $menuItemsCount={2.75} ref={menuRef}>
+        <Menu $menuItemsCount={isAdmin ? 5.50 : 2.75} ref={menuRef}>
           {
             isAuthencated ? (
               <>
                 {isAuthencated && (
-                  <MenuItem onClick={manageProductOnClick}>
-                    <BiPackage />
-                    Gerenciar produtos
+                  isAdmin && (
+                    <MenuItem onClick={manageProductOnClick}>
+                      <BiPackage />
+                      Gerenciar produtos
+                    </MenuItem>
+                  )
+                )}
+                {isAuthencated && (
+                  <MenuItem onClick={manageOrdersOnClick}>
+                    <GrOrderedList />
+                    Meus Pedidos
                   </MenuItem>
                 )}
                 <MenuItem onClick={logoutOnClick}>
