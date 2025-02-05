@@ -3,9 +3,11 @@ import React, { useEffect } from "react"
 import { BsCartCheckFill } from "react-icons/bs"
 import { FaCartPlus } from "react-icons/fa6"
 
-import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
+import { CartContext, CartContextType, CartItem } from "../../contexts/CartContext/CartContext"
 import { MidiaService } from "../../services/midia-service"
 import { Product } from "../../services/entities"
+import { CartService } from "../../services/cart-service"
+import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 
 type Props = {
   product: Product
@@ -23,6 +25,7 @@ export const ProductCardItem = ({ product, readonly }: Props) => {
   const [addedCart, setAddedCart] = React.useState(false)
 
   const { addItemCart, existsProduct } = React.useContext(CartContext) as CartContextType
+  const { accessToken } = React.useContext(AuthContext) as AuthContextType
 
   React.useEffect(() => {
     const productService = new MidiaService()
@@ -39,8 +42,17 @@ export const ProductCardItem = ({ product, readonly }: Props) => {
   }, [existsProduct, product])
 
   const addProductToCartOnClick = React.useCallback((product: Product) => {
-    addItemCart(product)
-  }, [addItemCart])
+    const cartService = new CartService(accessToken)
+    cartService.addProductToCart(product)
+      .then(() => {
+        const cartItem = {
+          createdAt: new Date(),
+          product: product,
+          quantity: 1,
+        } as CartItem
+        addItemCart(cartItem)
+      })
+  }, [addItemCart, accessToken])
 
   return (
     <Container $readonly={readonly} onClick={!addedCart && !readonly ? () => addProductToCartOnClick(product) : undefined}>

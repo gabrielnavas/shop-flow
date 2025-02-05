@@ -7,14 +7,17 @@ import styled from "styled-components";
 
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext";
 import { routeNames } from "../../routes/routes-names";
-import { CartItem } from "../../contexts/CartContext/CartContext";
+import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext";
+import { CartService } from "../../services/cart-service";
+import { LoadingIcon } from "../ui/LoadingContainer";
 
-type Props = {
-  cartItems: CartItem[]
-}
 
-export const MenuRightSideHeader = ({ cartItems }: Props) => {
-  const { isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
+
+export const MenuRightSideHeader = () => {
+  const [isLoading, setIsLoading] = React.useState(false)
+
+  const { accessToken, isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
+  const { cartItems, setCartItems } = React.useContext(CartContext) as CartContextType
 
   const [openMenu, setOpenMenu] = React.useState(false)
   const menuRef = React.useRef<HTMLUListElement | null>(null)
@@ -34,6 +37,26 @@ export const MenuRightSideHeader = ({ cartItems }: Props) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  React.useEffect(() => {
+    async function fetchRemoteCartItems() {
+      if (!isAuthencated) {
+        return
+      }
+      setIsLoading(true)
+      try {
+        const cartService = new CartService(accessToken)
+        const cartItems = await cartService.fetchCartItems()
+        setCartItems(cartItems)
+      } catch {
+        // TODO: adicionar erro em algum lugar
+        // setGlobalError(err.message)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchRemoteCartItems()
+  }, [accessToken, isAuthencated, setCartItems])
 
   const menuOnClick = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
@@ -73,9 +96,13 @@ export const MenuRightSideHeader = ({ cartItems }: Props) => {
         <BiUser />
       </ButtonContainer>
       <CartButtonContainer onClick={cartOnClick}>
-        <CartButtonCountContainer>
-          {cartItems.length}
-        </CartButtonCountContainer>
+        {isLoading ? (
+          <LoadingIcon />
+        ) : (
+          <CartButtonCountContainer>
+            {cartItems.length}
+          </CartButtonCountContainer>
+        )}
         <BiCart />
       </CartButtonContainer>
 

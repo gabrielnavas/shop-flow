@@ -1,16 +1,12 @@
-import React from "react";
 import { FaShopify } from "react-icons/fa6";
 import { Link } from "react-router";
 import styled from "styled-components";
 
 import { routeNames } from "../../routes/routes-names";
-import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext";
 import { MenuRightSideHeader } from "./MenuRightSideHeader";
 
 
 export const HeaderPage = () => {
-  const { items } = React.useContext(CartContext) as CartContextType
-
   return (
     <Container>
       <LeftSide to={routeNames.home}>
@@ -20,7 +16,7 @@ export const HeaderPage = () => {
         <Title>Shop Flow</Title>
       </LeftSide>
       <RightSide>
-        <MenuRightSideHeader cartItems={items} />
+        <MenuRightSideHeader />
       </RightSide>
     </Container>
   )

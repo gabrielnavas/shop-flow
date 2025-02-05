@@ -8,11 +8,10 @@ export type CartItem = {
 }
 
 export type CartContextType = {
-  items: CartItem[]
-  globalError: string
-  clearGlobalError: () => void
-  isLoading: boolean
-  addItemCart: (product: Product) => void
+  cartItems: CartItem[]
+  setCartItems: (cartItem: CartItem[]) => void
+  totalPrice: number
+  addItemCart: (cartItem: CartItem) => void
   existsProduct: (product: Product) => boolean
   incrementQuantityItem: (productId: number, quantityIncrement: number) => void
   decrementQuantityItem: (productId: number, quantityIncrement: number) => void

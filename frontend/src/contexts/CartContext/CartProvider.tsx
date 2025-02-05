@@ -1,5 +1,4 @@
 import React, { useEffect } from "react"
-import { CartService } from "../../services/cart-service"
 import { AuthContext, AuthContextType } from "../AuthContext/AuthContext"
 import { CartContext, CartItem } from "./CartContext"
 import { Product } from "../../services/entities"
@@ -14,190 +13,82 @@ const localStorageKeys = {
 }
 
 export const CartProvider = ({ children }: Props) => {
-  const [items, setItems] = React.useState<CartItem[]>([])
-  const [globalError, setGlobalError] = React.useState<string>('')
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-
+  const [cartItems, setCartItems] = React.useState<CartItem[]>([])
+  const [totalPrice, setTotalPrice] = React.useState<number>(0.00)
   const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
 
   useEffect(() => {
-    async function fetchCartItemsWithoutAuth() {
+    async function fetchLocalCartItems() {
       const itemsJson = localStorage.getItem(localStorageKeys.cartItems)
       if (itemsJson) {
-        setItems(JSON.parse(itemsJson))
+        setCartItems(JSON.parse(itemsJson))
       }
     }
-
-    async function fetchCartItemsWithAuth() {
-      if (!isAuthencated) {
-        return
-      }
-
-      setIsLoading(true)
-      try {
-        const cartService = new CartService(accessToken)
-        const cartItems = await cartService.fetchCartItems()
-        // const mergedCartItems = mergeCartItems(cartItems, items)
-
-        // const promises = mergedCartItems.map(async item => (
-        //   await cartService.addProductToCart(item.product)
-        // ))
-        // await Promise.all(promises)
-
-        setItems(cartItems)
-        localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(cartItems))
-      } catch (err) {
-        if (err instanceof Error) {
-          setGlobalError(err.message)
-        } else {
-          setGlobalError('Tente novamente mais tarde.')
-        }
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-
-    // IDEIA: sempre busco localmente, pois não precisa de autenticação
-    // SEM autenticação: busca o items sem autenticação
-    // COM autenticação: busca o items com autenticação, caso tiver logado
-    // Resolver isso mais pra frente. problema quando dar refresh, estava incrementando a quantidade de produto.
-    fetchCartItemsWithoutAuth()
-    fetchCartItemsWithAuth()
+    fetchLocalCartItems()
   }, [accessToken, isAuthencated,])
 
+  React.useEffect(() => {
+    const totalPrice = cartItems.reduce((acc, item) => acc + item.quantity * item.product.price, 0)
+    setTotalPrice(totalPrice)
+  }, [cartItems])
 
-  const clearGlobalError = React.useCallback(() => {
-    setGlobalError('')
-  }, [])
 
-
-  // TODO: Mover a logica do add item to cart da api da home pra cá
-  const addItemCart = React.useCallback((product: Product): void => {
-    clearGlobalError()
-
-    if (isAuthencated) {
-      setIsLoading(true)
-      try {
-        const cartService = new CartService(accessToken)
-        cartService.addProductToCart(product)
-      } catch (err) {
-        if (err instanceof Error) {
-          setGlobalError(err.message)
-        } else {
-          setGlobalError('Tente novamente mais tarde.')
-        }
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    const productCart = {
-      product: product,
-      quantity: 1,
-      createdAt: new Date()
-    } as CartItem
-
-    setItems(prev => {
-      const updatedItems = [...prev, productCart]
+  const addItemCart = React.useCallback((cartItem: CartItem): void => {
+    setCartItems(prev => {
+      const updatedItems = [...prev, cartItem]
       localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(updatedItems))
       return updatedItems
     })
-  }, [clearGlobalError, accessToken, isAuthencated])
+  }, [])
 
   const existsProduct = React.useCallback((product: Product): boolean => {
-    return items.some(item => product.id === item.product.id)
-  }, [items])
+    return cartItems.some(item => product.id === item.product.id)
+  }, [cartItems])
 
   const incrementQuantityItem = React.useCallback(async (productId: number, quantity: number): Promise<void> => {
-    clearGlobalError()
-
-    setIsLoading(true)
-    const cartService = new CartService(accessToken)
-    cartService.incrementQuantityItem(productId, quantity)
-      .then(() => {
-        const index = items.findIndex(item => item.product.id === productId)
-        if (index < 0) {
-          return
-        }
-        const newItems = [...items]
-        newItems[index].quantity += quantity
-        setItems(newItems)
-        localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
-      })
-      .catch((err) => {
-        if (err instanceof Error) {
-          setGlobalError(err.message)
-        } else {
-          setGlobalError('Tente novamente mais tarde.')
-        }
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [clearGlobalError, accessToken, items])
+    setCartItems(cartItems => {
+      const index = cartItems.findIndex(item => item.product.id === productId)
+      if (index < 0) {
+        return cartItems
+      }
+      const newItems = [...cartItems]
+      newItems[index].quantity += quantity
+      localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
+      return newItems
+    })
+  }, [])
 
   const decrementQuantityItem = React.useCallback(async (productId: number, quantity: number): Promise<void> => {
-    clearGlobalError()
-
-    setIsLoading(true)
-    const cartService = new CartService(accessToken)
-    cartService.decrementQuantityItem(productId, quantity)
-      .then(() => {
-        const index = items.findIndex(item => item.product.id === productId)
-        if (index < 0) {
-          return
-        }
-        const newItems = [...items]
-        newItems[index].quantity -= quantity
-        setItems(newItems)
-        localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
-      })
-      .catch((err) => {
-        if (err instanceof Error) {
-          setGlobalError(err.message)
-        } else {
-          setGlobalError('Tente novamente mais tarde.')
-        }
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [accessToken, items, clearGlobalError])
+    setCartItems(cartItems => {
+      const index = cartItems.findIndex(item => item.product.id === productId)
+      if (index < 0) {
+        return cartItems
+      }
+      const newItems = [...cartItems]
+      newItems[index].quantity -= quantity
+      localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
+      return newItems
+    })
+  }, [])
 
   const removeItem = React.useCallback(async (productId: number): Promise<void> => {
-    clearGlobalError()
-
-    const cartService = new CartService(accessToken)
-    await cartService.removeItem(productId)
-      .then(() => {
-        const index = items.findIndex(item => item.product.id === productId)
-        if (index < 0) {
-          return
-        }
-        const newItems = [...items]
-        newItems.splice(index, 1)
-        setItems(newItems)
-        localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
-      })
-      .catch((err) => {
-        if (err instanceof Error) {
-          setGlobalError(err.message)
-        } else {
-          setGlobalError('Tente novamente mais tarde.')
-        }
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [accessToken, items, clearGlobalError])
+   setCartItems(cartItems => {
+    const index = cartItems.findIndex(item => item.product.id === productId)
+    if (index < 0) {
+      return cartItems
+    }
+    const newItems = [...cartItems]
+    newItems.splice(index, 1)
+    localStorage.setItem(localStorageKeys.cartItems, JSON.stringify(newItems))
+    return newItems
+   })
+  }, [])
 
   return (
     <CartContext.Provider value={{
-      items,
-      globalError,
-      clearGlobalError,
-      isLoading,
+      totalPrice,
+      cartItems,
+      setCartItems,
       addItemCart,
       existsProduct,
       incrementQuantityItem,

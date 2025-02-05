@@ -38,12 +38,10 @@ export class CartService {
         const { message } = await response.json()
         throw new Error(message)
       }
-
     } catch (err) {
       if ((err as Error).name === 'TypeError' && (err as Error).message === 'Failed to fetch') {
         throw new Error('Servidor offline.')
       }
-
       throw err
     }
   }
@@ -116,7 +114,7 @@ export class CartService {
     }
   }
 
-  async removeItem(productId: number) {
+  async removeItem(productId: number): Promise<void>{
     const url = `${this.urlEndpoint}/cart-item/product/${productId}`
     const response = await fetch(url, {
       method: 'DELETE',
