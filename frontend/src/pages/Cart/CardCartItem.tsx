@@ -1,26 +1,31 @@
 import { BiMinus, BiPlus } from "react-icons/bi"
-import { ProductCart } from "./types"
 import styled from "styled-components"
 import { Button } from "../../components/ui/Button"
 import { Input } from "../../components/ui/Input"
-import { midiaUrldefaults } from "../../services/midia-service"
+import { MidiaService, midiaUrldefaults } from "../../services/midia-service"
 import React from "react"
 import { transformToMoney } from "../../utils/money-transform"
-import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
+import { CartContext, CartContextType, CartItem } from "../../contexts/CartContext/CartContext"
 
 import { RemoveItemButton } from "./RemoveItemButton"
 
 type Props = {
-  productCart: ProductCart
+  cartItem: CartItem
 }
 
-export const CartItem = ({ productCart }: Props) => {
-  const [imageUrl, setImageUrl] = React.useState(productCart.product.imageUrl)
+export const CardCartItem = ({ cartItem }: Props) => {
+  const [imageUrl, setImageUrl] = React.useState('')
 
   const {
     incrementQuantityItem,
     decrementQuantityItem,
   } = React.useContext(CartContext) as CartContextType
+
+  React.useEffect(() => {
+    const midiaService = new MidiaService()
+    const imageUrl = midiaService.getUrl(cartItem.product.imageUrl)
+    setImageUrl(imageUrl)
+  }, [cartItem.product.imageUrl])
 
   return (
     <>
@@ -35,38 +40,38 @@ export const CartItem = ({ productCart }: Props) => {
         <Middle>
           <TopMiddle>
             <Name>
-              {productCart.product.name}
+              {cartItem.product.name}
             </Name>
             <Description>
-              {productCart.product.description}
+              {cartItem.product.description}
             </Description>
             <CreatedAt>
               <span>Adicionado ao carrinho em </span>
-              {productCart.createdAt.toString()}
+              {cartItem.createdAt.toString()}
             </CreatedAt>
           </TopMiddle>
           <BottomMiddle>
             <QuantityItemContainer>
-              <DecrementButton onClick={() => decrementQuantityItem(productCart.product.id, 1)}>
+              <DecrementButton onClick={() => decrementQuantityItem(cartItem.product.id, 1)}>
                 <BiMinus />
               </DecrementButton>
-              <CountItems onChange={() => { }} value={productCart.quantity} />
-              <IncrementItemButton onClick={() => incrementQuantityItem(productCart.product.id, 1)}>
+              <CountItems onChange={() => { }} value={cartItem.quantity} />
+              <IncrementItemButton onClick={() => incrementQuantityItem(cartItem.product.id, 1)}>
                 <BiPlus />
               </IncrementItemButton>
             </QuantityItemContainer>
             <PipeSeparator />
-            <RemoveItemButton productCart={productCart} />
+            <RemoveItemButton cartItem={cartItem} />
           </BottomMiddle>
         </Middle>
         <RightSide>
           <QuantityPriceContainer>
-            <QuantityItem>{productCart.quantity} Itens</QuantityItem>
+            <QuantityItem>{cartItem.quantity}</QuantityItem>
             <SymbolMultiply>x</SymbolMultiply>
-            <PriceItem>{transformToMoney(productCart.product.price.toString())}</PriceItem>
+            <PriceItem>{transformToMoney(cartItem.product.price.toString())}</PriceItem>
           </QuantityPriceContainer>
           <TotalPriceContainer>
-            {transformToMoney((productCart.product.price * productCart.quantity).toFixed(2))}
+            {transformToMoney((cartItem.product.price * cartItem.quantity).toFixed(2))}
           </TotalPriceContainer>
         </RightSide>
       </Container>
@@ -96,6 +101,7 @@ const Image = styled.img`
   height: 185px; /* Tamanho fixo para a imagem */
   object-fit: cover; /* Para a imagem preencher a área sem distorção */
   border-radius: ${props => props.theme.borderRadius.default};
+  width: 300px;
 `
 const TopMiddle = styled.div`
   display: flex;

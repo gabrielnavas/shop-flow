@@ -1,8 +1,7 @@
 import styled from "styled-components"
 import { Button } from "../../components/ui/Button"
-import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
+import { CartContext, CartContextType, CartItem } from "../../contexts/CartContext/CartContext"
 import React from "react"
-import { ProductCart } from "./types"
 
 import { Modal } from "../../components/ui/Modal"
 import { ModalContent } from "../../components/ui/ModalContent"
@@ -16,10 +15,10 @@ import { MdCancel } from "react-icons/md"
 import { BiTrash } from "react-icons/bi"
 
 type Props = {
-  productCart: ProductCart
+  cartItem: CartItem
 }
 
-export const RemoveItemButton = ({ productCart }: Props) => {
+export const RemoveItemButton = ({ cartItem }: Props) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false)
 
   const {
@@ -39,9 +38,9 @@ export const RemoveItemButton = ({ productCart }: Props) => {
   }, [onCloseModal])
 
   const removeItemOnClick = React.useCallback(() => {
-    removeItem(productCart.product.id)
+    removeItem(cartItem.product.id)
     onCloseModal()
-  }, [removeItem, onCloseModal, productCart.product.id])
+  }, [removeItem, onCloseModal, cartItem.product.id])
 
 
   return (

@@ -1,8 +1,7 @@
 import React, { useEffect } from "react"
-import { ProductCart } from "../../pages/Cart/types"
 import { CartService } from "../../services/cart-service"
 import { AuthContext, AuthContextType } from "../AuthContext/AuthContext"
-import { CartContext } from "./CartContext"
+import { CartContext, CartItem } from "./CartContext"
 import { Product } from "../../services/entities"
 
 
@@ -15,7 +14,7 @@ const localStorageKeys = {
 }
 
 export const CartProvider = ({ children }: Props) => {
-  const [items, setItems] = React.useState<ProductCart[]>([])
+  const [items, setItems] = React.useState<CartItem[]>([])
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
 
@@ -97,7 +96,7 @@ export const CartProvider = ({ children }: Props) => {
       product: product,
       quantity: 1,
       createdAt: new Date()
-    } as ProductCart
+    } as CartItem
 
     setItems(prev => {
       const updatedItems = [...prev, productCart]

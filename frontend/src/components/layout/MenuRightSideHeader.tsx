@@ -7,13 +7,13 @@ import styled from "styled-components";
 
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext";
 import { routeNames } from "../../routes/routes-names";
-import { ProductCart } from "../../pages/Cart/types";
+import { CartItem } from "../../contexts/CartContext/CartContext";
 
 type Props = {
-  items: ProductCart[]
+  cartItems: CartItem[]
 }
 
-export const MenuRightSideHeader = ({ items }: Props) => {
+export const MenuRightSideHeader = ({ cartItems }: Props) => {
   const { isAuthencated, signout } = React.useContext(AuthContext) as AuthContextType
 
   const [openMenu, setOpenMenu] = React.useState(false)
@@ -74,7 +74,7 @@ export const MenuRightSideHeader = ({ items }: Props) => {
       </ButtonContainer>
       <CartButtonContainer onClick={cartOnClick}>
         <CartButtonCountContainer>
-          {items.length}
+          {cartItems.length}
         </CartButtonCountContainer>
         <BiCart />
       </CartButtonContainer>

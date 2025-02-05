@@ -4,7 +4,7 @@ import { SigninPage } from "../pages/SignIn/Signin"
 import { ProductCatalogPage } from "../pages/ProductCatalog/ProductCatalog"
 import { routeNames } from "./routes-names"
 import { ManageProductPage } from "../pages/ManageProduct/ManageProduct"
-import { CartPage } from "../pages/Cart/Cart"
+import { CartPage } from "../pages/Cart/CartPage"
 
 
 export const MyRoutes = () => (

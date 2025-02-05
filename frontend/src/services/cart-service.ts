@@ -1,7 +1,7 @@
-import { ProductCart } from "../pages/Cart/types";
+import { CartItem } from "../contexts/CartContext/CartContext";
 import { Product } from "./entities";
 
-type ProductCartBody = Omit<ProductCart, 'createdAt'> & {
+type CartItemBody = Omit<CartItem, 'createdAt'> & {
   product: Omit<Product, 'createdAt' & 'updatedAt'> & {
     createdAt: string
     updatedAt?: string
@@ -49,7 +49,7 @@ export class CartService {
   }
 
 
-  async fetchCartItems(): Promise<ProductCart[]> {
+  async fetchCartItems(): Promise<CartItem[]> {
     const url = `${this.urlEndpoint}/cart-item`
     const response = await fetch(url, {
       method: 'GET',
@@ -63,7 +63,7 @@ export class CartService {
       throw new Error(message)
     }
     const cartItems = await response.json()
-    const cartItemsWrapped = cartItems.map((item: ProductCartBody) => ({
+    const cartItemsWrapped = cartItems.map((item: CartItemBody) => ({
       product: {
         ...item.product,
         createdAt: new Date(item.product.createdAt),

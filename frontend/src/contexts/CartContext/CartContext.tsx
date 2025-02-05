@@ -1,9 +1,14 @@
 import React from "react"
-import { ProductCart } from "../../pages/Cart/types"
 import { Product } from "../../services/entities"
 
+export type CartItem = {
+  product: Product
+  quantity: number
+  createdAt: Date
+}
+
 export type CartContextType = {
-  items: ProductCart[]
+  items: CartItem[]
   globalError: string
   clearGlobalError: () => void
   isLoading: boolean

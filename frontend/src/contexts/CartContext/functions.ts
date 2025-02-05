@@ -1,7 +1,7 @@
-import { ProductCart } from "../../pages/Cart/types"
+import { CartItem } from "./CartContext";
 
-export function mergeCartItems(cartItems1: ProductCart[], cartItems2: ProductCart[]) {
-  const mergedItemsMap = new Map<number, ProductCart>();
+export function mergeCartItems(cartItems1: CartItem[], cartItems2: CartItem[]) {
+  const mergedItemsMap = new Map<number, CartItem>();
 
 
   // Adicionar itens existentes ao mapa

@@ -20,7 +20,7 @@ export const HeaderPage = () => {
         <Title>Shop Flow</Title>
       </LeftSide>
       <RightSide>
-        <MenuRightSideHeader items={items} />
+        <MenuRightSideHeader cartItems={items} />
       </RightSide>
     </Container>
   )

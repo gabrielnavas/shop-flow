@@ -7,7 +7,7 @@ import { useNavigate } from "react-router"
 import { Page } from "../../components/ui/Page"
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { CartContext, CartContextType } from "../../contexts/CartContext/CartContext"
-import { CartItem } from "./CartItem"
+import { CardCartItem } from "./CardCartItem"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 
@@ -38,7 +38,7 @@ export const CartPage = () => {
         )}
         <CartList>
           {items.map(item => (
-            <CartItem productCart={item} />
+            <CardCartItem cartItem={item} />
           ))}
         </CartList>
       </Content>
