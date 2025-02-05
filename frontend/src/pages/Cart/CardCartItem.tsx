@@ -21,6 +21,8 @@ import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { CartService } from "../../services/cart-service"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
+import { distanceFrom } from "../../utils/date"
+
 
 type Props = {
   cartItem: CartItem
@@ -52,7 +54,7 @@ export const CardCartItem = ({ cartItem }: Props) => {
 
   const incrementQuantityItemOnClick = React.useCallback(() => {
     setGlobalError('')
-    
+
     const cartService = new CartService(accessToken)
     const quantity = 1
 
@@ -100,7 +102,7 @@ export const CardCartItem = ({ cartItem }: Props) => {
   const removeCartItemOnClick = React.useCallback(() => {
     setGlobalError('')
     setModalError('')
-    
+
     const cartService = new CartService(accessToken)
     setIsLoading(true)
 
@@ -130,52 +132,52 @@ export const CardCartItem = ({ cartItem }: Props) => {
     <>
       <Container>
         <CardContent>
-        <LeftSide>
-          <ImageContainer>
-            <Image
-              src={imageUrl}
-              onError={() => setImageUrl(midiaUrldefaults.product)} />
-          </ImageContainer>
-        </LeftSide>
-        <Middle>
-          <TopMiddle>
-            <Name>
-              {cartItem.product.name}
-            </Name>
-            <Description>
-              {cartItem.product.description}
-            </Description>
-            <CreatedAt>
-              <span>Adicionado ao carrinho em </span>
-              {cartItem.createdAt.toString()}
-            </CreatedAt>
-          </TopMiddle>
-          <BottomMiddle>
-            <QuantityItemContainer>
-              <DecrementButton onClick={() => decrementQuantityItemOnClick()}>
-                <BiMinus />
-              </DecrementButton>
-              <CountItems onChange={() => { }} value={cartItem.quantity} />
-              <IncrementItemButton onClick={() => incrementQuantityItemOnClick()}>
-                <BiPlus />
-              </IncrementItemButton>
-            </QuantityItemContainer>
-            <PipeSeparator />
-            <RemoveItemButton onClick={() => setIsRemoveItemModalOpen(true)} >
-              Remover
-            </RemoveItemButton>
-          </BottomMiddle>
-        </Middle>
-        <RightSide>
-          <QuantityPriceContainer>
-            <QuantityItem>{cartItem.quantity}</QuantityItem>
-            <SymbolMultiply>x</SymbolMultiply>
-            <PriceItem>{transformToMoney(cartItem.product.price.toString())}</PriceItem>
-          </QuantityPriceContainer>
-          <TotalPriceContainer>
-            {transformToMoney((cartItem.product.price * cartItem.quantity).toFixed(2))}
-          </TotalPriceContainer>
-        </RightSide>
+          <LeftSide>
+            <ImageContainer>
+              <Image
+                src={imageUrl}
+                onError={() => setImageUrl(midiaUrldefaults.product)} />
+            </ImageContainer>
+          </LeftSide>
+          <Middle>
+            <TopMiddle>
+              <Name>
+                {cartItem.product.name}
+              </Name>
+              <Description>
+                {cartItem.product.description}
+              </Description>
+              <CreatedAt>
+                <span>Adicionado ao carrinho </span>
+                {distanceFrom(cartItem.createdAt)}
+              </CreatedAt>
+            </TopMiddle>
+            <BottomMiddle>
+              <QuantityItemContainer>
+                <DecrementButton onClick={() => decrementQuantityItemOnClick()}>
+                  <BiMinus />
+                </DecrementButton>
+                <CountItems onChange={() => { }} value={cartItem.quantity} />
+                <IncrementItemButton onClick={() => incrementQuantityItemOnClick()}>
+                  <BiPlus />
+                </IncrementItemButton>
+              </QuantityItemContainer>
+              <PipeSeparator />
+              <RemoveItemButton onClick={() => setIsRemoveItemModalOpen(true)} >
+                Remover
+              </RemoveItemButton>
+            </BottomMiddle>
+          </Middle>
+          <RightSide>
+            <QuantityPriceContainer>
+              <QuantityItem>{cartItem.quantity}</QuantityItem>
+              <SymbolMultiply>x</SymbolMultiply>
+              <PriceItem>{transformToMoney(cartItem.product.price.toString())}</PriceItem>
+            </QuantityPriceContainer>
+            <TotalPriceContainer>
+              {transformToMoney((cartItem.product.price * cartItem.quantity).toFixed(2))}
+            </TotalPriceContainer>
+          </RightSide>
         </CardContent>
 
         {!!globalError && (
