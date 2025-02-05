@@ -102,5 +102,6 @@ const TotalPrice = styled.div`
 
 const FinishOrderButton = styled(Button)`
   height: 60px;
+  width: 250px;
   font-size: ${props => props.theme.fontSizes.medium};
 `
