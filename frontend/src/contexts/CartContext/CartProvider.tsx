@@ -84,11 +84,16 @@ export const CartProvider = ({ children }: Props) => {
    })
   }, [])
 
+  const clearCart = React.useCallback(() => {
+      setCartItems([])
+  }, [])
+
   return (
     <CartContext.Provider value={{
       totalPrice,
       cartItems,
       setCartItems,
+      clearCart,
       addItemCart,
       existsProduct,
       incrementQuantityItem,

@@ -19,6 +19,7 @@ import { InititalDataModule } from './initial-data/initial-data.module';
 import { CartModule } from './cart/cart.module';
 import { MidiaModule } from './midia/midia.module';
 import { ErrorGenericExceptionFilter } from './filters/error-generic-exception.filter';
+import { OrderModule } from './order/order.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ErrorGenericExceptionFilter } from './filters/error-generic-exception.f
     UserModule,
     ProductModule,
     CartModule,
+    OrderModule,
   ],
   controllers: [],
   providers: [

@@ -10,6 +10,7 @@ export type CartItem = {
 export type CartContextType = {
   cartItems: CartItem[]
   setCartItems: (cartItem: CartItem[]) => void
+  clearCart: () => void
   totalPrice: number
   addItemCart: (cartItem: CartItem) => void
   existsProduct: (product: Product) => boolean

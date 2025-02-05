@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UserRole } from './user-role.entity';
 import { CartItem } from './cart-item.entity';
+import { Order } from './order.entity';
 
 @Entity({ name: 'users' })
 export class User {
@@ -27,4 +28,7 @@ export class User {
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.user)
   cartItems: CartItem[];
+
+  @OneToMany(() => Order, (order) => order.user)
+  orders: Order[];
 }

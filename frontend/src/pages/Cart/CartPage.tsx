@@ -10,11 +10,20 @@ import { CartContext, CartContextType } from "../../contexts/CartContext/CartCon
 import { CardCartItem } from "./CardCartItem"
 import { transformToMoney } from "../../utils/money-transform"
 import { Button } from "../../components/ui/Button"
+import { OrderService } from "../../services/order-service"
+import { ErrorList } from "../../components/ui/ErrorList"
+import { ErrorItem } from "../../components/ui/ErrorItem"
+import { LoadingIcon } from "../../components/ui/LoadingContainer"
+import { ImSad } from "react-icons/im"
+import { LinkCustom } from "../../components/ui/LinkCustom"
 
 export const CartPage = () => {
 
-  const { isAuthencated } = React.useContext(AuthContext) as AuthContextType
-  const { cartItems, totalPrice } = React.useContext(CartContext) as CartContextType
+  const { isAuthencated, accessToken } = React.useContext(AuthContext) as AuthContextType
+  const { clearCart, cartItems, totalPrice } = React.useContext(CartContext) as CartContextType
+
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [globalError, setGlobalError] = React.useState<string>('')
 
   const navigate = useNavigate()
 
@@ -22,28 +31,84 @@ export const CartPage = () => {
     document.title = "Shop flow | Carrinho"
   })
 
+  const onFinishOnClick = React.useCallback(() => {
+    const orderService = new OrderService(accessToken)
+
+    setIsLoading(true)
+    const newOrder = {
+      orderItems: cartItems.map(cartItem => ({
+        productId: cartItem.product.id,
+        quantity: cartItem.quantity,
+        unitPrice: cartItem.product.price,
+      }))
+    }
+    orderService.newOrder(newOrder).then(() => {
+      navigate(routeNames.orders)
+      clearCart()
+    }).catch((err) => {
+      if (err instanceof Error) {
+        setGlobalError(err.message)
+      } else {
+        setGlobalError('Tente novamente mais tarde')
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }, [navigate, cartItems, accessToken, clearCart])
+
   if (!isAuthencated) {
     navigate(routeNames.home)
     return null
   }
+
+  const emptyList = (
+    <EmptyListCard>
+      <EmptyListMessage>
+        Nenhum item adicionado no carrinho.
+      </EmptyListMessage>
+      <EmptyListIcon>
+        <ImSad />
+      </EmptyListIcon>
+      <GoToCatalogLink to={routeNames.home}>
+        Ir para o catálogo
+      </GoToCatalogLink>
+    </EmptyListCard>
+  )
 
   return (
     <Page>
       <HeaderPage />
       <Content>
         <CartListContainer>
-          <CartList>
-            {cartItems.map(item => (
-              <CardCartItem cartItem={item} />
-            ))}
-          </CartList>
+          {cartItems.length === 0 ? (
+            emptyList
+          ) : (
+            <CartList>
+              {cartItems.map(item => (
+                <CardCartItem cartItem={item} />
+              ))}
+            </CartList>
+          )}
         </CartListContainer>
         <CartInfoCard>
+          {globalError && (
+            <ErrorList>
+              <ErrorItem>
+                {globalError}
+              </ErrorItem>
+            </ErrorList>
+          )}
           <CartInfo>
             <TotalItems>Total de {cartItems.length} {cartItems.length > 1 ? 'Produtos' : 'Produto'}</TotalItems>
             <TotalPrice>{transformToMoney(totalPrice.toFixed(2))}</TotalPrice>
           </CartInfo>
-          <FinishOrderButton>Finalizar pedido</FinishOrderButton>
+          {isLoading ? (
+            <LoadingIcon />
+          ) : (
+            <FinishOrderButton onClick={() => onFinishOnClick()} disabled={isLoading}>
+              Finalizar pedido
+            </FinishOrderButton>
+          )}
         </CartInfoCard>
       </Content>
     </Page>
@@ -73,8 +138,10 @@ const CartList = styled.ul`
 const CartInfoCard = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: space-between;
-  height: 200px;
+  width: 320px;
+  height: 300px;
   position: sticky;
   top: 100px;
   right: 0;
@@ -105,3 +172,36 @@ const FinishOrderButton = styled(Button)`
   width: 250px;
   font-size: ${props => props.theme.fontSizes.medium};
 `
+
+const EmptyListCard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 1000px;
+  height: 500px;
+  gap: ${props => props.theme.spacing.lg};
+
+  border: 1px solid ${props => props.theme.colors.borderColor};
+  border-radius: ${props => props.theme.borderRadius.default};
+  padding: ${props => props.theme.spacing.lg};
+`
+
+const EmptyListMessage = styled.span`
+  display: flex;
+
+  font-weight: bold;
+  font-size: calc(${props => props.theme.fontSizes.large} * 1.25);
+`
+
+const EmptyListIcon = styled.div`
+  display: flex;
+  svg {
+    font-size: calc(${props => props.theme.fontSizes.large} * 5);
+    color: ${props => props.theme.colors.darkIcon};
+  }
+`
+
+const GoToCatalogLink = styled(LinkCustom)`
+`
+
