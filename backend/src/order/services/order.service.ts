@@ -14,7 +14,8 @@ import { OrderStatusNotFoundException } from '../exceptions/order-status-not-fou
 import { CartItem } from 'src/entities/cart-item.entity';
 import { CartItemNotFoundException } from '../exceptions/cart-item-not-found-exception';
 import { OrderItemPriceIsWrongException } from '../exceptions/order-item-price-is-wrong-exception';
-import { OrderDto, OrderItemDto } from '../dtos';
+import { OrderDto, OrderItemDto, UpdateOrderStatusDto } from '../dtos';
+import { OrderNotFoundException } from '../exceptions/order-not-found-exception';
 
 @Injectable()
 export class OrderService {
@@ -25,14 +26,14 @@ export class OrderService {
 
     await queryRunner.startTransaction();
 
-    const user = await this.entityManager.findOneBy(User, {
-      id: loggedUserId,
-    });
-    if (user === null) {
-      throw new UserNotFoundException();
-    }
-
     try {
+      const user = await this.entityManager.findOneBy(User, {
+        id: loggedUserId,
+      });
+      if (user === null) {
+        throw new UserNotFoundException();
+      }
+
       const orderStatus = await this.entityManager.findOneBy(OrderStatus, {
         name: OrderStatusName.PENDING,
       });
@@ -102,7 +103,7 @@ export class OrderService {
     }
   }
 
-  async findOrdersByloggedUser(loggedUserId: number): Promise<OrderDto[]> {
+  async findOrdersByLoggedUser(loggedUserId: number): Promise<OrderDto[]> {
     try {
       const user = await this.entityManager.findOne(User, {
         where: {
@@ -125,6 +126,7 @@ export class OrderService {
       const orderDtos = orders.map(
         (order) =>
           ({
+            id: order.id,
             user: {
               id: user.id,
               email: user.email,
@@ -151,6 +153,45 @@ export class OrderService {
     } catch (err) {
       console.log(err);
       throw err;
+    }
+  }
+
+  async updateOrderStatus(dto: UpdateOrderStatusDto) {
+    const queryRunner = this.entityManager.connection.createQueryRunner();
+
+    await queryRunner.startTransaction();
+
+    try {
+      const order = await this.entityManager.findOne(Order, {
+        where: {
+          id: dto.orderId,
+        },
+        relations: {
+          orderStatus: true,
+        },
+      });
+      if (order === null) {
+        throw new OrderNotFoundException();
+      }
+
+      const orderStatus = await this.entityManager.findOne(OrderStatus, {
+        where: {
+          name: dto.orderStatusName,
+        },
+      });
+      if (orderStatus === null) {
+        throw new OrderStatusNotFoundException();
+      }
+
+      order.orderStatus = orderStatus;
+
+      await this.entityManager.save(Order, order);
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 }

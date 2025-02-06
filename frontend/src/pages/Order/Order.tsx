@@ -15,11 +15,15 @@ import { BiUser } from "react-icons/bi"
 import { Select } from "../../components/ui/Select"
 import { SelectOption } from "../../components/ui/SelectOption"
 import { SiDatev } from "react-icons/si"
+import { ErrorList } from "../../components/ui/ErrorList"
+import { ErrorItem } from "../../components/ui/ErrorItem"
 
 export const OrderPage = () => {
 
   const { permissionRoles, accessToken, isAuthenticated } = React.useContext(AuthContext) as AuthContextType
   const isAdmin = permissionRoles.some(permissionRole => permissionRole === PermissionRole.ADMIN)
+
+  const [globalError, setGlobalError] = React.useState<string>('')
 
   const [orders, setOrders] = React.useState<Order[]>([])
 
@@ -49,6 +53,32 @@ export const OrderPage = () => {
     fetchOrdersByLoggedUser()
   }, [accessToken])
 
+  const selectOrderStatusNameOnChange = React.useCallback((
+    orderId: number,
+    orderStatusName: OrderStatusName
+  ) => {
+    const orderService = new OrderService(accessToken)
+    orderService.updateOrderStatus({
+      orderId: orderId,
+      orderStatusName: orderStatusName,
+    }).then(() => {
+      setOrders(prev => {
+        const index = prev.findIndex(order => order.id === orderId)
+        if (index < 0) {
+          return prev
+        }
+        const newOrders = [...prev]
+        newOrders[index].orderStatusName = orderStatusName
+        return newOrders
+      })
+    }).catch(err => {
+      if (err instanceof Error) {
+        setGlobalError(err.message)
+      } else {
+        setGlobalError('Tente novamente mais tarde.')
+      }
+    })
+  }, [accessToken])
 
   return (
     <Page>
@@ -60,16 +90,28 @@ export const OrderPage = () => {
           </PageTitle>
           {orders.map((order, index) => (
             <OrderComponent key={index}>
+              {globalError && (
+                <ErrorList>
+                  <ErrorItem>
+                    {globalError}
+                  </ErrorItem>
+                </ErrorList>
+              )}
               <Header>
                 <Status>
                   <GrStatusInfo />
                   {isAdmin ? (
                     <SelectOrderStatusName
                       $error={false}
-                      onChange={e => console.log(e.target.value)}
+                      onChange={e => selectOrderStatusNameOnChange(
+                        order.id,
+                        e.target.value as OrderStatusName
+                      )}
                       value={order.orderStatusName}>
-                      {Object.values(OrderStatusName).map(orderStatusName => (
-                        <SelectOption value={orderStatusName}>
+                      {Object.values(OrderStatusName).map((orderStatusName, index) => (
+                        <SelectOption
+                          key={index}
+                          value={orderStatusName}>
                           {OrderService.translate(orderStatusName)}
                         </SelectOption>
                       ))}

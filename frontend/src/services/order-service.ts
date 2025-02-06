@@ -11,6 +11,12 @@ type NewOrder = {
   orderItems: NewOrderItem[];
 }
 
+
+export type UpdateOrderStatus = {
+  orderId: number;
+  orderStatusName: OrderStatusName;
+};
+
 export class OrderService {
 
   constructor(
@@ -65,9 +71,33 @@ export class OrderService {
     }
   }
 
+  async updateOrderStatus(payload: UpdateOrderStatus): Promise<void> {
+    try {
+      const response = await fetch(this.urlEndpoint, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.accessToken}`
+        },
+        body: JSON.stringify(payload)
+      })
+      if (response.status >= 400) {
+        const { message } = await response.json()
+        throw new Error(message)
+      }
+    } catch (err) {
+      if ((err as Error).name === 'TypeError' &&
+        (err as Error).message === 'Failed to fetch') {
+        throw new Error('Servidor offline.')
+      }
+
+      throw new Error('Tente novamente mais tarde.')
+    }
+  }
+
   static translate(orderStatusName: OrderStatusName, locale = 'ptBR') {
-    if(locale === 'ptBR') {
-      switch(orderStatusName) {
+    if (locale === 'ptBR') {
+      switch (orderStatusName) {
         case OrderStatusName.PENDING: return 'Pendente'
         case OrderStatusName.PROCESSING: return 'Processando'
         case OrderStatusName.SHIPPED: return 'Enviado'

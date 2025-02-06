@@ -42,6 +42,7 @@ export type OrderItem = {
 }
 
 export type Order = {
+  id: number
   user: User
   totalPrice: number
   orderStatusName: OrderStatusName
