@@ -1,13 +1,25 @@
-import { Body, Controller, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 
 import { NewOrderDto } from '../types';
 import { OrderService } from '../services/order.service';
 import { LoggedUser } from 'src/user/decorators/logged-user.decorator';
 import { Token } from 'src/user/models';
-import { SetRoles } from 'src/user/guards/set-roles';
+import { SetRoles } from 'src/guards/set-roles';
 import { RoleName } from 'src/entities/role-name.enum';
 import { OrderDto, UpdateOrderStatusDto } from '../dtos';
+import { RolesJwt } from 'src/user/guards/roles-jwt.guard';
+import { ErrorExceptionFilter } from '../filters/error-exception.filter';
 
+@UseFilters(new ErrorExceptionFilter())
+@UseGuards(RolesJwt)
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -21,8 +33,13 @@ export class OrderController {
   @Get()
   @SetRoles(RoleName.CONSUMER)
   async findOrdersByLoggedUser(@LoggedUser() user: Token): Promise<OrderDto[]> {
-    const orders = await this.orderService.findOrdersByLoggedUser(user.sub);
-    return orders;
+    try {
+      const orders = await this.orderService.findOrdersByLoggedUser(user.sub);
+      return orders;
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   }
 
   @Put()

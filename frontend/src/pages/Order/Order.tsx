@@ -2,6 +2,8 @@ import React from "react"
 import styled from "styled-components"
 import { useNavigate } from "react-router"
 
+import { io } from "socket.io-client"
+
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { Page } from "../../components/ui/Page"
 import { AuthContext, AuthContextType, PermissionRole } from "../../contexts/AuthContext/AuthContext"
@@ -18,7 +20,12 @@ import { SiDatev } from "react-icons/si"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 
+const OrderSocketIOEvents = {
+  authorizate: 'authorizate'
+}
+
 export const OrderPage = () => {
+
 
   const { permissionRoles, accessToken, isAuthenticated } = React.useContext(AuthContext) as AuthContextType
   const isAdmin = permissionRoles.some(permissionRole => permissionRole === PermissionRole.ADMIN)
@@ -26,6 +33,8 @@ export const OrderPage = () => {
   const [globalError, setGlobalError] = React.useState<string>('')
 
   const [orders, setOrders] = React.useState<Order[]>([])
+
+  const socket = React.useMemo(() => io(import.meta.env.VITE_SOCKET_ENDPOINT), [])
 
   const navigate = useNavigate()
 
@@ -38,6 +47,20 @@ export const OrderPage = () => {
   React.useEffect(() => {
     document.title = 'Shop flow | Pedidos'
   }, [])
+
+  React.useEffect(() => {
+    if(!isAuthenticated) {
+      return
+    }
+    socket.on('connect', function () {
+      console.log('socket connect');
+
+      socket.emit(OrderSocketIOEvents.authorizate, { accessToken });
+    });
+    socket.on('disconnect', function () {
+      console.log('socket disconnected');
+    });
+  }, [socket, isAuthenticated, accessToken])
 
   React.useEffect(() => {
     function fetchOrdersByLoggedUser() {

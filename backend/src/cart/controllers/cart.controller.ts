@@ -7,17 +7,20 @@ import {
   Post,
   Put,
   UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { AddItemToCart, QuantityItemBody } from '../dtos';
 import { CartService } from '../services/cart.service';
-import { SetRoles } from 'src/user/guards/set-roles';
+import { SetRoles } from 'src/guards/set-roles';
 import { RoleName } from 'src/entities/role-name.enum';
 import { LoggedUser } from 'src/user/decorators/logged-user.decorator';
 import { Token } from 'src/user/models';
 import { ErrorExceptionFilter } from '../filters/error-exception.filter';
+import { RolesJwt } from 'src/user/guards/roles-jwt.guard';
 
 @Controller('cart-item')
 @UseFilters(new ErrorExceptionFilter())
+@UseGuards(RolesJwt)
 export class CartController {
   constructor(private cartService: CartService) {}
 

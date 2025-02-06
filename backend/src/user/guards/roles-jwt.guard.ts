@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import { Token } from 'src/user/models';
+import { SetRolesKey } from 'src/guards/set-roles';
 
 @Injectable()
 export class RolesJwt implements CanActivate {
@@ -13,7 +14,7 @@ export class RolesJwt implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const requiredRoles = this.reflector.get<string[]>(
-      'roles',
+      SetRolesKey,
       context.getHandler(),
     );
     if (!requiredRoles) {

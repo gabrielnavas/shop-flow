@@ -9,10 +9,12 @@ import { HttpResponseException } from './types';
 
 @Catch()
 export class ErrorGenericExceptionFilter implements ExceptionFilter {
-  catch(_: Error, host: ArgumentsHost) {
+  catch(err: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
+
+    console.log(err);
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
       message: 'Algo aconteceu. Tente novamente mais tarde.',

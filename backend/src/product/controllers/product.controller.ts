@@ -9,18 +9,21 @@ import {
   Query,
   UploadedFile,
   UseFilters,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 
 import { AddProductDto, ProductDto, UpdateProductDto } from '../dtos';
 import { RoleName } from 'src/entities/role-name.enum';
 import { ProductService } from '../services/product.service';
-import { SetRoles } from 'src/user/guards/set-roles';
+import { SetRoles } from 'src/guards/set-roles';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MidiaService } from 'src/midia/midia.service';
 import { ErrorExceptionFilter } from '../filters/error-exception.filter';
+import { RolesJwt } from 'src/user/guards/roles-jwt.guard';
 
 @UseFilters(new ErrorExceptionFilter())
+@UseGuards(RolesJwt)
 @Controller('product')
 export class ProductController {
   constructor(

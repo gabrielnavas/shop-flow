@@ -2,9 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
-
-import { RolesJwt } from './user/guards/roles-jwt.guard';
+import { APP_FILTER } from '@nestjs/core';
 
 import { UserModule } from './user/user.module';
 import { AuthService } from './user/services/auth.service';
@@ -20,6 +18,7 @@ import { CartModule } from './cart/cart.module';
 import { MidiaModule } from './midia/midia.module';
 import { ErrorGenericExceptionFilter } from './filters/error-generic-exception.filter';
 import { OrderModule } from './order/order.module';
+import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -42,6 +41,7 @@ import { OrderModule } from './order/order.module';
       signOptions: { expiresIn: '7d' },
     }),
     InititalDataModule,
+    EventsModule,
     MidiaModule,
     UserModule,
     ProductModule,
@@ -51,10 +51,6 @@ import { OrderModule } from './order/order.module';
   controllers: [],
   providers: [
     AuthService,
-    {
-      provide: APP_GUARD,
-      useClass: RolesJwt,
-    },
     {
       provide: APP_FILTER,
       useClass: ErrorGenericExceptionFilter,
