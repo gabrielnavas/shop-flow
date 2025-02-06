@@ -17,12 +17,16 @@ import { RoleName } from 'src/entities/role-name.enum';
 import { OrderDto, UpdateOrderStatusDto } from '../dtos';
 import { RolesJwt } from 'src/user/guards/roles-jwt.guard';
 import { ErrorExceptionFilter } from '../filters/error-exception.filter';
+import { OrderClientsSocketService } from '../services/order-clients-socket.service';
 
 @UseFilters(new ErrorExceptionFilter())
 @UseGuards(RolesJwt)
 @Controller('order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly orderClientsSocketService: OrderClientsSocketService,
+  ) {}
 
   @Post()
   @SetRoles(RoleName.CONSUMER)
@@ -44,7 +48,16 @@ export class OrderController {
 
   @Put()
   @SetRoles(RoleName.ADMIN)
-  async updateOrderStatus(@Body() dto: UpdateOrderStatusDto): Promise<void> {
-    await this.orderService.updateOrderStatus(dto);
+  async updateOrderStatus(
+    @LoggedUser() user: Token,
+    @Body() dto: UpdateOrderStatusDto,
+  ): Promise<void> {
+    const order = await this.orderService.updateOrderStatus(dto);
+    this.orderClientsSocketService.updateOrderStatusName({
+      userId: order.user.id,
+      orderId: order.id,
+      orderStatusName: order.orderStatus.name,
+      orderUpdatedAt: order.updatedAt!,
+    });
   }
 }

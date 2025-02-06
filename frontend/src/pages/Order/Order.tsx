@@ -16,13 +16,14 @@ import { MdDateRange } from "react-icons/md"
 import { BiUser } from "react-icons/bi"
 import { Select } from "../../components/ui/Select"
 import { SelectOption } from "../../components/ui/SelectOption"
-import { SiDatev } from "react-icons/si"
 import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
+import { LiaCalendarCheck } from "react-icons/lia"
 
-const OrderSocketIOEvents = {
-  authorizate: 'authorizate'
-}
+const socketEventNames = {
+  updateOrderStatusName: 'updateOrderStatusName',
+   authorizate: 'authorizate'
+};
 
 export const OrderPage = () => {
 
@@ -34,7 +35,7 @@ export const OrderPage = () => {
 
   const [orders, setOrders] = React.useState<Order[]>([])
 
-  const socket = React.useMemo(() => io(import.meta.env.VITE_SOCKET_ENDPOINT), [])
+  const socket = React.useMemo(() => io(`${import.meta.env.VITE_SOCKET_ENDPOINT}/order`), [])
 
   const navigate = useNavigate()
 
@@ -48,18 +49,37 @@ export const OrderPage = () => {
     document.title = 'Shop flow | Pedidos'
   }, [])
 
+
   React.useEffect(() => {
-    if(!isAuthenticated) {
+    if (!isAuthenticated) {
       return
     }
     socket.on('connect', function () {
       console.log('socket connect');
 
-      socket.emit(OrderSocketIOEvents.authorizate, { accessToken });
+      socket.emit(socketEventNames.authorizate, { accessToken });
     });
+
     socket.on('disconnect', function () {
       console.log('socket disconnected');
     });
+
+    socket.on(socketEventNames.updateOrderStatusName, function (body: {
+      orderId: number;
+      orderStatusName: OrderStatusName;
+      updatedAt: Date,
+    }) {
+      setOrders(prev => {
+        const index = prev.findIndex(order => order.id === body.orderId)
+        if (index < 0) {
+          return prev
+        }
+        const newOrders = [...prev]
+        newOrders[index].orderStatusName = body.orderStatusName
+        newOrders[index].updatedAt = body.updatedAt
+        return newOrders
+      })
+    })
   }, [socket, isAuthenticated, accessToken])
 
   React.useEffect(() => {
@@ -145,12 +165,12 @@ export const OrderPage = () => {
                 </Status>
                 <SeparatorVertical />
                 <CreatedAt>
-                  <MdDateRange />
+                  <LiaCalendarCheck />
                   <span>Pedido feito {distanceFrom(order.createdAt)}</span>
                 </CreatedAt>
                 {order.updatedAt && (
                   <UpdatedAt>
-                    <SiDatev />
+                    <MdDateRange />
                     <span>Pedido atualizado {distanceFrom(order.updatedAt)}</span>
                   </UpdatedAt>
                 )}
@@ -259,9 +279,9 @@ const CreatedAt = styled.span`
 
 const UpdatedAt = styled(CreatedAt)`
   span {
-    font-weight: 300;
+    font-weight: 400;
     font-size: ${props => props.theme.fontSizes.small};
-    color: ${props => props.theme.colors.textSecondary};
+    color: ${props => props.theme.colors.textPrimary};
   }
 `
 

@@ -18,7 +18,6 @@ import { CartModule } from './cart/cart.module';
 import { MidiaModule } from './midia/midia.module';
 import { ErrorGenericExceptionFilter } from './filters/error-generic-exception.filter';
 import { OrderModule } from './order/order.module';
-import { EventsModule } from './events/events.module';
 
 @Module({
   imports: [
@@ -41,7 +40,6 @@ import { EventsModule } from './events/events.module';
       signOptions: { expiresIn: '7d' },
     }),
     InititalDataModule,
-    EventsModule,
     MidiaModule,
     UserModule,
     ProductModule,

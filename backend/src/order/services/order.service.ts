@@ -156,7 +156,7 @@ export class OrderService {
     }
   }
 
-  async updateOrderStatus(dto: UpdateOrderStatusDto) {
+  async updateOrderStatus(dto: UpdateOrderStatusDto): Promise<Order> {
     const queryRunner = this.entityManager.connection.createQueryRunner();
 
     await queryRunner.startTransaction();
@@ -168,6 +168,7 @@ export class OrderService {
         },
         relations: {
           orderStatus: true,
+          user: true,
         },
       });
       if (order === null) {
@@ -184,9 +185,11 @@ export class OrderService {
       }
 
       order.orderStatus = orderStatus;
+      order.updatedAt = new Date();
 
       await this.entityManager.save(Order, order);
       await queryRunner.commitTransaction();
+      return order;
     } catch (error) {
       await queryRunner.rollbackTransaction();
       throw error;

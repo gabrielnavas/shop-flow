@@ -8,26 +8,28 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { ClientsSocketService } from '../services/clients-socket.service';
+import { Namespace, Server, Socket } from 'socket.io';
+import { OrderClientsSocketService } from '../services/order-clients-socket.service';
 import { JwtService } from '@nestjs/jwt';
 import { Token } from 'src/user/models';
+import { UnauthorizedException } from '@nestjs/common';
 
 @WebSocketGateway({
+  namespace: 'order',
   cors: {
     origin: '*',
   },
 })
-export class EventsGateway
+export class OrderGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
 {
   constructor(
-    private readonly clientsSocketService: ClientsSocketService,
+    private readonly orderClientsSocketService: OrderClientsSocketService,
     private readonly jwtService: JwtService,
   ) {}
 
   @WebSocketServer()
-  server: Server;
+  server: Namespace;
 
   @SubscribeMessage('authorizate')
   async authorizateEvent(
@@ -40,11 +42,12 @@ export class EventsGateway
 
     try {
       const token: Token = this.jwtService.decode(body.accessToken);
-      await this.clientsSocketService.addUser(client.id, token.sub);
+      await this.orderClientsSocketService.addUser(client, token.sub);
     } catch (err) {
       console.log(err);
+      client.disconnect();
+      throw new UnauthorizedException('Você não tem permissão');
     }
-    console.log(client.id, body);
   }
 
   handleConnection(client: Socket) {
