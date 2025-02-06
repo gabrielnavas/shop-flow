@@ -84,6 +84,9 @@ export class OrderService {
 
         await this.entityManager.delete(CartItem, cartItem);
 
+        product.stock = product.stock - cartItem.quantity;
+        await this.entityManager.update(Product, product.id, product);
+
         return this.entityManager.save(OrderItem, orderItem);
       });
 

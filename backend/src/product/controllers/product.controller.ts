@@ -37,8 +37,8 @@ export class ProductController {
 
   @Delete(':productId')
   @SetRoles(RoleName.ADMIN, RoleName.CONSUMER)
-  async removeProduct(@Param('productId') productId: number) {
-    await this.productService.removeProduct(productId);
+  async removeProduct(@Param('productId') productId: string) {
+    await this.productService.removeProduct(Number(productId));
   }
 
   @Delete()

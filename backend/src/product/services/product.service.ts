@@ -12,6 +12,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProductAlreadyExistsWithNameException } from '../exceptions/product-already-exists-with-name-exception';
 import { CategoryNotFoundException } from '../exceptions/category-not-found-by-exception';
 import { ProductNotFoundException } from '../exceptions/product-not-found-by-exception';
+import { CartItem } from 'src/entities/cart-item.entity';
+import { ProductCannotBeDeletedException } from '../exceptions/product-cannot-be-deleted-deleted-exception';
+import { OrderItem } from 'src/entities/order-item.entity';
 
 @Injectable()
 export class ProductService {
@@ -122,6 +125,28 @@ export class ProductService {
   }
 
   async removeProduct(productId: number) {
+    const cartItemCount = await this.entityManager.count(CartItem, {
+      where: {
+        productId: productId,
+      },
+    });
+    if (cartItemCount > 0) {
+      throw new ProductCannotBeDeletedException();
+    }
+
+    const orderItemCount = await this.entityManager.count(OrderItem, {
+      where: {
+        productId: productId,
+      },
+    });
+    if (orderItemCount > 0) {
+      throw new ProductCannotBeDeletedException();
+    }
+
+    await this.entityManager.delete(CartItem, {
+      productId: productId,
+    });
+
     const productFound = await this.productRepository.findOneBy({
       id: productId,
     });
@@ -145,6 +170,25 @@ export class ProductService {
         if (productFound === null) {
           throw new ProductNotFoundException();
         }
+
+        const cartItemCount = await this.entityManager.count(CartItem, {
+          where: {
+            productId: productId,
+          },
+        });
+        if (cartItemCount > 0) {
+          throw new ProductCannotBeDeletedException();
+        }
+
+        const orderItemCount = await this.entityManager.count(OrderItem, {
+          where: {
+            productId: productId,
+          },
+        });
+        if (orderItemCount > 0) {
+          throw new ProductCannotBeDeletedException();
+        }
+
         return queryRunner.manager.delete(Product, {
           id: productFound.id,
         });

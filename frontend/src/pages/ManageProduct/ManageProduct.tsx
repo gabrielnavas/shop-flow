@@ -180,7 +180,7 @@ export const ManageProductPage = () => {
                     <Selected
                       type="checkbox"
                       checked={item.selected}
-                      onClick={() => toggleSelectProductItemOnClick(item.product.id)} />
+                      onChange={() => toggleSelectProductItemOnClick(item.product.id)} />
                   </Td>
                   <Td $width={widths.name}>
                     <TableCeilText>{item.product.name}</TableCeilText>
