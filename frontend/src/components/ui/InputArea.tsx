@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-export const TextArea = styled.textarea<{ 
+export const InputArea = styled.textarea<{ 
   $error?: boolean;
   $maxLines?: number;
 }>`

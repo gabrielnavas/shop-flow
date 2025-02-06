@@ -21,8 +21,8 @@ export class Order {
   @Column({ name: 'created_at', nullable: false })
   createdAt: Date;
 
-  @Column({ name: 'updated_at' })
-  updatedAt: Date;
+  @Column({ name: 'updated_at', nullable: true })
+  updatedAt?: Date;
 
   @ManyToOne(() => User, (user) => user.orders)
   @JoinColumn({ name: 'users_id' })

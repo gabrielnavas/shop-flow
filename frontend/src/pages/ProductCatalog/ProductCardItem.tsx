@@ -71,7 +71,6 @@ export const ProductCardItem = ({ product, readonly }: Props) => {
             <AddToCardButton $added={addedCart}>
               {addedCart ? <BsCartCheckFill /> : <FaCartPlus />}
             </AddToCardButton>
-
           )}
         </CardBottom>
       </Info>

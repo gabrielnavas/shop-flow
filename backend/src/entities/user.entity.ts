@@ -21,7 +21,7 @@ export class User {
   createdAt: Date;
 
   @Column({ name: 'updated_at', nullable: true })
-  updatedAt: Date;
+  updatedAt?: Date;
 
   @OneToMany(() => UserRole, (userRole) => userRole.user)
   userRoles: UserRole[];

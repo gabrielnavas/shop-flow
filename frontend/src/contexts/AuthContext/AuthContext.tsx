@@ -5,7 +5,7 @@ export type AuthContextType = {
   permissionRoles: PermissionRole[]
   signin: (accessToken: string) => void
   signout: () => void
-  isAuthencated: boolean
+  isAuthenticated: boolean
 }
 
 export enum PermissionRole {

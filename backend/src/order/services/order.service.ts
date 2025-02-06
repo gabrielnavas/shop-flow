@@ -14,6 +14,7 @@ import { OrderStatusNotFoundException } from '../exceptions/order-status-not-fou
 import { CartItem } from 'src/entities/cart-item.entity';
 import { CartItemNotFoundException } from '../exceptions/cart-item-not-found-exception';
 import { OrderItemPriceIsWrongException } from '../exceptions/order-item-price-is-wrong-exception';
+import { OrderDto, OrderItemDto } from '../dtos';
 
 @Injectable()
 export class OrderService {
@@ -98,6 +99,58 @@ export class OrderService {
       throw error;
     } finally {
       await queryRunner.release();
+    }
+  }
+
+  async findOrdersByloggedUser(loggedUserId: number): Promise<OrderDto[]> {
+    try {
+      const user = await this.entityManager.findOne(User, {
+        where: {
+          id: loggedUserId,
+        },
+      });
+      if (user === null) {
+        throw new UserNotFoundException();
+      }
+
+      const orders = await this.entityManager.find(Order, {
+        where: {
+          user: user,
+        },
+        relations: {
+          orderItems: true,
+          orderStatus: true,
+        },
+      });
+      const orderDtos = orders.map(
+        (order) =>
+          ({
+            user: {
+              id: user.id,
+              email: user.email,
+              createdAt: user.createdAt,
+              name: user.name,
+              updatedAt: user.updatedAt,
+            },
+            createdAt: order.createdAt,
+            updatedAt: order.updatedAt,
+            orderStatusName: order.orderStatus.name,
+            totalPrice: order.totalPrice,
+            orderItems: order.orderItems.map(
+              (orderItem) =>
+                ({
+                  product: orderItem.product,
+                  totalPrice: orderItem.totalPrice,
+                  unitPrice: orderItem.unitPrice,
+                  quantity: orderItem.quantity,
+                }) as OrderItemDto,
+            ),
+          }) as OrderDto,
+      );
+      return orderDtos;
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   }
 }

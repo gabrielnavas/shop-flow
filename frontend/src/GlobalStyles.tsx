@@ -1,15 +1,16 @@
 import { createGlobalStyle } from "styled-components";
 
 export const GlobalStyles = createGlobalStyle`
-  /* Importa a fonte Roboto */
-  @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
-
   /* Reset básico e estilos globais */
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: "Roboto", sans-serif;
+  }
+
+  ul {
+    list-style-type: none;
   }
 
   /* Personalização da barra de rolagem (Chrome, Edge, Safari) */

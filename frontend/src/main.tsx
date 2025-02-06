@@ -7,6 +7,8 @@ import { theme } from './theme'
 import { AppProvider } from './contexts/AppContext/AppProvider'
 import GlobalStyles from './GlobalStyles'
 
+import './index.css'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>

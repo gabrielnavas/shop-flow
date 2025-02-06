@@ -39,7 +39,7 @@ export const SigninPage = () => {
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState(false)
 
-  const { signin, isAuthencated } = useContext(AuthContext) as AuthContextType
+  const { signin, isAuthenticated } = useContext(AuthContext) as AuthContextType
 
   const {
     register,
@@ -82,7 +82,7 @@ export const SigninPage = () => {
     }
   }, [navigate, signin])
 
-  if (isAuthencated) {
+  if (isAuthenticated) {
     navigate(routeNames.home)
   }
 

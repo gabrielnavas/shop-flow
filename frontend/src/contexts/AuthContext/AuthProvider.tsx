@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: Props) => {
       permissionRoles,
       signin,
       signout,
-      isAuthencated: !!accessToken,
+      isAuthenticated: !!accessToken,
     }}>
       {children}
     </AuthContext.Provider>

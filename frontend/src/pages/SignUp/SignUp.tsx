@@ -40,7 +40,7 @@ export const SignupPage = () => {
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState(false)
 
-  const { isAuthencated } = useContext(AuthContext) as AuthContextType
+  const { isAuthenticated } = useContext(AuthContext) as AuthContextType
 
   const {
     register,
@@ -79,7 +79,7 @@ export const SignupPage = () => {
   }, [navigate])
 
 
-  if (isAuthencated) {
+  if (isAuthenticated) {
     navigate(routeNames.home)
   }
 

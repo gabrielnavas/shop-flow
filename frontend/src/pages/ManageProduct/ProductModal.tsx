@@ -9,7 +9,7 @@ import { Select } from "../../components/ui/Select"
 import { SelectOption } from "../../components/ui/SelectOption"
 import { FormImagePreview } from "../../components/ui/FormImagePreview"
 import { FormGroupButton } from "../../components/ui/FormGroupButton"
-import { TextArea } from "../../components/ui/TextArea"
+import { InputArea } from "../../components/ui/InputArea"
 import { Input } from "../../components/ui/Input"
 import { Controller, SubmitHandler, useForm } from "react-hook-form"
 import { ProductService } from "../../services/product-service"
@@ -55,7 +55,7 @@ export const ProductModal = ({ product, isOpenModal, onClose }: Props) => {
   const defaultCategory = React.useMemo(() => ({ id: 0, name: 'Selecione' }), [])
   const [categories, setCategories] = React.useState<Category[]>([defaultCategory])
 
-  const { accessToken, isAuthencated } = React.useContext(AuthContext) as AuthContextType
+  const { accessToken, isAuthenticated } = React.useContext(AuthContext) as AuthContextType
   const {
     addProduct,
     updateProduct
@@ -343,7 +343,7 @@ export const ProductModal = ({ product, isOpenModal, onClose }: Props) => {
 
 
 
-  if (!isAuthencated) {
+  if (!isAuthenticated) {
     navigate(routeNames.home)
   }
 
@@ -385,7 +385,7 @@ export const ProductModal = ({ product, isOpenModal, onClose }: Props) => {
         </FormGroup>
         <FormGroup>
           <Label required>Descrição</Label>
-          <TextArea
+          <InputArea
             $maxLines={4}
             placeholder="Descreva o produto, suas características..."
             {...register("description", {

@@ -19,7 +19,7 @@ import { LinkCustom } from "../../components/ui/LinkCustom"
 
 export const CartPage = () => {
 
-  const { isAuthencated, accessToken } = React.useContext(AuthContext) as AuthContextType
+  const { isAuthenticated, accessToken } = React.useContext(AuthContext) as AuthContextType
   const { clearCart, cartItems, totalPrice } = React.useContext(CartContext) as CartContextType
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
@@ -56,7 +56,7 @@ export const CartPage = () => {
     })
   }, [navigate, cartItems, accessToken, clearCart])
 
-  if (!isAuthencated) {
+  if (!isAuthenticated) {
     navigate(routeNames.home)
     return null
   }

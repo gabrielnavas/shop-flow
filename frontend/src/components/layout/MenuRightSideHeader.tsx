@@ -16,7 +16,7 @@ import { LoadingIcon } from "../ui/LoadingContainer";
 export const MenuRightSideHeader = () => {
   const [isLoading, setIsLoading] = React.useState(false)
 
-  const { accessToken, isAuthencated, permissionRoles, signout } = React.useContext(AuthContext) as AuthContextType
+  const { accessToken, isAuthenticated, permissionRoles, signout } = React.useContext(AuthContext) as AuthContextType
   const { cartItems, setCartItems } = React.useContext(CartContext) as CartContextType
 
   const isAdmin = permissionRoles.some(permissionRole => permissionRole === PermissionRole.ADMIN)
@@ -42,7 +42,7 @@ export const MenuRightSideHeader = () => {
 
   React.useEffect(() => {
     async function fetchRemoteCartItems() {
-      if (!isAuthencated) {
+      if (!isAuthenticated) {
         return
       }
       setIsLoading(true)
@@ -58,7 +58,7 @@ export const MenuRightSideHeader = () => {
       }
     }
     fetchRemoteCartItems()
-  }, [accessToken, isAuthencated, setCartItems])
+  }, [accessToken, isAuthenticated, setCartItems])
 
   const menuOnClick = React.useCallback((event: React.MouseEvent) => {
     event.stopPropagation();
@@ -114,9 +114,9 @@ export const MenuRightSideHeader = () => {
       {openMenu && (
         <Menu $menuItemsCount={isAdmin ? 5.50 : 2.75} ref={menuRef}>
           {
-            isAuthencated ? (
+            isAuthenticated ? (
               <>
-                {isAuthencated && (
+                {isAuthenticated && (
                   isAdmin && (
                     <MenuItem onClick={manageProductOnClick}>
                       <BiPackage />
@@ -124,7 +124,7 @@ export const MenuRightSideHeader = () => {
                     </MenuItem>
                   )
                 )}
-                {isAuthencated && (
+                {isAuthenticated && (
                   <MenuItem onClick={manageOrdersOnClick}>
                     <GrOrderedList />
                     Meus Pedidos

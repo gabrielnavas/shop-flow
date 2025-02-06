@@ -34,7 +34,7 @@ export const ManageProductPage = () => {
 
   const [searchInput, setSearchInput] = React.useState('')
 
-  const {accessToken, isAuthencated} = React.useContext(AuthContext) as AuthContextType
+  const {accessToken, isAuthenticated} = React.useContext(AuthContext) as AuthContextType
 
   const navigate = useNavigate()
 
@@ -103,8 +103,6 @@ export const ManageProductPage = () => {
       product: product,
       selected: false,
     })))
-
-    console.log(searchInput);
   }, [searchInput, accessToken])
 
   const loadingComponent = (
@@ -209,7 +207,7 @@ export const ManageProductPage = () => {
     </Content >
   )
 
-  if(!isAuthencated) {
+  if(!isAuthenticated) {
     navigate(routeNames.home)
     return null
   }
