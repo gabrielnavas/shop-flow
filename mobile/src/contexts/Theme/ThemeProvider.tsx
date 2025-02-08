@@ -1,4 +1,4 @@
-import { Theme } from "@/constants/Theme"
+import { Theme } from "@/src/constants/Theme"
 import { ThemeContext } from "./ThemeContext"
 
 type Props = {

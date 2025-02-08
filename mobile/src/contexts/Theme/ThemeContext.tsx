@@ -1,4 +1,4 @@
-import { Theme } from "@/constants/Theme"
+import { Theme } from "@/src/constants/Theme"
 import React from "react"
 
 export type ThemeContextType = {

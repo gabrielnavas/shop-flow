@@ -1,7 +1,10 @@
-import { useTheme } from "@/hooks/useTheme";
-import { StyleSheet, Text, View } from "react-native";
+import React from "react"
+import { Button, StyleSheet, Text, View } from "react-native"
 
-export default function IndexScreen() {
+import { useTheme } from "@/src/hooks/useTheme"
+import { router } from "expo-router"
+
+export default function SignUpScreen() {
   const { theme } = useTheme()
   return (
     <View style={[
@@ -11,7 +14,10 @@ export default function IndexScreen() {
       <Text style={[
         styles.text, {
           color: theme.colors.textSecondary
-        }]}>Hello World!</Text>
+        }]}>
+        Sign In!
+      </Text>
+      <Button title="Criar conta!" onPress={() => router.replace('/signup')} />
     </View>
   )
 }
