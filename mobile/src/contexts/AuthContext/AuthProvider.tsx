@@ -3,7 +3,9 @@ import { AuthContext, PermissionRole } from "./AuthContext"
 
 import { jwtDecode } from 'jwt-decode'
 
-const localStorageKey = {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const asyncStorageKey = {
   accessToken: 'access-token',
   permissionRoles: 'permission-roles',
 }
@@ -25,13 +27,13 @@ export const AuthProvider = ({ children }: Props) => {
   const [permissionRoles, setPermissionRoles] = React.useState<PermissionRole[]>([])
 
   React.useEffect(() => {
-    function setStatesFromLocalStorage() {
-      const accessToken = localStorage.getItem(localStorageKey.accessToken)
+    async function setStatesFromLocalStorage() {
+      const accessToken = await AsyncStorage.getItem(asyncStorageKey.accessToken)
       if (accessToken) {
         setAccessToken(accessToken)
       }
-  
-      const permissionRoles = JSON.parse(localStorage.getItem(localStorageKey.permissionRoles) || '[]') as PermissionRole[]
+
+      const permissionRoles = JSON.parse(await AsyncStorage.getItem(asyncStorageKey.permissionRoles) || '[]') as PermissionRole[]
       if (permissionRoles) {
         setPermissionRoles(permissionRoles)
       }
@@ -39,9 +41,9 @@ export const AuthProvider = ({ children }: Props) => {
     setStatesFromLocalStorage()
   }, [])
 
-  const signin = (accessToken: string) => {
+  const signin = async (accessToken: string) => {
     setAccessToken(accessToken)
-    localStorage.setItem(localStorageKey.accessToken, accessToken)
+    await AsyncStorage.setItem(asyncStorageKey.accessToken, accessToken)
 
     const token = jwtDecode(accessToken) as Token | null
     if (!token) {
@@ -49,13 +51,13 @@ export const AuthProvider = ({ children }: Props) => {
     }
 
     setPermissionRoles(token.roles)
-    localStorage.setItem(localStorageKey.permissionRoles, JSON.stringify(token.roles))
+    await AsyncStorage.setItem(asyncStorageKey.permissionRoles, JSON.stringify(token.roles))
   }
 
-  const signout = () => {
+  const signout = async () => {
     setAccessToken('')
     setPermissionRoles([])
-    localStorage.clear()
+    await AsyncStorage.clear()
   }
 
   return (
