@@ -9,11 +9,13 @@ import { UserAlreadyExistsEmail } from '../exceptions/user-already-exists-email.
 import { UserNotFoundException } from '../exceptions/user-not-found.exception';
 import { UserPasswordInvalidException } from '../exceptions/user-password-invalid.exception';
 import { HttpResponseException } from 'src/filters/types';
+import { RoleNotFoundException } from '../exceptions/role-not-found-exception.exception';
 
 @Catch(
   UserAlreadyExistsEmail,
   UserNotFoundException,
   UserPasswordInvalidException,
+  RoleNotFoundException,
 )
 export class ErrorExceptionFilter implements ExceptionFilter {
   catch(error: Error, host: ArgumentsHost) {
