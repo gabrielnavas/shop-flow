@@ -1,14 +1,6 @@
-import {
-  Body,
-  Controller,
-  HttpException,
-  HttpStatus,
-  Post,
-  UseFilters,
-} from '@nestjs/common';
+import { Body, Controller, Post, UseFilters } from '@nestjs/common';
 import { SignInDto, SignUpDto } from '../dtos';
 import { AuthService } from '../services/auth.service';
-import { UserAlreadyExistsEmail } from '../exceptions/user-already-exists-email.exception';
 import { ErrorExceptionFilter } from 'src/user/filters/error-exception.filter';
 
 @UseFilters(new ErrorExceptionFilter())
@@ -18,17 +10,7 @@ export class AuthController {
 
   @Post('signup')
   async signup(@Body() body: SignUpDto) {
-    try {
-      await this.authService.signup(body);
-    } catch (err) {
-      if (err instanceof UserAlreadyExistsEmail) {
-        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
-      }
-      throw new HttpException(
-        'Ocorreu um problema',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.authService.signup(body);
   }
 
   @Post('signin')
