@@ -5,7 +5,7 @@ import { TouchableOpacity, StyleSheet, TouchableOpacityProps, Text, ViewStyle, S
 type Variant = "primary" | "outlined" | "error" | "warning" | "cancel"
 
 type Props = {
-  title: string
+  title?: string
   variant?: Variant
   icon?: React.ReactNode
 } & TouchableOpacityProps
@@ -27,7 +27,6 @@ export const Button = ({ icon, title, variant = "primary", ...rest }: Props) => 
     }
   }
 
-
   if (variant === 'error') {
     themeVarient = {
       backgroundColor: theme.colors.buttonBackgroundError,
@@ -43,7 +42,9 @@ export const Button = ({ icon, title, variant = "primary", ...rest }: Props) => 
       },
         themeVarient]}
       {...rest}>
-      {icon ? icon : (
+      {icon && icon } 
+      
+      {!!title && (
         <Text style={{
           color: variant === 'outlined' ? theme.colors.textPrimary : theme.colors.textPrimaryDark,
           fontWeight: '500',
@@ -58,7 +59,6 @@ export const Button = ({ icon, title, variant = "primary", ...rest }: Props) => 
 
 const styles = StyleSheet.create({
   button: {
-    width: Dimensions.get('screen').width * .75,
     justifyContent: 'center',
     alignItems: 'center'
   },

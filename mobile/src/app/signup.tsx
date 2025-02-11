@@ -1,10 +1,10 @@
 import React from "react"
-import { Dimensions, StyleSheet, Text, View } from "react-native"
+import { StyleSheet, Text, View } from "react-native"
 
 import { Controller, useForm } from 'react-hook-form'
+import { router } from "expo-router"
 
 import { useTheme } from "@/src/hooks/useTheme"
-import { router } from "expo-router"
 import { Input } from "@/src/components/ui/Input"
 import { FormGroup } from "@/src/components/ui/FormGroup"
 import { Label } from "@/src/components/ui/Label"
@@ -43,7 +43,7 @@ export default function SignUpScreen() {
   React.useEffect(() => {
     function goToHomeIfAuthenticated() {
       if (isAuthenticated === true) {
-        router.replace('/home')
+        router.replace('/(drawer)/(tabs)/products')
       }
     }
     goToHomeIfAuthenticated()

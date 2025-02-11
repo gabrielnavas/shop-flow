@@ -1,10 +1,12 @@
 import React from "react"
-import { Dimensions, StyleSheet, Text, View } from "react-native"
+import { StyleSheet, Text, View } from "react-native"
 
 import { Controller, useForm } from 'react-hook-form'
 
-import { useTheme } from "@/src/hooks/useTheme"
 import { router } from "expo-router"
+import { useLocalSearchParams } from 'expo-router'
+
+import { useTheme } from "@/src/hooks/useTheme"
 import { Input } from "@/src/components/ui/Input"
 import { FormGroup } from "@/src/components/ui/FormGroup"
 import { Label } from "@/src/components/ui/Label"
@@ -18,7 +20,6 @@ import LoadingIcon from "@/src/components/ui/LoadingIcon"
 import { MessageList } from "@/src/components/ui/MessageList"
 import { MessageItem } from "@/src/components/ui/MessageItem"
 
-import { useLocalSearchParams } from 'expo-router'
 import { useAuth } from "@/src/hooks/useAuth"
 
 
@@ -27,7 +28,7 @@ type Inputs = {
   password: string
 }
 
-export default function SignUpScreen() {
+export default function SignInScreen() {
   const { theme } = useTheme()
 
   const { message } = useLocalSearchParams<{ message: string }>()
@@ -45,20 +46,20 @@ export default function SignUpScreen() {
   } = useForm<Inputs>()
 
   React.useEffect(() => {
+    function goToHomeIfAuthenticated() {
+      if (isAuthenticated === true) {
+        router.replace('/(drawer)/(tabs)/products')
+      }
+    }
+    goToHomeIfAuthenticated()
+  }, [isAuthenticated])
+
+  React.useEffect(() => {
     function setGlobalMessageFromOtherScreen() {
       setGlobalMessage(message)
     }
     setGlobalMessageFromOtherScreen()
   }, [])
-
-  React.useEffect(() => {
-    function goToHomeIfAuthenticated() {
-      if (isAuthenticated === true) {
-        router.replace('/home')
-      }
-    }
-    goToHomeIfAuthenticated()
-  }, [isAuthenticated])
 
   React.useEffect(() => {
     if (!!globalError) {
@@ -80,7 +81,7 @@ export default function SignUpScreen() {
         password,
       })
       signin(accessToken)
-      router.replace('/home')
+      router.replace('/(drawer)/(tabs)/products')
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message)
