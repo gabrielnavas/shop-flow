@@ -2,8 +2,9 @@ import styled from "styled-components";
 
 export const LinkItem = styled.div`
   display: flex;
-  width: 100%;
+  align-items: center;
   justify-content: center;
+  width: 100%;
   gap: 10px;
 
   color: ${props => props.theme.colors.textPrimary};

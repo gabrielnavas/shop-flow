@@ -1,6 +1,6 @@
 import React, { useContext } from "react"
 import { useNavigate } from "react-router"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { Controller, SubmitHandler, useForm } from "react-hook-form"
 
 import { HeaderPage } from "../../components/layout/HeaderPage"
 import { Page } from "../../components/ui/Page"
@@ -15,9 +15,8 @@ import { FormGroup } from "../../components/ui/FormGroup"
 import { Label } from "../../components/ui/Label"
 import { Input } from "../../components/ui/Input"
 import { ErrorItem } from "../../components/ui/ErrorItem"
-import { MoreLinks } from "../../components/ui/LinkList"
+import { LinkList } from "../../components/ui/LinkList"
 import { LinkItem } from "../../components/ui/LinkItem"
-import { LinkCustom } from "../../components/ui/LinkCustom"
 import { LinkItemTitle } from "../../components/ui/LinkItemTitle"
 import { ErrorList } from "../../components/ui/ErrorList"
 
@@ -27,6 +26,7 @@ import { routeNames } from "../../routes/routes-names"
 import { AiOutlineLoading } from "react-icons/ai"
 import { AuthContext, AuthContextType } from "../../contexts/AuthContext/AuthContext"
 import { Button } from "../../components/ui/Button"
+import { RequiredInput } from "../../components/ui/RequiredInput"
 
 type Inputs = {
   fullname: string
@@ -43,11 +43,19 @@ export const SignupPage = () => {
   const { isAuthenticated } = useContext(AuthContext) as AuthContextType
 
   const {
-    register,
+    control,
     handleSubmit,
     watch,
-    formState: { errors },
-  } = useForm<Inputs>()
+    formState: { errors, touchedFields },
+  } = useForm<Inputs>({
+    shouldFocusError: true,
+    values: {
+      email: '',
+      fullname: '',
+      password: '',
+      passwordConfirmation: ''
+    }
+  })
 
   const navigate = useNavigate()
 
@@ -83,6 +91,8 @@ export const SignupPage = () => {
     navigate(routeNames.home)
   }
 
+  console.log(touchedFields);
+
 
   return (
     <Page>
@@ -103,11 +113,11 @@ export const SignupPage = () => {
             </CardHeader>
             <Form onSubmit={handleSubmit(onSubmit)}>
               <FormGroup>
-                <Label>Nome completo</Label>
-                <Input
-                  type="text"
-                  autoComplete="on"
-                  {...register("fullname", {
+                <Label>Nome completo <RequiredInput /></Label>
+                <Controller
+                  control={control}
+                  name="fullname"
+                  rules={{
                     required: {
                       message: 'Esse Campo é requerido.',
                       value: true
@@ -116,34 +126,63 @@ export const SignupPage = () => {
                       message: 'Nome máximo de 100 caracteres.',
                       value: 100,
                     },
-                  })}
-                  $error={!!errors.fullname}
+                  }}
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <Input
+                      autoComplete="on"
+                      type='text'
+                      placeholder="john@email.com"
+                      value={value}
+                      $error={!!error}
+                      onChange={onChange}
+                      onBlur={() => {
+                        onBlur()
+                        if (value.length === 0) {
+                          control.setError('fullname', { type: 'validate', message: 'Esse Campo é requerido.' })
+                        }
+                      }}
+                    />
+                  )}
                 />
-                {errors.fullname && <ErrorItem>{errors.fullname.message}</ErrorItem>}
+                {touchedFields.fullname && errors.fullname && <ErrorItem>{errors.fullname.message}</ErrorItem>}
               </FormGroup>
               <FormGroup>
-                <Label>E-mail</Label>
-                <Input
-                  type="email"
-                  autoComplete="on"
-                  $error={!!errors.email}
-                  {...register("email", {
+                <Label>E-mail <RequiredInput /></Label>
+                <Controller
+                  control={control}
+                  name="email"
+                  rules={{
                     required: {
                       message: 'Esse Campo é requerido.',
                       value: true
                     },
                     validate: formValidateEmail,
-                  })}
+                  }}
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <Input
+                      type='email'
+                      placeholder="john@email.com"
+                      value={value}
+                      $error={!!error}
+                      onChange={onChange}
+                      onBlur={() => {
+                        onBlur()
+                        const errorMessage = formValidateEmail(value)
+                        if (typeof errorMessage === 'string') {
+                          control.setError('email', { type: 'validate', message: errorMessage })
+                        }
+                      }}
+                    />
+                  )}
                 />
-                {errors.email && <ErrorItem>{errors.email.message}</ErrorItem>}
+                {touchedFields.email && errors.email && <ErrorItem>{errors.email.message}</ErrorItem>}
               </FormGroup>
               <FormGroup>
-                <Label>Senha</Label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  $error={!!errors.password}
-                  {...register("password", {
+                <Label>Senha <RequiredInput /></Label>
+                <Controller
+                  control={control}
+                  name="password"
+                  rules={{
                     required: {
                       message: 'Esse Campo é requerido.',
                       value: true
@@ -162,17 +201,35 @@ export const SignupPage = () => {
                       message: 'Senha deve ter no máximo 100 caracteres',
                       value: 100,
                     },
-                  })}
+                  }}
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <Input
+                      type="password"
+                      autoComplete="new-password"
+                      placeholder="******"
+                      $error={!!error}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={() => {
+                        onBlur()
+                        if (value.length < 6) {
+                          control.setError('password', {
+                            type: 'minLength',
+                            message: 'Senha deve ter no mínimo 6 caracteres',
+                          })
+                        }
+                      }}
+                    />
+                  )}
                 />
-                {errors.password && <ErrorItem>{errors.password.message}</ErrorItem>}
+                {touchedFields.password && errors.password && <ErrorItem>{errors.password.message}</ErrorItem>}
               </FormGroup>
               <FormGroup>
-                <Label>Confirmação de senha</Label>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  $error={!!errors.passwordConfirmation}
-                  {...register("passwordConfirmation", {
+                <Label>Confirmação de senha <RequiredInput /></Label>
+                <Controller
+                  control={control}
+                  name="passwordConfirmation"
+                  rules={{
                     required: {
                       message: 'Esse Campo é requerido.',
                       value: true
@@ -191,9 +248,28 @@ export const SignupPage = () => {
                       message: 'Confirmação de senha deve ter no máximo 100 caracteres',
                       value: 100,
                     },
-                  })}
+                  }}
+                  render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
+                    <Input
+                      type="password"
+                      autoComplete="new-password"
+                      placeholder="******"
+                      $error={!!error}
+                      value={value}
+                      onChange={onChange}
+                      onBlur={() => {
+                        onBlur()
+                        if (value.length < 6) {
+                          control.setError('passwordConfirmation', {
+                            type: 'minLength',
+                            message: 'Senha deve ter no mínimo 6 caracteres',
+                          })
+                        }
+                      }}
+                    />
+                  )}
                 />
-                {errors.passwordConfirmation && <ErrorItem>{errors.passwordConfirmation.message}</ErrorItem>}
+                {touchedFields.passwordConfirmation && errors.passwordConfirmation && <ErrorItem>{errors.passwordConfirmation.message}</ErrorItem>}
               </FormGroup>
               <Button type="submit" $variant="add">
                 {isLoading ? (
@@ -208,12 +284,20 @@ export const SignupPage = () => {
           </PageCard>
         </Row>
         <Row>
-          <MoreLinks>
+          <LinkList>
             <LinkItem>
               <LinkItemTitle>Já tem uma conta?</LinkItemTitle>
-              <LinkCustom to='/sign-in'>Entrar</LinkCustom>
+              <Button
+                $variant="link"
+                type="button"
+                onClick={e => {
+                  e.preventDefault()
+                  navigate(routeNames.signin)
+                }}>
+                Entrar!
+              </Button>
             </LinkItem>
-          </MoreLinks>
+          </LinkList>
         </Row>
       </Rows>
     </Page>

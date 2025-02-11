@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router"
 import { SignupPage } from "../pages/SignUp/SignUp"
-import { SigninPage } from "../pages/SignIn/Signin"
+import { SigninPage } from "../pages/SignIn/SignIn"
 import { ProductCatalogPage } from "../pages/ProductCatalog/ProductCatalog"
 import { routeNames } from "./routes-names"
 import { ManageProductPage } from "../pages/ManageProduct/ManageProduct"

@@ -15,7 +15,6 @@ import { ErrorList } from "../../components/ui/ErrorList"
 import { ErrorItem } from "../../components/ui/ErrorItem"
 import { LoadingIcon } from "../../components/ui/LoadingContainer"
 import { ImSad } from "react-icons/im"
-import { LinkCustom } from "../../components/ui/LinkCustom"
 
 export const CartPage = () => {
 
@@ -69,9 +68,12 @@ export const CartPage = () => {
       <EmptyListIcon>
         <ImSad />
       </EmptyListIcon>
-      <GoToCatalogLink to={routeNames.home}>
+      <Button $variant="link" onClick={e => {
+        e.preventDefault()
+        navigate(routeNames.home)
+      }}>
         Ir para o catálogo
-      </GoToCatalogLink>
+      </Button>
     </EmptyListCard>
   )
 
@@ -201,7 +203,3 @@ const EmptyListIcon = styled.div`
     color: ${props => props.theme.colors.darkIcon};
   }
 `
-
-const GoToCatalogLink = styled(LinkCustom)`
-`
-

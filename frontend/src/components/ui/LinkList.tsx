@@ -1,5 +1,5 @@
 import styled from "styled-components";
 
-export const MoreLinks = styled.div`
+export const LinkList = styled.div`
   display: flex;
 `

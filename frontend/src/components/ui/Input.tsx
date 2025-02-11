@@ -9,7 +9,7 @@ export const Input = styled.input<{ $error?: boolean }>`
   color: ${({ theme }) => theme.colors.textPrimary};
   border-radius: ${({ theme }) => theme.borderRadius.default};
   outline: none;
-  border: 1px solid ${({ theme }) => theme.colors.borderColor};
+  border: 1px solid ${({ theme, $error }) => $error ? theme.colors.error : theme.colors.borderColor};
   background-color: ${({ theme }) => theme.colors.cardBackground};
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
