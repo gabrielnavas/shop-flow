@@ -12,6 +12,7 @@ import { OrderStatusNotFoundException } from '../exceptions/order-status-not-fou
 import { ProductNotFoundException } from '../exceptions/product-not-found-exception';
 import { CartItemNotFoundException } from '../exceptions/cart-item-not-found-exception';
 import { OrderItemPriceIsWrongException } from '../exceptions/order-item-price-is-wrong-exception';
+import { OrderItemsIsEmptyException } from '../exceptions/order-items-is-empty-exception-exception';
 
 @Catch(
   UserNotFoundException,
@@ -19,6 +20,7 @@ import { OrderItemPriceIsWrongException } from '../exceptions/order-item-price-i
   ProductNotFoundException,
   CartItemNotFoundException,
   OrderItemPriceIsWrongException,
+  OrderItemsIsEmptyException,
 )
 export class ErrorExceptionFilter implements ExceptionFilter {
   catch(error: Error, host: ArgumentsHost) {

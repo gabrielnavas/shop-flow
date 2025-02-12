@@ -16,12 +16,17 @@ import { CartItemNotFoundException } from '../exceptions/cart-item-not-found-exc
 import { OrderItemPriceIsWrongException } from '../exceptions/order-item-price-is-wrong-exception';
 import { OrderDto, OrderItemDto, UpdateOrderStatusDto } from '../dtos';
 import { OrderNotFoundException } from '../exceptions/order-not-found-exception';
+import { OrderItemsIsEmptyException } from '../exceptions/order-items-is-empty-exception-exception';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly entityManager: EntityManager) {}
 
   async newOrder(loggedUserId: number, dto: NewOrderDto) {
+    if (dto.orderItems.length === 0) {
+      throw new OrderItemsIsEmptyException();
+    }
+
     const queryRunner = this.entityManager.connection.createQueryRunner();
 
     await queryRunner.startTransaction();
