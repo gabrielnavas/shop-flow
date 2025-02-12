@@ -1,5 +1,5 @@
 import { Dimensions, Image, StyleSheet, Text, View } from "react-native"
-import { Button } from "./Button"
+import { Button } from "../ui/Button"
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons"
 import { Product } from "@/src/services/entities"
 import React from "react"
@@ -12,12 +12,7 @@ type Props = {
 export const ProductCard = ({ product }: Props) => {
 
   const [imageUrl, setImageUrl] = React.useState(product.imageUrl)
-
   const { theme } = useTheme()
-
-  const handleImageError = () => {
-    setImageUrl('');
-  };
 
   return (
     <View style={styles.container}>
@@ -30,7 +25,7 @@ export const ProductCard = ({ product }: Props) => {
               source={imageUrl ? { uri: imageUrl } : require('../../../assets/images/no-image.jpg')}
               style={styles.image}
               resizeMode="contain"
-              onError={handleImageError}
+              onError={() => setImageUrl('')}
             />
           </View>
         </View>

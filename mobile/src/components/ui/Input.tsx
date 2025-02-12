@@ -1,16 +1,16 @@
 import { useTheme } from "@/src/hooks/useTheme";
 import React from "react";
-import { StyleSheet, TextInput, TextInputProps, View, Keyboard, TouchableWithoutFeedback, Alert, Dimensions } from "react-native";
+import { StyleSheet, TextInput, TextInputProps, Dimensions } from "react-native";
 
 type Props = {
   error?: boolean;
 } & TextInputProps;
 
 export const Input = React.forwardRef<TextInput, Props>(
-  ({ error, ...rest }: Props, ref) => {
+  ({ error, style, ...rest }: Props, ref) => {
     const { theme } = useTheme();
 
-    const [ísFocused, setIsFocused] = React.useState(false)
+    const [isFocused, setIsFocused] = React.useState(false)
 
     return (
       <TextInput
@@ -23,14 +23,14 @@ export const Input = React.forwardRef<TextInput, Props>(
             paddingHorizontal: theme.spacing.md,
             borderColor: error
               ? theme.colors.error
-              : ísFocused
+              : isFocused
                 ? theme.colors.textPrimary
                 : theme.colors.textSecondary,
             color: error ? theme.colors.error : theme.colors.textPrimary,
-            borderWidth: ísFocused ? 1.5 : 1.0,
+            borderWidth: isFocused ? 1.5 : 1.0,
           },
+          style
         ]}
-        {...rest}
         onFocus={() => setIsFocused(true)}
         onBlur={(event) => {
           if (rest.onBlur) {
@@ -38,6 +38,7 @@ export const Input = React.forwardRef<TextInput, Props>(
           }
           setIsFocused(false)
         }}
+        {...rest}
       />
     );
   }

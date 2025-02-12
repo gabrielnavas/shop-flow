@@ -3,7 +3,7 @@ import { Dimensions } from "react-native"
 
 import { FlatList, StyleSheet, Text, View } from "react-native"
 
-import { ProductCard } from "@/src/components/ui/ProductCard"
+import { ProductCard } from "@/src/components/layout/ProductCard"
 import { Product } from "@/src/services/entities"
 import { ProductService } from "@/src/services/product-service"
 import { ErrorList } from "@/src/components/ui/ErrorList"
