@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@/src/components/ui/Button";
 import { CartItemCard } from "@/src/components/layout/CartItemCard";
@@ -14,7 +14,7 @@ import { ErrorList } from "@/src/components/ui/ErrorList";
 import { ErrorItem } from "@/src/components/ui/ErrorItem";
 import LoadingIcon from "@/src/components/ui/LoadingIcon";
 import EntypoIcons from "react-native-vector-icons/Entypo";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 
 export default function CartScreen() {
 
@@ -53,6 +53,17 @@ export default function CartScreen() {
   }, 0)
 
   const onSubmitOnPress = React.useCallback(async () => {
+    if(!isAuthenticated) {
+      Alert.alert('Atenção', 'Você precisa estar logado pra finalizar o pedido', [{
+        text: "Entrar",
+        onPress: () => router.replace('/(drawer)/signin'),
+        style: "default"
+      }, {
+        text: 'Fechar',
+        style: "destructive"
+      }])
+      return
+    }
     try {
       setIsLoading(true)
       const newOrder = {
@@ -67,6 +78,8 @@ export default function CartScreen() {
       setCartItems([])
       setGlobalError('')
     } catch (err) {
+      console.log(err);
+      
       if (err instanceof Error) {
         setGlobalError(err.message)
       } else {

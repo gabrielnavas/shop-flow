@@ -26,7 +26,7 @@ type Props = {
 
 export const CartItemCard = ({ cartItem, disabled }: Props) => {
   const { theme } = useTheme()
-  const { accessToken } = useAuth()
+  const { accessToken, isAuthenticated } = useAuth()
 
   const [imageUrl, setImageUrl] = React.useState(cartItem.product.imageUrl)
   const [showActionsModal, setShowActionsModal] = React.useState<boolean>(false);
@@ -45,8 +45,10 @@ export const CartItemCard = ({ cartItem, disabled }: Props) => {
     try {
       setIsLoading(true)
       const quantity = 1
-      const cartService = new CartService(accessToken)
-      await cartService.incrementQuantityItem(productId, quantity)
+      if(isAuthenticated) {
+        const cartService = new CartService(accessToken)
+        await cartService.incrementQuantityItem(productId, quantity)
+      }
       incrementQuantityItem(productId, quantity)
     } catch (err) {
       if (err instanceof Error) {
@@ -63,8 +65,10 @@ export const CartItemCard = ({ cartItem, disabled }: Props) => {
     try {
       setIsLoading(true)
       const quantity = 1
-      const cartService = new CartService(accessToken)
-      await cartService.decrementQuantityItem(productId, quantity)
+      if(isAuthenticated) { 
+        const cartService = new CartService(accessToken)
+        await cartService.decrementQuantityItem(productId, quantity)
+      }
       decrementQuantityItem(productId, quantity)
     } catch (err) {
       if (err instanceof Error) {
