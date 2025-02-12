@@ -1,0 +1,1 @@
+TODO: terraform/: Configurações do Terraform (se usado). docker/: Configurações do Docker (Dockerfile, docker-compose). kubernetes/: Configurações do Kubernetes (se usado). scripts/: Scripts de deploy e gerenciamento de infraestrutura.
