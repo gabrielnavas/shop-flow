@@ -58,7 +58,7 @@ export class AuthService {
       }
 
       const user = this.userRepository.create({
-        email: data.email,
+        email: data.email.toLowerCase(),
         name: data.fullname,
         password: passwordHash,
         createdAt: new Date(),
@@ -90,7 +90,7 @@ export class AuthService {
 
   async signin(data: SignInDto): Promise<{ accessToken: string }> {
     const user = await this.userRepository.findOneBy({
-      email: data.email.trim(),
+      email: data.email.trim().toLowerCase(),
     });
     if (user === null) {
       throw new UserPasswordInvalidException();
