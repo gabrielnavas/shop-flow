@@ -3,6 +3,7 @@ import { useTheme } from "@/src/hooks/useTheme";
 import Drawer from "expo-router/drawer";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import AntDesignIcons from "react-native-vector-icons/AntDesign";
+import IoniconsIcons from "react-native-vector-icons/Ionicons";
 
 export default function DrawerLayout() {
   const { isAuthenticated } = useAuth()
@@ -18,6 +19,7 @@ export default function DrawerLayout() {
           name="(tabs)"
           options={{
             title: 'Shop Flow',
+            headerTitleAlign: 'center',
             drawerLabel: 'Catálogo de produtos',
             drawerIcon: ({ focused, size }) => (
               <AntDesignIcons
@@ -27,10 +29,24 @@ export default function DrawerLayout() {
               />
             ),
           }} />
+          <Drawer.Screen
+          name="orders"
+          options={{
+            title: 'Pedidos',
+            drawerLabel: 'Pedidos',
+            headerTitleAlign: 'center',
+            drawerItemStyle: { display: isAuthenticated ? 'flex' : 'none' },
+            drawerIcon: ({ focused, size }) => (
+              <IoniconsIcons
+                name="list"
+                size={size}
+                color={focused ? theme.colors.buttonBackgroundActive : theme.colors.buttonBackgroundDisabled} // Cor do ícone ativo e inativo
+              />
+            ),
+          }} />
         <Drawer.Screen
           name="logout"
           options={{
-            title: 'Shop Flow',
             drawerLabel: 'Sair',
             drawerItemStyle: { display: isAuthenticated ? 'flex' : 'none' },
             drawerIcon: ({ focused, size }) => (
@@ -44,7 +60,6 @@ export default function DrawerLayout() {
         <Drawer.Screen
           name="signin"
           options={{
-            title: 'Shop Flow',
             drawerLabel: 'Entrar',
             drawerItemStyle: { display: !isAuthenticated ? 'flex' : 'none' },
             drawerIcon: ({ focused, size }) => (
@@ -58,7 +73,6 @@ export default function DrawerLayout() {
         <Drawer.Screen
           name="signup"
           options={{
-            title: 'Shop Flow',
             drawerLabel: 'Criar conta',
             drawerItemStyle: { display: !isAuthenticated ? 'flex' : 'none' },
             drawerIcon: ({ focused, size }) => (
