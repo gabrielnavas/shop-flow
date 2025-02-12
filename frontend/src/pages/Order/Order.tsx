@@ -22,7 +22,7 @@ import { LiaCalendarCheck } from "react-icons/lia"
 
 const socketEventNames = {
   updateOrderStatusName: 'updateOrderStatusName',
-   authorizate: 'authorizate'
+  authorizate: 'authorizate'
 };
 
 export const OrderPage = () => {
@@ -141,44 +141,49 @@ export const OrderPage = () => {
                 </ErrorList>
               )}
               <Header>
-                <Status>
-                  <GrStatusInfo />
-                  {isAdmin ? (
-                    <SelectOrderStatusName
-                      $error={false}
-                      onChange={e => selectOrderStatusNameOnChange(
-                        order.id,
-                        e.target.value as OrderStatusName
-                      )}
-                      value={order.orderStatusName}>
-                      {Object.values(OrderStatusName).map((orderStatusName, index) => (
-                        <SelectOption
-                          key={index}
-                          value={orderStatusName}>
-                          {OrderService.translate(orderStatusName)}
-                        </SelectOption>
-                      ))}
-                    </SelectOrderStatusName>
-                  ) : (
-                    OrderService.translate(order.orderStatusName)
+                <HeaderTop>
+                  <UserOwn>
+                    <BiUser />
+                    Feito por{' '}
+                    {order.user.name}
+                  </UserOwn>
+                </HeaderTop>
+                <HeaderBottom>
+                  <Status>
+                    <GrStatusInfo />
+                    {isAdmin ? (
+                      <SelectOrderStatusName
+                        $error={false}
+                        onChange={e => selectOrderStatusNameOnChange(
+                          order.id,
+                          e.target.value as OrderStatusName
+                        )}
+                        value={order.orderStatusName}>
+                        {Object.values(OrderStatusName).map((orderStatusName, index) => (
+                          <SelectOption
+                            key={index}
+                            value={orderStatusName}>
+                            {OrderService.translate(orderStatusName)}
+                          </SelectOption>
+                        ))}
+                      </SelectOrderStatusName>
+                    ) : (
+                      OrderService.translate(order.orderStatusName)
+                    )}
+                  </Status>
+                  <SeparatorVertical />
+                  <CreatedAt>
+                    <LiaCalendarCheck />
+                    <span>Pedido feito {distanceFrom(order.createdAt)}</span>
+                  </CreatedAt>
+                  {order.updatedAt && (
+                    <UpdatedAt>
+                      <MdDateRange />
+                      <span>Pedido atualizado {distanceFrom(order.updatedAt)}</span>
+                    </UpdatedAt>
                   )}
-                </Status>
-                <SeparatorVertical />
-                <CreatedAt>
-                  <LiaCalendarCheck />
-                  <span>Pedido feito {distanceFrom(order.createdAt)}</span>
-                </CreatedAt>
-                {order.updatedAt && (
-                  <UpdatedAt>
-                    <MdDateRange />
-                    <span>Pedido atualizado {distanceFrom(order.updatedAt)}</span>
-                  </UpdatedAt>
-                )}
-                <SeparatorVertical />
-                <UserOwn>
-                  <BiUser />
-                  {order.user.name}
-                </UserOwn>
+                  <SeparatorVertical />
+                </HeaderBottom>
               </Header>
               <OrderItems>
                 {order.orderItems.map((orderItem, index) => (
@@ -234,7 +239,7 @@ const OrderItems = styled.ul`
 
 const Header = styled.header`
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: ${props => props.theme.spacing.md};
   padding: calc(${props => props.theme.spacing.xs} * 1.8) ${props => props.theme.spacing.xs};
 `
@@ -300,4 +305,14 @@ const SeparatorVertical = styled.div`
   height: 100%;
   width: 1.2px;
   background-color: ${props => props.theme.colors.textSecondary};
+`
+
+const HeaderTop = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const HeaderBottom = styled.div`
+  display: flex;
+  gap: ${props => props.theme.spacing.sm}
 `
