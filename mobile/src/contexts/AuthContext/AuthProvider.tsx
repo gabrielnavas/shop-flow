@@ -28,10 +28,6 @@ export const AuthProvider = ({ children }: Props) => {
   const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
   const [permissionRoles, setPermissionRoles] = React.useState<PermissionRole[]>([])
 
-  React.useEffect(() => {
-    console.log("isAuthenticated:", isAuthenticated)
-  }, [isAuthenticated])
-
   React.useLayoutEffect(() => {
     async function setStatesFromAsyncStorage() {
       const accessToken = await AsyncStorage.getItem(asyncStorageKey.accessToken)

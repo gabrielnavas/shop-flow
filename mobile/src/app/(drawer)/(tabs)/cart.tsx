@@ -85,7 +85,7 @@ export default function CartScreen() {
           renderItem={({ item }) => <CartItemCard cartItem={item} disabled={isLoading} />}
           ItemSeparatorComponent={() => <View style={{ height: theme.spacing.lg }}></View>}
           ListHeaderComponent={() => <View style={{ height: theme.spacing.lg }}></View>}
-          ListEmptyComponent={() => !!globalError && (
+          ListEmptyComponent={() => !globalError && (
             <View style={[styles.listEmptyContainer, {
               paddingVertical: theme.spacing.lg * 2,
               gap: theme.spacing.md,
