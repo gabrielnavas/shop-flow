@@ -2,7 +2,9 @@ import React from "react"
 import { StyleSheet, Text, View } from "react-native"
 
 import { Controller, useForm } from 'react-hook-form'
+
 import { router } from "expo-router"
+import { useLocalSearchParams } from 'expo-router'
 
 import { useTheme } from "@/src/hooks/useTheme"
 import { Input } from "@/src/components/ui/Input"
@@ -15,58 +17,63 @@ import { ErrorItem } from "@/src/components/ui/ErrorItem"
 import { ErrorList } from "@/src/components/ui/ErrorList"
 
 import LoadingIcon from "@/src/components/ui/LoadingIcon"
+import { MessageList } from "@/src/components/ui/MessageList"
+import { MessageItem } from "@/src/components/ui/MessageItem"
+
 import { useAuth } from "@/src/hooks/useAuth"
 
 
 type Inputs = {
-  fullname: string
   email: string
   password: string
-  passwordConfirmation: string
 }
 
-export default function SignUpScreen() {
+export default function SignInScreen() {
   const { theme } = useTheme()
 
+  const { message } = useLocalSearchParams<{ message: string }>()
+
+  const [globalMessage, setGlobalMessage] = React.useState<string>()
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState(false)
 
-  const { isAuthenticated } = useAuth()
+  const { signin } = useAuth()
 
   const {
     handleSubmit,
     control,
-    watch,
+    reset,
     formState: { errors },
   } = useForm<Inputs>()
 
   React.useEffect(() => {
-    function goToHomeIfAuthenticated() {
-      if (isAuthenticated === true) {
-        router.replace('/(drawer)/(tabs)/products')
-      }
+    function setGlobalMessageFromOtherScreen() {
+      setGlobalMessage(message)
     }
-    goToHomeIfAuthenticated()
+    setGlobalMessageFromOtherScreen()
   }, [])
 
+  React.useEffect(() => {
+    if (!!globalError) {
+      setGlobalMessage('')
+    }
+    if (!!globalMessage) {
+      setGlobalError('')
+    }
+  }, [globalError, globalMessage])
+
   const onSubmitOnClick = React.useCallback(async ({ email,
-    fullname,
     password,
-    passwordConfirmation
   }: Inputs) => {
     try {
       setIsLoading(true)
       const authService = new AuthService()
-      await authService.signup({
+      const { accessToken } = await authService.signin({
         email,
-        fullname,
         password,
-        passwordConfirmation
       })
-      router.replace({
-        pathname: '/signin',
-        params: { message: 'Entre com sua nova conta' }
-      })
+      await signin(accessToken)
+      router.replace('/(drawer)/(tabs)/products')
     } catch (err) {
       if (err instanceof Error) {
         setGlobalError(err.message)
@@ -78,10 +85,8 @@ export default function SignUpScreen() {
     }
   }, [])
 
-  const goToSignInOnPress = React.useCallback(() => {
-    router.replace({
-      pathname: '/signin',
-    })
+  const goToSignUpOnPress = React.useCallback(() => {
+    router.replace('/signup')
   }, [])
 
   return (
@@ -89,39 +94,16 @@ export default function SignUpScreen() {
       styles.container, {
         backgroundColor: theme.colors.cardBackground,
       }]}>
+      {!!globalMessage && (
+        <MessageList>
+          <MessageItem>{globalMessage}</MessageItem>
+        </MessageList>
+      )}
       <View style={styles.titleContainer}>
         <Title />
         <Subtitle />
       </View>
       <View style={styles.form}>
-        <FormGroup>
-          <Label>Nome completo</Label>
-          <Controller
-            control={control}
-            name="fullname"
-            rules={{
-              required: {
-                message: 'Esse Campo é requerido.',
-                value: true,
-              },
-              maxLength: {
-                message: 'Nome máximo de 100 caracteres.',
-                value: 100,
-              },
-            }}
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-              <Input
-                autoFocus={true}
-                placeholder="John Woe"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={!!error}
-              />
-            )}
-          />
-          {errors.fullname && <ErrorItem>{errors.fullname.message}</ErrorItem>}
-        </FormGroup>
         <FormGroup>
           <Label>E-mail</Label>
           <Controller
@@ -136,6 +118,7 @@ export default function SignUpScreen() {
             }}
             render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
               <Input
+                autoFocus={true}
                 keyboardType='email-address'
                 placeholder="john@email.com"
                 value={value}
@@ -156,12 +139,6 @@ export default function SignUpScreen() {
               required: {
                 message: 'Esse Campo é requerido.',
                 value: true
-              },
-              validate: (value) => {
-                if (value === watch('passwordConfirmation')) {
-                  return true
-                }
-                return 'Senha está diferente da confirmação de senha.'
               },
               minLength: {
                 message: 'Senha deve ter no mínimo 6 caracteres',
@@ -185,45 +162,7 @@ export default function SignUpScreen() {
           />
           {errors.password && <ErrorItem>{errors.password.message}</ErrorItem>}
         </FormGroup>
-        <FormGroup>
-          <Label>Confirmação de senha</Label>
-          <Controller
-            control={control}
-            name="passwordConfirmation"
-            rules={{
-              required: {
-                message: 'Esse Campo é requerido.',
-                value: true
-              },
-              validate: (value) => {
-                if (value === watch('password')) {
-                  return true
-                }
-                return 'Confirmação de senha está diferente da senha.'
-              },
-              minLength: {
-                message: 'Confirmação de senha deve ter no mínimo 6 caracteres',
-                value: 6,
-              },
-              maxLength: {
-                message: 'Confirmação de senha deve ter no máximo 100 caracteres',
-                value: 100,
-              },
-            }}
-            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => (
-              <Input
-                secureTextEntry={true}
-                placeholder="********"
-                value={value}
-                onChangeText={onChange}
-                onBlur={onBlur}
-                error={!!error}
-              />
-            )}
-          />
-          {errors.passwordConfirmation && <ErrorItem>{errors.passwordConfirmation.message}</ErrorItem>}
-        </FormGroup>
-        {globalError && (
+        {!!globalError && (
           <ErrorList>
             <ErrorItem>{globalError}</ErrorItem>
           </ErrorList>
@@ -233,13 +172,15 @@ export default function SignUpScreen() {
           marginVertical: 20,
         }}>
           <Button
-            title="Criar conta"
+            style={styles.buttons}
+            title="Entrar"
             onPress={handleSubmit(onSubmitOnClick)}
             icon={isLoading && <LoadingIcon />} />
           <Button
+            style={styles.buttons}
             variant="outlined"
-            title="Já tenho uma conta"
-            onPress={() => goToSignInOnPress()} />
+            title="Criar uma conta"
+            onPress={() => goToSignUpOnPress()} />
         </FormGroup>
       </View>
     </View>
@@ -253,7 +194,7 @@ const Title = () => {
       fontSize: theme.fontSizes.extraLarge,
       fontWeight: 'bold'
     }}>
-      Criar conta
+      Entre com sua conta
     </Text>
   )
 }
@@ -265,7 +206,7 @@ const Subtitle = () => {
       fontSize: theme.fontSizes.small,
       fontWeight: '400'
     }}>
-      Crie uma conta para continuar
+      Entre com as credenciais da sua conta
     </Text>
   )
 }
@@ -283,5 +224,9 @@ const styles = StyleSheet.create({
   form: {
     alignItems: 'center',
     gap: 10,
+  },
+  buttons: {
+    paddingHorizontal: 40,
+    paddingVertical: 12,
   }
 })

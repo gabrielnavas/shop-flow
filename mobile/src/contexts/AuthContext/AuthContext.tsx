@@ -3,8 +3,8 @@ import React from "react";
 export type AuthContextType = {
   accessToken: string
   permissionRoles: PermissionRole[]
-  signin: (accessToken: string) => void
-  signout: () => void
+  signin: (accessToken: string) => Promise<void>
+  signout: () => Promise<void>
   isAuthenticated: boolean
 }
 

@@ -17,7 +17,7 @@ export const ErrorList = ({ children, style, ...rest }: Props) => {
       borderColor: theme.colors.error,
       borderRadius: theme.borderRadius.default,
       borderWidth: 1,
-      width: Dimensions.get('screen').width * .75,
+      width: '100%',
       padding: 20,
     }, style]} {...rest}>
       {children}

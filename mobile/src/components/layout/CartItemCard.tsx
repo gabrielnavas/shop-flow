@@ -15,13 +15,16 @@ import { CartService } from "@/src/services/cart-service"
 import { useAuth } from "@/src/hooks/useAuth"
 import { ErrorList } from "../ui/ErrorList"
 import { ErrorItem } from "../ui/ErrorItem"
+import { OrderService } from "@/src/services/order-service"
+import LoadingIcon from "../ui/LoadingIcon"
 
 
 type Props = {
   cartItem: CartItem
+  disabled: boolean
 }
 
-export const CartItemCard = ({ cartItem }: Props) => {
+export const CartItemCard = ({ cartItem, disabled }: Props) => {
   const { theme } = useTheme()
   const { accessToken } = useAuth()
 
@@ -29,6 +32,8 @@ export const CartItemCard = ({ cartItem }: Props) => {
   const [showActionsModal, setShowActionsModal] = React.useState<boolean>(false);
   const [globalError, setGlobalError] = React.useState<string>('')
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+
+  const buttonDisabled = isLoading || disabled
 
   const {
     incrementQuantityItem,
@@ -54,7 +59,6 @@ export const CartItemCard = ({ cartItem }: Props) => {
     }
   }, [])
 
-
   const decrementQuantityItemOnPress = React.useCallback(async (productId: number) => {
     try {
       setIsLoading(true)
@@ -72,7 +76,6 @@ export const CartItemCard = ({ cartItem }: Props) => {
       setIsLoading(false)
     }
   }, [])
-
 
   const removeItemOnPress = React.useCallback(async (productId: number) => {
     try {
@@ -113,23 +116,27 @@ export const CartItemCard = ({ cartItem }: Props) => {
           gap: theme.spacing.xs,
           padding: theme.spacing.sm,
         }]}>
-          <Text style={[styles.productName, {
-            fontSize: theme.fontSizes.medium
-          }]}>
-            {cartItem.product.name}
-          </Text>
-          <Text style={styles.cartItemUnitTotalPrice}>
-            {transformToMoney((cartItem.quantity * cartItem.product.price).toFixed(2))}
-          </Text>
-          <Text style={[styles.cartItemCreated, {
-            fontSize: theme.fontSizes.small
-          }]}>
-            {'Adicionado'} {distanceFrom(cartItem.createdAt)}
-          </Text>
+          <View style={styles.productNameAndPriceContainer}>
+            <Text style={[styles.productName, {
+              fontSize: theme.fontSizes.medium
+            }]}>
+              {cartItem.product.name}
+            </Text>
+            <Text style={styles.cartItemUnitTotalPrice}>
+              {transformToMoney((cartItem.quantity * cartItem.product.price).toFixed(2))}
+            </Text>
+          </View>
+          <View>
+            <Text style={[styles.cartItemCreated, {
+              fontSize: theme.fontSizes.small
+            }]}>
+              {'Adicionado no carrinho'} {distanceFrom(cartItem.createdAt)}
+            </Text>
+          </View>
         </View>
         <View style={styles.right}>
           <Button
-            disabled={isLoading}
+            disabled={buttonDisabled}
             variant="primary"
             icon={<FeatherIcon name='plus' size={theme.fontSizes.medium} color={theme.colors.icon} />}
             style={[styles.quantityButton]}
@@ -142,7 +149,7 @@ export const CartItemCard = ({ cartItem }: Props) => {
             }]}
             value={cartItem.quantity.toString()} />
           <Button
-            disabled={isLoading}
+            disabled={buttonDisabled}
             variant="primary"
             icon={<FeatherIcon name='minus' size={theme.fontSizes.medium} color={theme.colors.icon} />}
             style={[styles.quantityButton]}
@@ -150,7 +157,7 @@ export const CartItemCard = ({ cartItem }: Props) => {
         </View>
       </View>
       {!!globalError && (
-        <ErrorList style={styles.globalError}>
+        <ErrorList>
           <ErrorItem>
             {globalError}
           </ErrorItem>
@@ -162,10 +169,15 @@ export const CartItemCard = ({ cartItem }: Props) => {
         {showActionsModal ? (
           <>
             <Button
-              disabled={isLoading}
+              disabled={buttonDisabled}
               variant="primary"
               title="Confirmar"
-              icon={<FontAwesomeIcon name='trash-o' size={theme.fontSizes.large} color={theme.colors.icon} />}
+              icon={
+                buttonDisabled ? (
+                  <LoadingIcon color={theme.colors.darkIcon} />
+                ) : (
+                  <FontAwesomeIcon name='trash-o' size={theme.fontSizes.large} color={theme.colors.icon} />
+                )}
               style={[styles.removeButton, {
                 paddingVertical: theme.spacing.lg,
                 flexDirection: 'row',
@@ -173,10 +185,15 @@ export const CartItemCard = ({ cartItem }: Props) => {
               }]}
               onPress={() => removeItemOnPress(cartItem.product.id)} />
             <Button
-              disabled={isLoading}
+              disabled={buttonDisabled}
               variant="cancel"
               title="Cancelar"
-              icon={<FontAwesomeIcon name='close' size={theme.fontSizes.large} color={theme.colors.icon} />}
+              icon={
+                buttonDisabled ? (
+                  <LoadingIcon color={theme.colors.darkIcon} />
+                ) : (
+                  <FontAwesomeIcon name='close' size={theme.fontSizes.large} color={theme.colors.icon} />
+                )}
               style={[styles.removeButton, {
                 paddingVertical: theme.spacing.lg,
                 flexDirection: 'row',
@@ -186,10 +203,16 @@ export const CartItemCard = ({ cartItem }: Props) => {
           </>
         ) : (
           <Button
-            disabled={isLoading}
+            disabled={buttonDisabled}
             variant="error"
             title="Remover"
-            icon={<FontAwesomeIcon name='trash-o' size={theme.fontSizes.large} color={theme.colors.icon} />}
+            icon={
+              buttonDisabled ? (
+                <LoadingIcon color={theme.colors.darkIcon} />
+              ) : (
+                <FontAwesomeIcon name='trash-o' size={theme.fontSizes.large} color={theme.colors.icon} />
+              )
+            }
             style={[styles.removeButton, {
               paddingVertical: theme.spacing.md,
               flexDirection: 'row',
@@ -228,11 +251,14 @@ const styles = StyleSheet.create({
     width: 115,
     height: 115,
   },
+  productNameAndPriceContainer: {
+    flex: 1,
+  },
   productName: {
     fontWeight: 'bold',
   },
   cartItemCreated: {
-    fontWeight: '400',
+    fontWeight: '300',
     fontStyle: 'italic',
   },
   cartItemUnitTotalPrice: {
@@ -250,7 +276,4 @@ const styles = StyleSheet.create({
   },
   cartActionContainer: {
   },
-  globalError: {
-    width: '100%',
-  }
 })

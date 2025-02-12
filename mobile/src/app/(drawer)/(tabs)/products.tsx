@@ -16,6 +16,12 @@ export default function ProductScreen() {
   const [globalError, setGlobalError] = React.useState<string>('')
 
   React.useEffect(() => {
+    return () => {
+      setGlobalError('')
+    }
+  })
+
+  React.useEffect(() => {
     async function fetchProducts() {
       try {
         setIsLoading(true)

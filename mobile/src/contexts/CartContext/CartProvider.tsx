@@ -15,7 +15,7 @@ const asyncStorageKeys = {
 export const CartProvider = ({ children }: Props) => {
   const [cartItems, setCartItems] = React.useState<CartItem[]>([])
   // const [totalPrice, setTotalPrice] = React.useState<number>(0.00)
-  const { accessToken, isAuthenticated } = React.useContext(AuthContext) as AuthContextType
+
 
   useEffect(() => {
     async function fetchLocalCartItems() {
@@ -25,7 +25,7 @@ export const CartProvider = ({ children }: Props) => {
       }
     }
     fetchLocalCartItems()
-  }, [accessToken, isAuthenticated,])
+  }, [])
 
   // React.useEffect(() => {
   //   const totalPrice = cartItems.reduce((acc, item) => acc + item.quantity * item.product.price, 0)

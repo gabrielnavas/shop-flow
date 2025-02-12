@@ -4,4 +4,4 @@ export default function IndexApp() {
   return (
     <Redirect href='/(drawer)/(tabs)/products' />
   )
-}
+} 

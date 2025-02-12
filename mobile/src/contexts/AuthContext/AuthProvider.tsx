@@ -4,6 +4,7 @@ import { AuthContext, PermissionRole } from "./AuthContext"
 import { jwtDecode } from 'jwt-decode'
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from "expo-router";
 
 const asyncStorageKey = {
   accessToken: 'access-token',
@@ -24,13 +25,19 @@ type Props = {
 
 export const AuthProvider = ({ children }: Props) => {
   const [accessToken, setAccessToken] = React.useState<string>('')
+  const [isAuthenticated, setIsAuthenticated] = React.useState<boolean>(false)
   const [permissionRoles, setPermissionRoles] = React.useState<PermissionRole[]>([])
 
   React.useEffect(() => {
-    async function setStatesFromLocalStorage() {
+    console.log("isAuthenticated:", isAuthenticated)
+  }, [isAuthenticated])
+
+  React.useLayoutEffect(() => {
+    async function setStatesFromAsyncStorage() {
       const accessToken = await AsyncStorage.getItem(asyncStorageKey.accessToken)
       if (accessToken) {
         setAccessToken(accessToken)
+        setIsAuthenticated(true)
       }
 
       const permissionRoles = JSON.parse(await AsyncStorage.getItem(asyncStorageKey.permissionRoles) || '[]') as PermissionRole[]
@@ -38,27 +45,33 @@ export const AuthProvider = ({ children }: Props) => {
         setPermissionRoles(permissionRoles)
       }
     }
-    setStatesFromLocalStorage()
+    setStatesFromAsyncStorage()
   }, [])
 
-  const signin = async (accessToken: string) => {
-    setAccessToken(accessToken)
-    await AsyncStorage.setItem(asyncStorageKey.accessToken, accessToken)
-
+  const signin = React.useCallback(async (accessToken: string) => {
     const token = jwtDecode(accessToken) as Token | null
     if (!token) {
       throw new Error('Você não tem permissão para isso')
     }
 
-    setPermissionRoles(token.roles)
+    await AsyncStorage.setItem(asyncStorageKey.accessToken, accessToken)
     await AsyncStorage.setItem(asyncStorageKey.permissionRoles, JSON.stringify(token.roles))
-  }
 
-  const signout = async () => {
-    setAccessToken('')
-    setPermissionRoles([])
-    await AsyncStorage.clear()
-  }
+    setPermissionRoles(token.roles)
+    setAccessToken(accessToken)
+    setIsAuthenticated(true)
+  }, [])
+
+  const signout = React.useCallback(async () => {
+    try {
+      await AsyncStorage.clear()
+      setPermissionRoles([])
+      setAccessToken('')
+      setIsAuthenticated(false)
+    } catch (err) {
+      console.log(err);
+    }
+  }, [])
 
   return (
     <AuthContext.Provider value={{
@@ -66,7 +79,7 @@ export const AuthProvider = ({ children }: Props) => {
       permissionRoles,
       signin,
       signout,
-      isAuthenticated: !!accessToken,
+      isAuthenticated,
     }}>
       {children}
     </AuthContext.Provider>

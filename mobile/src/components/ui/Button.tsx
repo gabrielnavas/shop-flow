@@ -34,6 +34,10 @@ export const Button = ({ icon, disabled, style, styleText, title, variant = "pri
       borderColor: theme.colors.borderColor,
       borderWidth: 1
     }
+    themeVarientText = {
+      ...themeVarientText,
+      color: theme.colors.textPrimary,
+    }
   }
 
   if (variant === 'error') {
@@ -52,6 +56,14 @@ export const Button = ({ icon, disabled, style, styleText, title, variant = "pri
     themeVarientText = {
       ...themeVarientText,
       fontWeight: 'bold',
+    }
+  }
+
+  if(icon && title) {
+    themeVarientContainer = {
+      ...themeVarientContainer,
+      flexDirection: 'row',
+      gap: theme.spacing.md,
     }
   }
 

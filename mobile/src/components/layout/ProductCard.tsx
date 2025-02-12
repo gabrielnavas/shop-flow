@@ -4,6 +4,12 @@ import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityI
 import { Product } from "@/src/services/entities"
 import React from "react"
 import { useTheme } from "@/src/hooks/useTheme"
+import { useCart } from "@/src/hooks/useCart"
+import { CartService } from "@/src/services/cart-service"
+import { useAuth } from "@/src/hooks/useAuth"
+import LoadingIcon from "../ui/LoadingIcon"
+import { ErrorList } from "../ui/ErrorList"
+import { ErrorItem } from "../ui/ErrorItem"
 
 type Props = {
   product: Product
@@ -13,6 +19,39 @@ export const ProductCard = ({ product }: Props) => {
 
   const [imageUrl, setImageUrl] = React.useState(product.imageUrl)
   const { theme } = useTheme()
+
+  const { accessToken, isAuthenticated } = useAuth()
+  const { addItemCart } = useCart()
+
+  const [globalError, setGlobalError] = React.useState('')
+  const [isLoading, setIsLoading] = React.useState(false)
+
+  const addItemCartOnPress = React.useCallback(async (product: Product) => {
+    try {
+      setIsLoading(true)
+      const quantity = 1
+
+      const newItemCart = {
+        product,
+        quantity,
+        createdAt: new Date()
+      }
+      addItemCart(newItemCart)
+
+      if (isAuthenticated) {
+        const cartService = new CartService(accessToken)
+        await cartService.addProductToCart(product, quantity)
+      }
+    } catch (err) {
+      if (err instanceof Error) {
+        setGlobalError(err.message)
+      } else {
+        setGlobalError('Tente novamente mais tarde.')
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -49,13 +88,27 @@ export const ProductCard = ({ product }: Props) => {
           }]}>
             {product.price}
           </Text>
+          {globalError && (
+            <ErrorList>
+              <ErrorItem>
+                {globalError}
+              </ErrorItem>
+            </ErrorList>
+          )}
           <View style={styles.buttonContainer}>
-            <Button icon={
-              <MaterialCommunityIcons
-                size={theme.fontSizes.extraLarge}
-                name="cart-plus"
-                color={theme.colors.icon} />
-            } />
+            <Button
+              onPress={() => addItemCartOnPress(product)}
+              disabled={isLoading}
+              icon={
+                isLoading ? (
+                  <LoadingIcon color={theme.colors.darkIcon} />
+                ) : (
+                  <MaterialCommunityIcons
+                    size={theme.fontSizes.extraLarge}
+                    name="cart-plus"
+                    color={theme.colors.icon} />
+                )}
+            />
           </View>
         </View>
       </View>
